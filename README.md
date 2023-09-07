@@ -1,13 +1,14 @@
 # Kagi Small Web
 
-Kagi's mission is to humanize the web and this open source project is built to help surface recent (7 day old or newer) results from the small web (and "small
-youtube"!) - people and stories that typically zip by in legacy search engines. 
+Kagi's mission is to humanize the web and this project is built to help surface recent (7 day old or newer) results from the small web - people and stories that typically zip by in legacy search engines. Read more about it in the announcement [blog post](https://blog.kagi.com/small-web).
 
-[Kagi search engine](https://kagi.com) will directly surface posts from the small web for relevant queries. 
+Few things to note:
 
-Try the [Kagi Small Web](https://kagi.com/smallweb) website to read and appreciate the posts directly.
+- [Kagi search engine](https://kagi.com) now surfaces posts from the small web for relevant queries in its search results. 
 
-You can also use the [RSS feed](https://kagi.com/api/v1/smallweb/feed) or access these results as a part of broader [Kagi News Enrichment API](https://help.kagi.com/kagi/api/enrich.html). 
+- Try the [Kagi Small Web](https://kagi.com/smallweb) website to read and appreciate the posts directly.
+
+- You can also use the [RSS feed](https://kagi.com/api/v1/smallweb/feed) or access these results as a part of a broader [Kagi News Enrichment API](https://help.kagi.com/kagi/api/enrich.html). 
 
 ## Criteria for posts to show on the KSW website
 
