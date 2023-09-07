@@ -1,0 +1,292 @@
+@font-face {
+  font-family: 'pixel';
+  src: url('vt323-regular-webfont.woff2');
+}
+
+body {
+ margin:0
+}
+
+
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #2c3e50;
+  padding: 5px;
+  z-index: 100;
+  color: #ecf0f1;
+  font-family: pixel, Arial, sans-serif;
+  font-size: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+}
+
+#controls {
+  display: flex;
+  align-items: center;
+}
+
+#header button, .ok-button {
+  background-color: #3498db;
+  border: none;
+  padding: 8px !important;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+  margin-right: 10px;
+  font-size:22px;
+  font-family:pixel,Arial;
+  min-width: 100px;
+}
+
+
+#header button:hover {
+  background-color: #2980b9;
+}
+
+#header #url-display, #header #url-display-phone {
+  font-size: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width:30vw;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 5px 10px;
+  min-width:300px;
+}
+
+#header #url-display-phone {
+  display:none;
+  min-width:10px;
+}
+
+#header a {
+  color: white;
+  text-decoration: none;
+}
+
+#header .middle a, #header .right a {
+  padding: 0 10px;
+}
+
+.middle {
+  flex: 1;
+  text-align: center;
+}
+
+.right {
+  flex: 1;
+  text-align: right;
+  max-width:310px;
+}
+
+#content {
+  padding-top: 60px;
+  height: calc(100vh - 60px);
+}
+
+#content iframe { 
+  border: none;
+  width:100%;
+  height:100%;
+}
+
+#content-yt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 58px);
+}
+
+#content-yt iframe {
+  border: none;
+}
+
+.popup-container {
+  display: inline-block;
+  position: relative;
+  padding: 0 10px;
+}
+
+.popup {
+  display: none;
+  position: absolute;
+  left: 0;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 15px;
+  border: 1px solid #000;
+  z-index: 1000;
+  width: 420px;
+  overflow-y: auto;
+  max-height: 80vh;
+  line-height: 1em;
+}
+
+.popup-radio {
+  display: none;
+}
+
+.popup-radio:checked + .popup {
+  display: block;
+}
+
+.close-popup-button {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  color:red;
+  cursor: pointer;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+
+.note-textarea {
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  height: 7em;
+  font-size: 1em;
+}
+
+.popup-link {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+
+.note {
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.note-time {
+  color: #95a5a6;
+}
+
+.alternate {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.button.ok-button,
+.button.cancel-button {
+  width: 100px;
+  cursor: pointer;
+
+}
+
+.button.cancel-button {
+  background-color: indianred;
+  padding: 8px;
+  border-radius:5px;
+}
+
+.share-option {
+  display: block;
+  padding: 5px;
+  text-decoration: none;
+  color: #ecf0f1;
+  cursor: pointer;
+  text-weight : 700
+}
+
+.share-option:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  text-weight: 700;
+}
+
+.share-popup {
+  width: 256px;
+}
+
+
+.share-popup label.cancel-button {
+  display: block;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.right-popup-container {
+  text-align: left; /* Align left within the right section */
+}
+
+.right-popup {
+  right: 0; /* Align the popup to the right side */
+  left: -270px;
+  top: 41px;
+}
+
+#header .container-link {
+  vertical-align:unset;
+  padding:0 !important;
+  text-decoration:underline;
+}
+
+#author {
+  max-width: 220px;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+#logo {
+ padding-right: 30px;
+ width:53px;
+}
+
+
+
+svg {
+ vertical-align:middle;
+}
+
+@media (max-width: 1500px) {
+  #header #url-display-phone {
+    display: inline-block;
+  }
+
+  #header #url-display {
+    display: none;
+  }
+  
+}
+
+
+@media (max-width: 1200px) {
+  .right {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .middle {
+    display: none;
+  }
+ .right-popup {
+   right: 0; /* Align the popup to the right side */
+   left: -220px;
+ }
+}
+
+@media (max-width: 900px) {
+  #switch {
+    display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .popup {
+    width:360px;
+  }
+}
+
+

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tales from the Small Web - Kagi</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div id="header">
+    <div id="controls">
+      <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
+        <button>Next Post</button>
+      </a>
+      <div id="url-display">
+      {% if author and author != '' and author !=" " %}
+        <span id="author" title="author">{{author}}</span> @ 
+      {% endif %}
+
+      <a href="{{url}}">{{short_url}}</a>
+
+      </div>
+      <div id="url-display-phone">
+        <a class="phone" href="{{url}}">{{domain}}</a>
+
+      </div>
+      
+    </div>
+    <div class="middle">
+      <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
+      <a href="{{ prefix }}favorite?url={{ url }}{{ '&' if request.query_string else '' }}{{ request.query_string.decode()|safe }}"
+      class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</a>
+      <!-- Note Popup -->
+      <div class="popup-container">
+        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Leave a note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
+        <input type="radio" id="note-popup" name="popup" class="popup-radio">
+        <div class="popup">
+          {% for note, timestamp in notes_list %}
+            <div class="note {% if loop.index % 2 == 0 %}alternate{% endif %}">
+              <span class="note-time">({{ timestamp|time_ago }})</span> {{ note }}
+            </div>
+          {% endfor %}
+          <form action="{{ prefix }}note" method="get">
+            <p style="text-align:left">Got thoughts on this post? Share them in a public note.</p>
+            <textarea name="note_content" class="note-textarea"></textarea>
+            <input type="hidden" name="url" value="{{ url }}" />
+            <button type="submit" class="button ok-button">Submit</button>
+            <label for="close-popup" class="button cancel-button">Cancel</label>
+          </form>
+        </div>
+      </div>
+      <!-- Share Popup -->
+      <div class="popup-container">
+        <label for="share-popup" class="popup-link">Share</label>
+        <input type="radio" id="share-popup" name="popup" class="popup-radio">
+        <div class="popup share-popup">
+          <p>Share with the rest of the world.</p>
+          <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option"
+          "target=_blank" >Hacker News</a>
+          <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option"
+          target="_blank">Reddit</a>
+          <a href="https://lemmy.world/create_post?url={{url}}&title={{title}}" class="share-option"
+          target="_blank">Lemmy</a>
+          <a href="https://twitter.com/share?url={{url}}&text={{title}}" class="share-option"
+          target="_blank">Twitter</a>
+          <a href="https://mastodon.social/share?text={{ (title + '\n\n' + url)|urlencode }}" class="share-option" target="_blank">Mastodon</a>
+          <a href="https://lobste.rs/stories/new?url={{url}}&title={{title}}" class="share-option" target="_blank">Lobsters</a>
+          <a href="https://cohost.org"  class="share-option"  target="_blank">Cohost</a>
+          <a href="mailto:?subject={{title}}&body=Check%20out%20this%20link:%20{{url}}" class="share-option"
+          target="_blank">Email</a>
+          {% if is_youtube %} 
+            <a href="{{ prefix }}{{ query_string }}&url={{url}}" class="share-option"           target="_blank">Link here</a> 
+         {% else %}
+            <a href="{{ prefix }}{{ query_string }}?url={{url}}" class="share-option"          target="_blank">Link here</a>
+         {% endif %}
+
+
+          <label for="close-popup" class="sbutton cancel-button">Cancel</label>
+        </div>
+      </div>
+      {% if is_youtube %} 
+        <a id="switch" href="{{ prefix }}">Small Web</a>
+      {% else %}
+        <a id="switch" href="{{ prefix }}?yt">Small YouTube</a>
+      {% endif %}      
+    </div>
+    <div class="right">
+      {% if is_youtube %} 
+      <div class="popup-container right-popup-container">
+          <label for="report-popup" class="popup-link">Report</label>
+          <input type="radio" id="report-popup" name="popup" class="popup-radio">
+          <div class="popup right-popup">
+            <p>Need to report a YouTube channel? Here's when to hit that 'Report' button:</p>
+            <ul>
+              <li>If the channel's not in English, give us a heads-up.</li>
+              <li>Stumbled on low-quality content? Let us know.</li>
+              <li>If the channel seems more about making money than sharing
+              a passion or education, report it.</li>
+            </ul>
+            <p>When you click "Report," a new tab will open with our YouTube list. Just find the channel you're iffy about and take it off. And hey, jot down why you're reporting
+            it.</p>
+              <br/>
+
+              <a
+              href="https://github.com/kagisearch/smallweb/edit/main/smallyt.txt" class="button ok-button"
+              target="_blank">Report</a>
+              <label for="close-popup" class="button cancel-button">Cancel</label>
+          </div>
+        </div>
+
+        <div class="popup-container right-popup-container">
+          <label for="add-channel-popup" class="popup-link">Add channel</label>
+          <input type="radio" id="add-channel-popup" name="popup" class="popup-radio">
+          <div class="popup right-popup">
+            <p>Found a cool YouTube channel you want to add? Just a couple of things to keep in mind:</p>
+            <ul>
+              <li>It's about discovery, not self-promo. So, please don't add your own channel.</li>
+              <li>Grab the RSS feed from the channel and submit that.</li>
+              <li>We're an English-only zone for now.</li>
+              <li>We love channels about hobbies and personal interests.</li>
+              <li>Let's not overwhelm folks—channels that post no more than twice a week, please.</li>
+              <li>If the channel has more than 400,000 subscribers, it's too big for our little corner of the web.</li>
+            </ul>
+            <p>Once you hit "Add Channel," a new tab will pop up. Add the channel RSS feed to the end of the list there. We'll sort things out after a quick review.</p>
+            <br/>
+              <a href="https://github.com/kagisearch/smallweb/edit/main/smallyt.txt" class="button ok-button" target="_blank">Add
+              Channel</a>
+              <label for="close-popup" class="button cancel-button">Cancel</label>
+          </div>
+        </div>
+
+        <a href="https://kagifeedback.org">Feedback</a>
+        <a href="https://kagi.com/api/v1/smallweb/feed?yt">RSS</a>
+      {% else %}
+         <div class="popup-container right-popup-container">
+          <label for="report-popup" class="popup-link">Report</label>
+          <input type="radio" id="report-popup" name="popup" class="popup-radio">
+          <div class="popup right-popup">
+          <p>Got a site to report? Here's when you might want to:</p>
+          <ul>
+            <li>The site isn't in English.</li>
+            <li>You're finding the content a bit lackluster.</li>
+            <li>It's throwing ads or newsletter pop-ups at you.</li>
+            <li>The main goal of writing seems to be making money, not
+            informing or sharing knowledge.</li>
+          </ul>
+          <p>When you hit "Report," a new tab will open up with our small web list. Just find the site you're concerned about and take it off the list. Don't forget to jot down why you're
+          reporting. 
+          it.</p>
+          <br/>
+              <a
+              href="https://github.com/kagisearch/smallweb/edit/main/smallweb.txt" class="button ok-button"
+              target="_blank">Report</a>
+              <label for="close-popup" class="button cancel-button">Cancel</label>
+          </div>
+        </div>
+
+        <div class="popup-container right-popup-container">
+          <label for="add-site-popup" class="popup-link">Add site</label>
+          <input type="radio" id="add-site-popup" name="popup" class="popup-radio">
+          <div class="popup right-popup">
+          
+            <p>Want to add a new personal blog RSS feed? Here are some ground rules:</p>
+            <ul>
+              <li>Let's keep it about sharing, not self-promotion. So no adding your own site, okay?</li>
+              <li>Find and submit the site's RSS feed.</li>
+              <li>We're sticking to English for now—sorry, no other languages.</li>
+              <li>Only personal blogs, please. No companies or big publishers.</li>
+              <li>Make sure the blog has a post that's been published in the last 6 months. We like to keep things fresh!</li>
+              <li>No ads, pop-ups for newsletters, or any of that money-making stuff.</li>
+            </ul>
+            <p>Hit "Add Site," and a new tab will open where you can add the feed to the end of our list. We'll sort it out after we take a look.</p>
+            <br/>
+
+              <a
+              href="https://github.com/kagisearch/smallweb/edit/main/smallweb.txt" class="button ok-button" target="_blank">Add Site</a>
+              <label for="close-popup" class="button cancel-button">Cancel</label>
+          </div>
+        </div>
+        <a href="https://kagifeedback.org">Feedback</a>
+        <a href="https://kagi.com/api/v1/smallweb/feed/">RSS</a>
+      {% endif %}
+
+    </div>
+      <div style="padding-right:40px" class="popup-container right-popup-container about">
+          <label for="about-popup" class="popup-link">About</label>
+          <input type="radio" id="about-popup" name="popup" class="popup-radio">
+          <div class="popup right-popup">
+<label class="close-popup-button" for="close-popup">X</label>
+
+<p>Hey there, welcome to Kagi Small Web!</p>
+<p>Imagine the internet like a huge neighborhood. There's a lot of folks around, but we rarely bump into each other, right? Kagi's all about
+humanizing the web and we want to help surface the people behind the posts and stories that zip
+by. This less known corner of the web is also known as the "small web". Read
+more in our <a class="container-link" href="https://blog.kagi.com/small-web">blog post</a>.</p>
+<p>We want to amplify the voices of genuine humans on the web - see <a class="container-link"
+href="https://github.com/kagisearch/smallweb#small-web">our sources</a>
+or check if your blog is in the <a class="container-link" href="https://github.com/kagisearch/smallweb/blob/main/smallweb.txt">list</a>. You'll also
+encounter these pages now in <a class="container-link" href="https://kagi.com">Kagi search</a> when you're looking for something relevant.</p>
+<p>Hit 'Next Post' to read something new. We only show posts from the last
+seven days to keep it fresh. Feel like saying thanks or jotting down a thought? Use 'Appreciation' and 'Notes'. They'll be around for about a week, but hey, it's a way to say "hi" to someone else out here.
+</p>
+<p>Find a cool site or spot something sketchy? Use 'Report/Add Site' to help
+curate the feed. 
+</p>
+<p>
+And yep, this whole thing is <a class="container-link"
+href="https://github.com/kagisearch/smallweb">open-source</a>. Oh, and no JavaScript on our
+end.</p>
+<p>---</p>
+<p>So, what do you say? Ready to meet some neighbors? 
+<br/><br/></p>
+
+          </div>
+        </div>
+
+
+    <a href="https://kagi.com"><img id="logo" src="{{ url_for('static', filename='doggo_px.png') }}" alt="Kagi Doggo
+    mascot"/></a>
+  </div>
+  {% if is_youtube %}
+    <div id="content-yt">
+      <iframe width="840" height="472" src="https://www.youtube.com/embed/{{videoid}}" title="{{title}} video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+  {% else %}
+    <div id="content">
+      <iframe src="{{url}}"></iframe>
+    </div>
+  {% endif %}
+</body>
+</html>

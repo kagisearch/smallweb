@@ -1,0 +1,20 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push',  'us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}']
+  - name: google/cloud-sdk
+    args: [
+      'gcloud',
+      'run',
+      'deploy',
+      'smallweb',
+      '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}',
+      '--region', 'us-central1',
+      '--allow-unauthenticated',
+      '--set-env-vars', 'URL_PREFIX=/smallweb',
+      '--service-account', 'smallweb@${PROJECT_ID}.iam.gserviceaccount.com',
+      '--min-instances', '1'
+    ]
+images:
+  - us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}
