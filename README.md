@@ -64,6 +64,8 @@ Add a new YouTube channel RSS feed to the list. Rules:
 - The channel must not post more than twice a week.
 - The channel must have fewer than 400,000 subscribers.
 
+Hint: To extract the RSS link from a YouTube channel, you can use [this tool](https://youtube-rss-nu.vercel.app/).
+
 [Add YouTube channel RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
 
