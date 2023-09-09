@@ -45,7 +45,7 @@ app/ - App powering the Kagi Small Web website
 Add a new personal blog RSS feed to the list. Rules:
 
 - Do not submit your own website unless you submit 2 other sites that are not yours (and are not in list).
-- Locate and submit the RSS feed of the website.
+- Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - Only personal blogs may be submitted.
 - The blog must have a recent post, no older than 6 months, to meet the recency criteria for inclusion.
@@ -58,7 +58,7 @@ feed](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 Add a new YouTube channel RSS feed to the list. Rules:
 
 - Do not submit your own YouTube channel unless you submit 2 other channels that are not yours (and are not in list).
-- Locate and submit the RSS feed of the YouTube channel.
+- Locate and submit the RSS feed of the YouTube channel.  Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - Preference is given to channels focusing on hobbies or passions.
 - The channel must not post more than twice a week.
