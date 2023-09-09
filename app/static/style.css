@@ -82,7 +82,7 @@ body {
 .right {
   flex: 1;
   text-align: right;
-  max-width:310px;
+  max-width:340px;
 }
 
 #content {
