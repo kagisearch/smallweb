@@ -81,25 +81,29 @@ def parse_date(date_string):
 def update_entries(url):
     feed = feedparser.parse(url)
     entries = feed.entries
+    
+    if len(entries):
+        formatted_entries = []
+        for entry in entries:
+            domain = entry.link.split("//")[-1].split("/")[0]
+            domain = domain.replace("www.", "")
+            formatted_entries.append(
+                {
+                    "domain": domain,
+                    "title": entry.title,
+                    "link": entry.link,
+                    "author": entry.author,
+                }
+            )
 
-    formatted_entries = []
-    for entry in entries:
-        domain = entry.link.split("//")[-1].split("/")[0]
-        domain = domain.replace("www.", "")
-        formatted_entries.append(
-            {
-                "domain": domain,
-                "title": entry.title,
-                "link": entry.link,
-                "author": entry.author,
-            }
-        )
-
-    urls_cache = [
-        (entry["link"], entry["title"], entry["author"]) for entry in formatted_entries
-    ]
-    print(len(urls_cache), "entries")
-    return urls_cache
+        feed = [
+            (entry["link"], entry["title"], entry["author"]) for entry in formatted_entries
+        ]
+        print(len(feed), "entries")
+        return feed
+    else:
+        return False
+    
 
 
 def load_public_suffix_list(file_path):
