@@ -138,11 +138,12 @@ def index():
         cache = urls_cache
 
     if url is not None:
+        http_url = url.replace("https://", "http://")
         title, author = next(
             (
                 (url_tuple[1], url_tuple[2])
                 for url_tuple in cache
-                if url_tuple[0] == url
+                if url_tuple[0] == url or url_tuple[0] == http_url
             ),
             (None, None),
         )
