@@ -31,11 +31,11 @@ What is Small Web exactly? Recommend reading:
 
 ## Info
 
-[smallweb.txt](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt) - Contains the feeds of indexed blogs
+[smallweb.txt](https://github.com/kagisearch/smallweb/blob/main/smallweb.txt) - Contains the feeds of indexed blogs
 
-[smallyt.txt](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt) - Contains the feeds of indexed YouTube channels
+[smallyt.txt](https://github.com/kagisearch/smallweb/blob/main/smallyt.txt) - Contains the feeds of indexed YouTube channels
 
-[yt_rejected.txt](https://github.com/kagisearch/smallweb/edit/main/yt_rejected.txt) - Contains the list of YouTube channels that were reviewed (in an automated way) and rejected 
+[yt_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/yt_rejected.txt) - Contains the list of YouTube channels that were reviewed (in an automated way) and rejected 
 
 app/ - App powering the Kagi Small Web website
 
