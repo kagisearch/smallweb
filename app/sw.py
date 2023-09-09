@@ -152,7 +152,7 @@ def index():
         if len(cache):
             url, title, author = random.choice(cache)
         else:
-            url,title,author="https://blog.kagi.com/blog", "Nothing to see", "Feed not active, try later"
+            url,title,author="https://blog.kagi.com/small-web", "Nothing to see", "Feed not active, try later"
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
