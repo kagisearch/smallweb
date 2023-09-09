@@ -49,8 +49,8 @@ app.jinja_env.filters["time_ago"] = time_ago
 def update_all():
     global urls_cache, urls_yt_cache
 
-    #url = "http://127.0.0.1:4000"  # testing with local feed
-    url = "https://kagi.com/api/v1/smallweb/feed/"
+    url = "http://127.0.0.1:4000"  # testing with local feed
+    #url = "https://kagi.com/api/v1/smallweb/feed/"
     
     new_entries=update_entries(url + "?nso")  # no same origin sites feed
     
