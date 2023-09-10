@@ -82,7 +82,7 @@ body {
 .right {
   flex: 1;
   text-align: right;
-  max-width:310px;
+  max-width:340px;
 }
 
 #content {
@@ -202,15 +202,21 @@ body {
   text-weight: 700;
 }
 
-.share-popup {
+.spread-love {
   width: 256px;
 }
 
 
-.share-popup label.cancel-button {
+.spread-love label.cancel-button {
   display: block;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.rss-popup {
+ text-align:center;
+ left:-110px;
+ top: 41px;
 }
 
 .right-popup-container {

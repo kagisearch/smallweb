@@ -9,9 +9,11 @@ from flask import (
     jsonify,
     Markup,
     render_template,
-    make_response
+    make_response,
+    Response
 )
 import feedparser
+from dateutil.parser import parse
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import random
@@ -22,7 +24,7 @@ from datetime import datetime
 import os
 import time
 from urllib.parse import urlparse
-
+from feedwerk.atom import AtomFeed, FeedEntry
 
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
@@ -45,12 +47,17 @@ prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
 app.jinja_env.filters["time_ago"] = time_ago
 
+master_feed=False
 
 def update_all():
-    global urls_cache, urls_yt_cache
+    global urls_cache, urls_yt_cache, master_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
+    
+    check_feed = feedparser.parse(url)
+    if (check_feed):
+        master_feed=check_feed
     
     new_entries=update_entries(url + "?nso")  # no same origin sites feed
     
@@ -81,25 +88,29 @@ def parse_date(date_string):
 def update_entries(url):
     feed = feedparser.parse(url)
     entries = feed.entries
+    
+    if len(entries):
+        formatted_entries = []
+        for entry in entries:
+            domain = entry.link.split("//")[-1].split("/")[0]
+            domain = domain.replace("www.", "")
+            formatted_entries.append(
+                {
+                    "domain": domain,
+                    "title": entry.title,
+                    "link": entry.link,
+                    "author": entry.author,
+                }
+            )
 
-    formatted_entries = []
-    for entry in entries:
-        domain = entry.link.split("//")[-1].split("/")[0]
-        domain = domain.replace("www.", "")
-        formatted_entries.append(
-            {
-                "domain": domain,
-                "title": entry.title,
-                "link": entry.link,
-                "author": entry.author,
-            }
-        )
-
-    urls_cache = [
-        (entry["link"], entry["title"], entry["author"]) for entry in formatted_entries
-    ]
-    print(len(urls_cache), "entries")
-    return urls_cache
+        cache= [
+            (entry["link"], entry["title"], entry["author"]) for entry in formatted_entries
+        ]
+        print(len(cache), "entries")
+        return cache
+    else:
+        return False
+    
 
 
 def load_public_suffix_list(file_path):
@@ -138,11 +149,12 @@ def index():
         cache = urls_cache
 
     if url is not None:
+        http_url = url.replace("https://", "http://")
         title, author = next(
             (
                 (url_tuple[1], url_tuple[2])
                 for url_tuple in cache
-                if url_tuple[0] == url
+                if url_tuple[0] == url or url_tuple[0] == http_url
             ),
             (None, None),
         )
@@ -151,7 +163,7 @@ def index():
         if len(cache):
             url, title, author = random.choice(cache)
         else:
-            url,title,author="https://blog.kagi.com/blog", "Nothing to see", "Feed not active, try later"
+            url,title,author="https://blog.kagi.com/small-web", "Nothing to see", "Feed not active, try later"
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
@@ -262,6 +274,37 @@ def note():
     else:
         return redirect(prefix+f"/?url={url}")
 
+@app.route("/appreciated")
+def appreciated():
+    global master_feed
+    
+    feed = AtomFeed(
+            "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
+        )
+    count = 1
+    
+    if master_feed:        
+        for entry in master_feed.entries:
+            url=entry.link
+            http_url=url.replace("https://", "http://")
+            
+            if (url in favorites_dict or url in notes_dict) or (http_url in favorites_dict or http_url  in notes_dict):
+
+            
+                count = count + 1
+                feed.add(
+                    entry.title,
+                    getattr(entry, "summary", ""),
+                    content_type="html",
+                    url=entry.link,
+                    updated=parse(entry.updated),
+                    published=parse(entry.published),
+                    author=getattr(entry, "author", ""),
+                )
+            
+    return Response(feed.to_string(), mimetype="application/atom+xml")
+
+    
 
 
 time_saved_favorites = datetime.now()
