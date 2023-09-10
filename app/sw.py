@@ -9,9 +9,11 @@ from flask import (
     jsonify,
     Markup,
     render_template,
-    make_response
+    make_response,
+    Response
 )
 import feedparser
+from dateutil.parser import parse
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 import random
@@ -22,7 +24,7 @@ from datetime import datetime
 import os
 import time
 from urllib.parse import urlparse
-
+from feedwerk.atom import AtomFeed, FeedEntry
 
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
@@ -45,12 +47,17 @@ prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
 app.jinja_env.filters["time_ago"] = time_ago
 
+master_feed=False
 
 def update_all():
-    global urls_cache, urls_yt_cache
+    global urls_cache, urls_yt_cache, master_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
+    
+    check_feed = feedparser.parse(url)
+    if (check_feed):
+        master_feed=check_feed
     
     new_entries=update_entries(url + "?nso")  # no same origin sites feed
     
@@ -96,11 +103,11 @@ def update_entries(url):
                 }
             )
 
-        feed = [
+        cache= [
             (entry["link"], entry["title"], entry["author"]) for entry in formatted_entries
         ]
-        print(len(feed), "entries")
-        return feed
+        print(len(cache), "entries")
+        return cache
     else:
         return False
     
@@ -267,6 +274,37 @@ def note():
     else:
         return redirect(prefix+f"/?url={url}")
 
+@app.route("/appreciated")
+def appreciated():
+    global master_feed
+    
+    feed = AtomFeed(
+            "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
+        )
+    count = 1
+    
+    if master_feed:        
+        for entry in master_feed.entries:
+            url=entry.link
+            http_url=url.replace("https://", "http://")
+            
+            if (url in favorites_dict or url in notes_dict) or (http_url in favorites_dict or http_url  in notes_dict):
+
+            
+                count = count + 1
+                feed.add(
+                    entry.title,
+                    getattr(entry, "summary", ""),
+                    content_type="html",
+                    url=entry.link,
+                    updated=parse(entry.updated),
+                    published=parse(entry.published),
+                    author=getattr(entry, "author", ""),
+                )
+            
+    return Response(feed.to_string(), mimetype="application/atom+xml")
+
+    
 
 
 time_saved_favorites = datetime.now()

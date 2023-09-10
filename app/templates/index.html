@@ -52,9 +52,9 @@
       </div>
       <!-- Share Popup -->
       <div class="popup-container">
-        <label for="share-popup" class="popup-link">Share</label>
-        <input type="radio" id="share-popup" name="popup" class="popup-radio">
-        <div class="popup share-popup">
+        <label for="spread-love" class="popup-link">Share</label>
+        <input type="radio" id="spread-love" name="popup" class="popup-radio">
+        <div class="popup spread-love">
           <p>Share with the rest of the world.</p>
           <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option"
           "target=_blank" >Hacker News</a>
@@ -179,7 +179,19 @@
           </div>
         </div>
         <a href="https://kagifeedback.org">Feedback</a>
-        <a href="https://kagi.com/api/v1/smallweb/feed/">RSS</a>
+       <div class="popup-container">
+        <label for="rss-popup" class="popup-link">RSS</label>
+        <input type="radio" id="rss-popup" name="popup" class="popup-radio">
+        <div class="popup spread-love rss-popup">
+          <p>Grab the RSS feed you like.</p>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">All posts</a>
+         <a
+         class="share-option" target="_blank"
+         href="https://kagi.com/smallweb/appreciated">Appreciated/Notable</a>
+          <label for="close-popup" class="sbutton cancel-button">Cancel</label>
+        </div>
+      </div>
+
       {% endif %}
 
     </div>
