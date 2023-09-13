@@ -261,6 +261,9 @@ http://feeds.feedburner.com/Zhu8
 http://feeds.hanselman.com/ScottHanselman
 http://feeds.kottke.org/main
 http://feeds.scottmuc.com/scottmucblog
+http://feeds2.feedburner.com/PetrMitrichev
+http://feeds2.feedburner.com/SlicingUpEyeballs
+http://feeds2.feedburner.com/Swissmiss
 http://feeds2.feedburner.com/microkhan
 http://feeds2.feedburner.com/patshaughnessy
 http://feeds2.feedburner.com/PetrMitrichev
@@ -882,6 +885,7 @@ https://ache.one/rss.xml
 https://acko.net/atom.xml
 https://acommonreader.st/feed
 https://acoup.blog/feed
+https://adactio.com/journal/rss
 https://adaged.blogspot.com/feeds/posts/default
 https://adam-p.ca/feed.xml
 https://adamapples.blogspot.com/feeds/posts/default
@@ -3587,6 +3591,7 @@ https://lucassifoni.info/rss.xml
 https://lucumr.pocoo.org/feed.atom
 https://lucybellwood.com/feed
 https://luetkemj.github.io/feed.xml
+https://luhr.co/feed.xml
 https://lukazi.blogspot.com/feeds/posts/default
 https://lukeb.co.uk/rss.xml
 https://lukebennett13.wordpress.com/feed/
