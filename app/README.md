@@ -5,7 +5,7 @@
 Python 3.X
 
 ```bash
-pip install -i app/requirements.txt
+pip install -r app/requirements.txt
 ```
 
 ### Running
