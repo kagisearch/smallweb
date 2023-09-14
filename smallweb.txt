@@ -61,6 +61,7 @@ http://blog.behnel.de/rss.xml
 http://blog.bravelocation.com/atom.xml
 http://blog.cleancoder.com/atom.xml
 http://blog.colinmarshall.org/?feed=rss2
+http://blog.davidedmundson.co.uk/feed/
 http://blog.devtang.com/atom.xml
 http://blog.eamonnmr.com/feed
 http://blog.echen.me/feeds/all.rss.xml
@@ -672,8 +673,6 @@ http://www.adambourg.com/feed.xml
 http://www.alexirpan.com/feed.xml
 http://www.aliirz.com/feed.xml
 http://www.ams.org/cgi-bin/content/news_items.cgi?rss=1
-http://www.annualreviews.org/action/showFeed?jc=statistics&amp;type=etoc&amp;feed=rss
-http://www.annualreviews.org/action/showFeed?ui=0&amp;mi=3hus46&amp;ai=67b7&amp;jc=economics&amp;type=etoc&amp;feed=rss
 http://www.antipope.org/charlie/blog-static/atom.xml
 http://www.argmin.net/feed.xml
 http://www.bayesianinvestor.com/blog/index.php/feed
@@ -3235,6 +3234,7 @@ https://johnlindquist.com/rss.xml
 https://johnmathews.is/feed.xml
 https://johnmckay.blogspot.com/feeds/posts/default
 https://johnmenadue.com/feed
+https://johnnydecimal.com/rss.xml
 https://johnpaulhernandez.com/feed
 https://johnquiggin.com/feed
 https://johnsonsrambler.wordpress.com/feed/
@@ -3722,6 +3722,7 @@ https://matthewstrom.com/feed.xml
 https://matthias-endler.de/rss.xml
 https://matthiasnoback.nl/atom.xml
 https://matthiasott.com/feed
+https://matthieu.io/blog/feed/rss.xml
 https://mattkeeter.com/atom.xml
 https://mattlakeman.org/feed
 https://mattmazur.com/feed/
@@ -3811,6 +3812,7 @@ https://michaelscodingspot.com/feed
 https://michaelspellacy.com/rss.xml
 https://michele.io/index.xml
 https://micro.welltempered.net/feed.xml
+https://microblog.vladh.net/posts/index.xml
 https://microkhan.com/feed
 https://micropubadventures.co.uk/feed
 https://microservices-on-my-mind.blogspot.com/feeds/posts/default
@@ -4751,7 +4753,6 @@ https://shud.in/feed.xml
 https://shufflingbytes.com/index.xml
 https://shufflingbytes.com/posts/index.xml
 https://shyamjos.com/index.xml
-https://si3t.ch/log/atom.xml
 https://sia.codes/feed/feed.xml
 https://siamorweng.wordpress.com/feed
 https://siddhantpyasi.com/feed.xml
@@ -6225,7 +6226,6 @@ https://www.oliverpalmer.com/feed.xml
 https://www.omps.in/feed
 https://www.oncontracts.com/feed
 https://www.onswiftwings.com/index.xml
-https://www.openfaas.com/feed.xml
 https://www.openidealapp.com/feed
 https://www.openmymind.net/atom.xml
 https://www.openobjects.org.uk/feed/
