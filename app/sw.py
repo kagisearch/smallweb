@@ -160,7 +160,7 @@ def index():
         )
 
     if title is None:
-        if len(cache):
+        if cache and len(cache):
             url, title, author = random.choice(cache)
         else:
             url,title,author="https://blog.kagi.com/small-web", "Nothing to see", "Feed not active, try later"
