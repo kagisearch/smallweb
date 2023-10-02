@@ -13,7 +13,8 @@ RUN set -e; \
     gcc \
     tini \
     lsb-release \
-    wget
+    wget \
+    fuse
 
 RUN wget https://github.com/GoogleCloudPlatform/gcsfuse/releases/download/v1.2.0/gcsfuse_1.2.0_amd64.deb
 RUN dpkg -i gcsfuse_1.2.0_amd64.deb
