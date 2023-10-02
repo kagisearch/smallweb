@@ -228,6 +228,7 @@ http://fabricebaudoin.wordpress.com/feed
 http://faganm.com/blog/feed
 http://fastml.com/atom.xml
 http://feed.techinch.com/techinch
+http://feedproxy.google.com/beyondsearchblog
 http://feeds.akkartik.name/kartiks-scrapbook
 http://feeds.d15.biz/Daniel15
 http://feeds.ellugar.co/ellugar-logs
@@ -646,7 +647,6 @@ http://qoppac.blogspot.com/feeds/posts/default?alt=rss
 http://quantstrattrader.wordpress.com/feed
 http://quomodocumque.wordpress.com/feed
 http://quotenil.com/blog.rss
-http://rachelbythebay.com/w/atom.xml
 http://radar.spacebar.org/f/a/weblog/rss/1
 http://radek.io/feed.xml
 http://radfordneal.wordpress.com/feed
@@ -1902,7 +1902,6 @@ https://bjoernkw.com/feed
 https://bkamins.github.io/feed.xml
 https://bkardell.com/blog/feed.rss
 https://bkhome.org/feed.rss
-https://bl.ag/rss/
 https://blackgirlinmaine.com/feed
 https://blackphoebe.com/msjen/feed
 https://blag.cedeela.fr/rss.xml
@@ -2144,7 +2143,6 @@ https://blog.gtank.cc/rss
 https://blog.habets.se/feed.xml
 https://blog.hadabot.com/feeds/all.atom.xml
 https://blog.harterrt.com/feeds/all.atom.xml
-https://blog.harterrt.com/feeds/all.rss.xml
 https://blog.hartwork.org/rss.xml
 https://blog.haschek.at/rss.xml
 https://blog.hayman.net/feed
@@ -3185,7 +3183,6 @@ https://coryetzkorn.com/feed.xml
 https://coryknox.dev/index.xml
 https://coryzue.com/feed.xml
 https://cosmicheroes.space/blog/index.php/feed
-https://cosmiclog.com/feed
 https://cosmicqbit.dev/blog/index.xml
 https://cosminilie.ro/index.xml
 https://countvajhula.com/feed
@@ -3596,6 +3593,7 @@ https://divisbyzero.com/feed
 https://divisionbyzero.net/atom.xml
 https://diwaker.io/rss
 https://diy.viktak.com/feed
+https://diziet.dreamwidth.org/data/rss
 https://djangoandy.com/feed
 https://djharper.dev/index.xml
 https://djharper.dev/post/index.xml
@@ -4065,7 +4063,6 @@ https://feeds.feedburner.com/SimonHolywell
 https://feeds.feedburner.com/SimonWeber
 https://feeds.feedburner.com/StudyHacks
 https://feeds.feedburner.com/TeacherTom
-https://feeds.feedburner.com/ThePositivityblog-PutSomePersonalDevelopmentAndPositivityIntoYourLife
 https://feeds.feedburner.com/WalkingArizona
 https://feeds.feedburner.com/artistsnotebook
 https://feeds.feedburner.com/artofthetitle_rss
@@ -4969,6 +4966,7 @@ https://james.brooks.page/rss/feed.xml
 https://james.cridland.net/index.xml
 https://jamesabley.com/feed.xml
 https://jamesaltucher.com/feed
+https://jamesbvaughan.com/feed.xml
 https://jamesdempsey.net/feed.xml
 https://jamesdoc.com/blog/feed.xml
 https://jamesg.blog/feeds/posts.xml
@@ -6700,6 +6698,7 @@ https://nuitka.net/blog/atom.xml
 https://nulliq.dev/index.xml
 https://nullonerror.org/feed.xml
 https://nullprogram.com/feed
+https://nullprogram.com/feed/
 https://nullr0ute.com/feed
 https://numbered.works/feed.xml
 https://numbersallthewaydown.com/feed
@@ -7123,7 +7122,6 @@ https://pravn.wordpress.com/feed
 https://praxtime.com/feed
 https://prbs23.com/blog/index.xml
 https://predr.ag/atom.xml
-https://preparednessmama.com/feed
 https://prepend.com/feed.xml
 https://preshing.com/feed
 https://preslav.me/index.xml
@@ -7633,6 +7631,7 @@ https://samnewman.io/blog/feed.xml
 https://samoburja.com/feed
 https://samsartor.dev/atom.xml
 https://samsoff.es/blog/rss.xml
+https://samthursfield.wordpress.com/feed
 https://samuel.dionne-riel.com/blog/index.xml
 https://samuelbigos.github.io/feed.xml
 https://samueltaylor.org/articles/feed.xml
@@ -9534,6 +9533,7 @@ https://www.friendlyskies.net/atom
 https://www.friendlyskies.net/rss
 https://www.frogtoss.com/labs/feeds/all.atom.xml
 https://www.ft.io/blog/feed.xml
+https://www.ftrain.com/xml/feed/rss.xml
 https://www.fullmoonfiberart.com/feed
 https://www.funkatron.com/rss
 https://www.funkysi1701.com/index.xml
@@ -10504,7 +10504,6 @@ https://www.windsortowncrier.com/feed
 https://www.windytan.com/feeds/posts/default
 https://www.woodlifestudio.com/feed
 https://www.wowhaus.co.uk/feed/
-https://www.wristwatchreview.com/feed/
 https://www.wurb.com/stack/feed
 https://www.wysr.xyz/feed
 https://www.xceptance.com/en/feed.xml
@@ -10536,7 +10535,6 @@ https://www.zombiezen.com/blog/index.xml
 https://www.zsolt.blog/feeds/posts/default
 https://www.zufallsheld.de/feeds/all.atom.xml
 https://www.zumsteg.net/feed
-https://www.zylstra.org/blog/feed
 https://www.zylstra.org/blog/feed/
 https://wyattbaldwin.com/posts/rss.xml
 https://wyeworks.com/rss.xml
