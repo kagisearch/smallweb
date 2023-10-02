@@ -12,15 +12,12 @@ RUN set -e; \
     curl \
     gcc \
     tini \
-    lsb-release; \
-    gcsFuseRepo=gcsfuse-`lsb_release -c -s`; \
-    echo "deb http://packages.cloud.google.com/apt $gcsFuseRepo main" | \
-    tee /etc/apt/sources.list.d/gcsfuse.list; \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
-    apt-key add -; \
-    apt-get update -y
+    lsb-release \
+    wget \
+    fuse
 
-RUN apt-get install -y gcsfuse
+RUN wget https://github.com/GoogleCloudPlatform/gcsfuse/releases/download/v1.2.0/gcsfuse_1.2.0_amd64.deb
+RUN dpkg -i gcsfuse_1.2.0_amd64.deb
 RUN apt-get clean
 
 WORKDIR /app
