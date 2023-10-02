@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tales from the Small Web - Kagi</title>
+  <title>Kagi Small Web</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
   <div id="header">
     <div id="controls">
@@ -52,9 +54,9 @@
       </div>
       <!-- Share Popup -->
       <div class="popup-container">
-        <label for="share-popup" class="popup-link">Share</label>
-        <input type="radio" id="share-popup" name="popup" class="popup-radio">
-        <div class="popup share-popup">
+        <label for="spread-love" class="popup-link">Share</label>
+        <input type="radio" id="spread-love" name="popup" class="popup-radio">
+        <div class="popup spread-love">
           <p>Share with the rest of the world.</p>
           <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option"
           "target=_blank" >Hacker News</a>
@@ -70,9 +72,9 @@
           <a href="mailto:?subject={{title}}&body=Check%20out%20this%20link:%20{{url}}" class="share-option"
           target="_blank">Email</a>
           {% if is_youtube %} 
-            <a href="{{ prefix }}{{ query_string }}&url={{url}}" class="share-option"           target="_blank">Link here</a> 
+            <a href="{{ prefix }}{{ query_string }}&url={{url}}" class="share-option" target="_blank">Link here</a> 
          {% else %}
-            <a href="{{ prefix }}{{ query_string }}?url={{url}}" class="share-option"          target="_blank">Link here</a>
+            <a href="{{ prefix }}{{ query_string }}?url={{url}}" class="share-option" target="_blank">Link here</a>
          {% endif %}
 
 
@@ -80,9 +82,9 @@
         </div>
       </div>
       {% if is_youtube %} 
-        <a id="switch" href="{{ prefix }}">Small Web</a>
+        <a id="switch" href="{{ prefix }}">Small&nbsp;Web</a>
       {% else %}
-        <a id="switch" href="{{ prefix }}?yt">Small YouTube</a>
+        <a id="switch" href="{{ prefix }}?yt">Small&nbsp;YouTube</a>
       {% endif %}      
     </div>
     <div class="right">
@@ -115,7 +117,7 @@
           <div class="popup right-popup">
             <p>Found a cool YouTube channel you want to add? Just a couple of things to keep in mind:</p>
             <ul>
-              <li>It's about discovery, not self-promo. So, please don't add your own channel.</li>
+              <li>It's about discovery, not self-promo. So, please don't add your own channel unless you add two other channels that are not in list.</li>
               <li>Grab the RSS feed from the channel and submit that.</li>
               <li>We're an English-only zone for now.</li>
               <li>We love channels about hobbies and personal interests.</li>
@@ -163,7 +165,7 @@
           
             <p>Want to add a new personal blog RSS feed? Here are some ground rules:</p>
             <ul>
-              <li>Let's keep it about sharing, not self-promotion. So no adding your own site, okay?</li>
+              <li>Let's keep it about sharing, not self-promotion. You can submit your own if you submit two other sites that are not in the list.</li>
               <li>Find and submit the site's RSS feed.</li>
               <li>We're sticking to English for now—sorry, no other languages.</li>
               <li>Only personal blogs, please. No companies or big publishers.</li>
@@ -179,7 +181,19 @@
           </div>
         </div>
         <a href="https://kagifeedback.org">Feedback</a>
-        <a href="https://kagi.com/api/v1/smallweb/feed/">RSS</a>
+       <div class="popup-container">
+        <label for="rss-popup" class="popup-link">RSS</label>
+        <input type="radio" id="rss-popup" name="popup" class="popup-radio">
+        <div class="popup spread-love rss-popup">
+          <p>Grab the RSS feed you like.</p>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">All posts</a>
+         <a
+         class="share-option" target="_blank"
+         href="https://kagi.com/smallweb/appreciated">Appreciated/Notable</a>
+          <label for="close-popup" class="sbutton cancel-button">Cancel</label>
+        </div>
+      </div>
+
       {% endif %}
 
     </div>
