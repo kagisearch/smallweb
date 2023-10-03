@@ -1110,7 +1110,7 @@ https://alexanderlolis.com/rss.xml
 https://alexanderobenauer.com/assets/feed/rss.xml
 https://alexanderpruss.blogspot.com/feeds/posts/default
 https://alexanderwales.com/feed
-https://alexandre.storelli.fr/rss
+https://alexandre.storelli.fr/tag/en/rss/
 https://alexandreafonso.me/feed
 https://alexandruburlacu.github.io/feed.xml
 https://alexandrugris.github.io/feed.xml
@@ -1349,6 +1349,7 @@ https://aphyr.com/posts.atom
 https://apihandyman.io/feed.xml
 https://apilgriminnarnia.com/feed/
 https://apiratelifefor.me/feed
+https://apod.nasa.gov/apod.rss
 https://apogliaghi.com/index.xml
 https://app.rodeo/index.xml
 https://appalachianground.com/feed
@@ -2089,7 +2090,6 @@ https://blog.kummerlaender.eu/atom.xml
 https://blog.kuperate.com/rss
 https://blog.kylekukshtel.com/feed.rss
 https://blog.lambda.cx/index.xml
-https://blog.lambdaclass.com/rss
 https://blog.landofcrispy.com/index.php/feed
 https://blog.langworth.com/feed.xml
 https://blog.larrold.com/feed
@@ -3170,6 +3170,7 @@ https://danlockton.com/feed
 https://danluu.com/atom.xml
 https://danmackinlay.name/index.xml
 https://dannas.name/feed.xml
+https://dannb.org/index.xml
 https://dannorris.me/feed
 https://dannorth.net/index.xml
 https://dannybate.com/feed
@@ -3315,7 +3316,6 @@ https://deletescape.ch/feed.xml
 https://delistraty.com/feed
 https://den.dev/index.xml
 https://denilson.sa.nom.br/atom.xml
-https://denimdev.com.au/feed
 https://denisdefreyne.com/feed.xml
 https://denisebushphoto.wordpress.com/feed
 https://denisegaskins.com/feed
@@ -3949,7 +3949,6 @@ https://feeds.feedburner.com/webdevnet
 https://feeds.lexblog.com/GreenBuildingLawUpdate
 https://feeds.megaphone.fm/darknetdiaries
 https://feeds.moxon.net/latest.xml
-https://feeds.realityblurred.com/realityblurred
 https://feeds.thejeshgn.com/thejeshgn
 https://feeds2.feedburner.com/Makingitclear
 https://feeds2.feedburner.com/OccamsRazorByAvinash
@@ -6379,7 +6378,6 @@ https://netlicensing.io/feed.xml
 https://netsettlement.blogspot.com/feeds/posts/default
 https://netwert.com/ideapad/feed
 https://neugierig.org/software/blog/atom.xml
-https://neural.it/feed/
 https://neuromantics.net/atom.xml
 https://neuroning.com/feed.atom
 https://nevalalee.wordpress.com/feed
@@ -9174,6 +9172,7 @@ https://www.codingvc.com/feed
 https://www.codingwithjesse.com/blog/feed
 https://www.coeneedell.com/post/index.xml
 https://www.cold-takes.com/rss
+https://www.colino.net/wordpress/feed/
 https://www.complete-review.com/saloon/rss.xml
 https://www.confluent.io/rss.xml
 https://www.conniewonnie.com/feeds/posts/default
@@ -9934,7 +9933,6 @@ https://www.pieterboerboom.nl/feed
 https://www.pieterbrinkman.com/feed
 https://www.pinchofintelligence.com/feed
 https://www.pinecoder.dev/index.xml
-https://www.pinterestcareers.com/feed
 https://www.planetjones.net/index.xml
 https://www.playthepast.org/?feed=rss2
 https://www.plengegen.com/feed/
