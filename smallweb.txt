@@ -124,8 +124,8 @@ http://cdrom.ca/feed.xml
 http://charlesmartin14.wordpress.com/feed
 http://cheesetalks.twolofbees.com/rss.php
 http://christopher-beckham.github.io/feed.xml
-http://chrisyin.com/feed.xml
 http://chriswiegman.com/feed
+http://chrisyin.com/feed.xml
 http://cinemasparagus.blogspot.com/feeds/posts/default
 http://clamba.blogspot.com/feeds/posts/default
 http://cliffle.com/rss.xml
@@ -222,7 +222,6 @@ http://feeds.feedburner.com/EverydayRails
 http://feeds.feedburner.com/FutilityCloset
 http://feeds.feedburner.com/GamesThatWerent
 http://feeds.feedburner.com/HighScalability
-http://feeds.feedburner.com/InformationIsBeautiful
 http://feeds.feedburner.com/JamieToddRubin
 http://feeds.feedburner.com/KTamasBlog
 http://feeds.feedburner.com/Kilianvalkhofcom
@@ -373,7 +372,6 @@ http://jeremykun.wordpress.com/feed
 http://jessdriscoll.com/blog/atom.xml
 http://jg.sn.sg/index.xml
 http://jimkang.com/weblog/feed.xml
-https://jlelse.blog/index.xml
 http://jmanton.wordpress.com/feed
 http://jmlr.csail.mit.edu/jmlr.xml
 http://jobjo.github.io//feed.xml
@@ -630,11 +628,12 @@ http://this-space.blogspot.com/feeds/posts/default
 http://thiswayupzine.blogspot.com/feeds/posts/default
 http://thmatters.wordpress.com/feed
 http://throneofsalt.blogspot.com/feeds/posts/default
+http://til.simonwillison.net/tils/feed.atom
 http://timvieira.github.io/blog/atom.xml
 http://timworthington.blogspot.com/feeds/posts/default
-http://til.simonwillison.net/tils/feed.atom
 http://tinyshopww.blogspot.com/feeds/posts/default
 http://tirkarthi.github.io/feed.xml
+http://tofspot.blogspot.com/feeds/posts/default
 http://tolkienandfantasy.blogspot.com/feeds/posts/default
 http://tomafro.net/weeknotes/rss.xml
 http://tomaugspurger.github.io/feeds/all.atom.xml
@@ -3711,6 +3710,7 @@ https://epage.github.io/rss.xml
 https://epatr.com/blog/index.xml
 https://epbarger.github.io/feed.xml
 https://ephemeralenigmascom.wordpress.com/feed/
+https://ephemeralnewyork.wordpress.com/feed/
 https://ephos.github.io//feed.xml
 https://epic.law/feed
 https://epiccoleman.com/rss.xml
@@ -5011,6 +5011,7 @@ https://jkrumbiegel.com/index.xml
 https://jlcollinsnh.com/feed
 https://jlelse.blog/.rss
 https://jlelse.blog/dev.rss
+https://jlelse.blog/index.xml
 https://jlelse.blog/posts.rss
 https://jloh.co/index.xml
 https://jlongster.com/feed.xml
@@ -5147,6 +5148,7 @@ https://joshmanders.com/rss
 https://joshreads.com/feed/
 https://joshrichards.net/feed
 https://joshtronic.com/atom.xml
+https://joshua.hu/feed.xml
 https://joshuagoodw.in/feed
 https://joshualoong.com/atom.xml
 https://joshuarogers.net/index.xml
@@ -5983,6 +5985,7 @@ https://mccormickml.com/atom.xml
 https://mchromiak.github.io/feeds/all.atom.xml
 https://mckayla.blog/feed.xml
 https://mckinley.cc/blog/atom.xml
+https://mcksp.com/rss.xml
 https://mcqn.com/feed.xml
 https://mcraiha.github.io/feed.xml
 https://mcturra2000.wordpress.com/feed
