@@ -1,21 +1,15 @@
 import pickle
-import requests
 import re
 from flask import (
     Flask,
-    render_template_string,
     request,
     redirect,
-    jsonify,
-    Markup,
     render_template,
-    make_response,
     Response
 )
 import feedparser
 from dateutil.parser import parse
 from apscheduler.schedulers.background import BackgroundScheduler
-import pytz
 import random
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse, parse_qs
@@ -24,7 +18,7 @@ from datetime import datetime
 import os
 import time
 from urllib.parse import urlparse
-from feedwerk.atom import AtomFeed, FeedEntry
+from feedwerk.atom import AtomFeed
 
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
