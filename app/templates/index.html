@@ -242,5 +242,16 @@ end.</p>
       <iframe src="{{url}}"></iframe>
     </div>
   {% endif %}
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const nextPostLink = document.querySelector(".stumble-link");
+      const oldHref = nextPostLink.href;
+      nextPostLink.removeAttribute("href");
+      setTimeout(() => {
+        nextPostLink.setAttribute("href", oldHref);
+      }, 5000);
+    });
+  </script>
 </body>
 </html>

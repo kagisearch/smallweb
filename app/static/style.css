@@ -308,5 +308,5 @@ svg {
   }
 
 .stumble-link button {
-    animation: enableButton 0s forwards 2s;
+    animation: enableButton 0s forwards 5s;
 }
