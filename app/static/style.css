@@ -297,7 +297,7 @@ svg {
 
 .stumble-link button {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 @keyframes enableButton {
@@ -308,5 +308,5 @@ svg {
   }
 
 .stumble-link button {
-    animation: enableButton 0s forwards 2s;
+    animation: enableButton 0s forwards 3s;
 }
