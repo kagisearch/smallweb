@@ -10,7 +10,7 @@ from flask import (
     Markup,
     render_template,
     make_response,
-    Response
+    Response,
 )
 import feedparser
 from dateutil.parser import parse
@@ -25,6 +25,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
+
 
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
@@ -47,26 +48,27 @@ prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
 app.jinja_env.filters["time_ago"] = time_ago
 
-master_feed=False
+master_feed = False
+
 
 def update_all():
     global urls_cache, urls_yt_cache, master_feed
 
-    #url = "http://127.0.0.1:4000"  # testing with local feed
+    # url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
-    
+
     check_feed = feedparser.parse(url)
-    if (check_feed):
-        master_feed=check_feed
-    
-    new_entries=update_entries(url + "?nso")  # no same origin sites feed
-    
+    if check_feed:
+        master_feed = check_feed
+
+    new_entries = update_entries(url + "?nso")  # no same origin sites feed
+
     if not bool(urls_cache) or bool(new_entries):
         urls_cache = new_entries
-    
-    new_entries = update_entries(url + "?yt")   # youtube sites
 
-    if not bool(urls_yt_cache) or bool(new_entries):    
+    new_entries = update_entries(url + "?yt")  # youtube sites
+
+    if not bool(urls_yt_cache) or bool(new_entries):
         urls_yt_cache = new_entries
 
 
@@ -88,7 +90,7 @@ def parse_date(date_string):
 def update_entries(url):
     feed = feedparser.parse(url)
     entries = feed.entries
-    
+
     if len(entries):
         formatted_entries = []
         for entry in entries:
@@ -103,38 +105,37 @@ def update_entries(url):
                 }
             )
 
-        cache= [
-            (entry["link"], entry["title"], entry["author"]) for entry in formatted_entries
+        cache = [
+            (entry["link"], entry["title"], entry["author"])
+            for entry in formatted_entries
         ]
         print(len(cache), "entries")
         return cache
     else:
         return False
-    
 
 
 def load_public_suffix_list(file_path):
     public_suffix_list = set()
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         for line in f:
             line = line.strip()
-            if line and not line.startswith('//'):
+            if line and not line.startswith("//"):
                 public_suffix_list.add(line)
     return public_suffix_list
 
+
 # Load the list from your actual file path
-public_suffix_list = load_public_suffix_list('public_suffix_list.dat')
+public_suffix_list = load_public_suffix_list("public_suffix_list.dat")
 
 
 def get_registered_domain(url):
     parsed_url = urlparse(url)
-    netloc_parts = parsed_url.netloc.split('.')
+    netloc_parts = parsed_url.netloc.split(".")
     for i in range(len(netloc_parts)):
-        possible_suffix = '.'.join(netloc_parts[i:])
+        possible_suffix = ".".join(netloc_parts[i:])
         if possible_suffix in public_suffix_list:
-            return '.'.join(netloc_parts[:i]) + '.' + possible_suffix
-            
-
+            return ".".join(netloc_parts[:i]) + "." + possible_suffix
 
 
 @app.route("/")
@@ -163,11 +164,15 @@ def index():
         if cache and len(cache):
             url, title, author = random.choice(cache)
         else:
-            url,title,author="https://blog.kagi.com/small-web", "Nothing to see", "Feed not active, try later"
+            url, title, author = (
+                "https://blog.kagi.com/small-web",
+                "Nothing to see",
+                "Feed not active, try later",
+            )
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
-    
+
     domain = get_registered_domain(url)
     domain = re.sub(r"^(www\.)?", "", domain)
 
@@ -187,14 +192,16 @@ def index():
     query_params.pop("url", None)
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
     if query_string:
-        query_string='?'+query_string
+        query_string = "?" + query_string
 
     # count notes
     notes_count = len(notes_dict.get(url, []))
     notes_list = notes_dict.get(url, [])
-    
-    if url.startswith('http://'):
-        url = url.replace('http://', 'https://') # force https as http will not work inside https iframe anyway
+
+    if url.startswith("http://"):
+        url = url.replace(
+            "http://", "https://"
+        )  # force https as http will not work inside https iframe anyway
 
     return render_template(
         "index.html",
@@ -204,7 +211,7 @@ def index():
         title=title,
         author=author,
         domain=domain,
-        prefix=prefix+'/',
+        prefix=prefix + "/",
         videoid=videoid,
         is_youtube=is_youtube,
         favorites_count=favorites_count,
@@ -237,7 +244,7 @@ def favorite():
     query_params.pop("url")
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
-    return redirect(prefix+f"/?url={url}&{query_string}")
+    return redirect(prefix + f"/?url={url}&{query_string}")
 
 
 @app.route("/note")
@@ -267,30 +274,31 @@ def note():
     query_params.pop("note_content", None)  # Remove the note content
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
     if query_string:
-        query_string='?'+query_string
+        query_string = "?" + query_string
 
     if query_string:
-        return redirect(prefix+f"/?url={url}&{query_string}")
+        return redirect(prefix + f"/?url={url}&{query_string}")
     else:
-        return redirect(prefix+f"/?url={url}")
+        return redirect(prefix + f"/?url={url}")
+
 
 @app.route("/appreciated")
 def appreciated():
     global master_feed
-    
-    feed = AtomFeed(
-            "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
-        )
-    count = 1
-    
-    if master_feed:        
-        for entry in master_feed.entries:
-            url=entry.link
-            http_url=url.replace("https://", "http://")
-            
-            if (url in favorites_dict or url in notes_dict) or (http_url in favorites_dict or http_url  in notes_dict):
 
-            
+    feed = AtomFeed(
+        "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
+    )
+    count = 1
+
+    if master_feed:
+        for entry in master_feed.entries:
+            url = entry.link
+            http_url = url.replace("https://", "http://")
+
+            if (url in favorites_dict or url in notes_dict) or (
+                http_url in favorites_dict or http_url in notes_dict
+            ):
                 count = count + 1
                 feed.add(
                     entry.title,
@@ -301,10 +309,8 @@ def appreciated():
                     published=parse(entry.published),
                     author=getattr(entry, "author", ""),
                 )
-            
-    return Response(feed.to_string(), mimetype="application/atom+xml")
 
-    
+    return Response(feed.to_string(), mimetype="application/atom+xml")
 
 
 time_saved_favorites = datetime.now()

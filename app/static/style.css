@@ -301,6 +301,13 @@ svg {
     animation: enableButton 0s forwards 3s;
 }
 
+
+#header {
+    pointer-events: none;
+    opacity: 0.85;
+    animation: enableButton 0s forwards 3s;
+}
+
 @keyframes enableButton {
     to {
       pointer-events: auto;
@@ -308,14 +315,3 @@ svg {
     }
   }
 
-.stumble-link button {
-
-}
-
-
-
-#header {
-    pointer-events: none;
-    opacity: 0.85;
-    animation: enableButton 0s forwards 3s;
-}
