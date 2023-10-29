@@ -59,7 +59,7 @@
         <div class="popup spread-love">
           <p>Share with the rest of the world.</p>
           <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option"
-          "target=_blank" >Hacker News</a>
+          target=_blank" >Hacker News</a>
           <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option"
           target="_blank">Reddit</a>
           <a href="https://lemmy.world/create_post?url={{url}}&title={{title}}" class="share-option"
@@ -71,6 +71,8 @@
           <a href="https://cohost.org"  class="share-option"  target="_blank">Cohost</a>
           <a href="mailto:?subject={{title}}&body=Check%20out%20this%20link:%20{{url}}" class="share-option"
           target="_blank">Email</a>
+          <a href="https://kagi.com/summarizer/index.html?url={{url}}" class="share-option"
+          target="_blank">Universal Summarizer</a>
           {% if is_youtube %} 
             <a href="{{ prefix }}{{ query_string }}&url={{url}}" class="share-option" target="_blank">Link here</a> 
          {% else %}
