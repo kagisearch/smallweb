@@ -14,6 +14,8 @@ steps:
       '--allow-unauthenticated',
       '--set-env-vars', 'URL_PREFIX=/smallweb',
       '--service-account', 'smallweb@${PROJECT_ID}.iam.gserviceaccount.com',
+      '--cpu=1',
+      '--memory=1Gi',
       '--min-instances', '1'
     ]
 images:
