@@ -83,9 +83,11 @@ http://sciruby.com/atom.xml
 http://scripting.com/rss.xml
 http://scytheassociation.org/feed/
 http://spaceisdisorienting.com/feed
+http://spawn.link/index.xml
 http://storagegaga.com/feed/
 http://techsnuffle.com/feed.xml
 http://tedquarters.net/feed/
+http://therenaissancetroll.blogspot.com/feeds/posts/default
 http://theroadchoseme.com/feed
 http://thestone.zone/feed.xml
 http://unremediatedgender.space/feeds/all.atom.xml
@@ -2191,7 +2193,6 @@ https://chrispenner.ca/atom.xml
 https://chrisruppel.com/travel.xml
 https://chrissanders.org/feed/
 https://chrisshort.net/index.xml
-https://christian-hockenberger.com/feed/
 https://christian.kellner.me/feed/
 https://christianfscott.com/index.xml
 https://christianheilmann.com/feed/
@@ -3829,7 +3830,6 @@ https://gbracha.blogspot.com/feeds/posts/default
 https://gc-taylor.com/blog?format=rss
 https://gcher.com/index.xml
 https://gcollazo.com/feed/
-https://gearsrealm.com/feed/
 https://gebir.ge/blog/index.xml
 https://geekdoctor.blogspot.com/feeds/posts/default
 https://geekgonecrazy.com/feed.xml
@@ -4201,6 +4201,7 @@ https://hongchao.me/feed.xml
 https://honk.sigxcpu.org/con/index.rss
 https://honnef.co/articles/index.xml
 https://honza.pokorny.ca/index.xml
+https://honzadvorsky.com/feed
 https://honzadvorsky.com/feed.xml
 https://hookrace.net/blog/feed/
 https://hop.ie/feed.xml
@@ -4551,6 +4552,7 @@ https://jasongorman.uk/writing/feed.xml
 https://jasonkerwin.com/feed/
 https://jasonkolb.com/feed/
 https://jasonmaa.com/feed.xml
+https://jasonmasten.com/feed/
 https://jasonmorrissc.github.io/index.xml
 https://jasono.co/feed/
 https://jasonpreu.com/feed/
@@ -5551,6 +5553,7 @@ https://markozivanovic.com/index.xml
 https://markphelps.me/index.xml
 https://markstoneman.com/feed/
 https://marksuth.dev/feed/posts.xml
+https://markus.hofer.rocks/feed
 https://markushatvan.com/rss.xml
 https://markusmeister.com/feed/
 https://markusstrasser.org/rss/
@@ -7873,6 +7876,7 @@ https://takeonethingoff.com/feed/
 https://takeonrules.com/index.xml
 https://takingsenseaway.wordpress.com/feed/
 https://taleofpainters.com/feed/
+https://tales.fromprod.com/feed.xml
 https://talesfromtheencrypt.home.blog/feed/
 https://talesoftimesforgotten.com/feed/
 https://talkingshelfspace.com/feed/
@@ -8006,6 +8010,7 @@ https://thebloggess.com/feed/
 https://theblogoftheatrethings.com/feed/
 https://theblorgonchronicles.blogspot.com/feeds/posts/default
 https://thebluemoment.com/feed/
+https://theboardgameschronicle.com/feed/
 https://thebootstrappedfounder.com/feed/
 https://thebreakfastpost.com/feed/
 https://thecaptivereader.com/feed/
@@ -9502,6 +9507,7 @@ https://www.jessesquires.com/feed.xml
 https://www.jessieathome.com/feed/
 https://www.jhaddix.com/blog-feed.xml
 https://www.jimhester.com/index.xml
+https://www.jimmielightner.com/feed/
 https://www.jimmybramlett.com/feed/
 https://www.jimwestergren.com/rss.xml
 https://www.jjinux.com/feeds/posts/default
@@ -10599,11 +10605,3 @@ https://ztpala.com/feed.xml
 https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed
-https://tales.fromprod.com/feed.xml
-http://therenaissancetroll.blogspot.com/feeds/posts/default
-https://theboardgameschronicle.com/feed/
-https://markus.hofer.rocks/feed
-https://honzadvorsky.com/feed
-https://jasonmasten.com/feed/
-https://www.jimmielightner.com/feed/
-http://spawn.link/index.xml
