@@ -48,6 +48,7 @@ http://iftheshoefritz.com/feed.xml
 http://inclem.net/feeds/all.atom.xml
 http://inthewilderness.net/feed/
 http://jeff-barr.com/feed.xml
+http://joe-steel.com/feed
 http://johnj.com/index.xml
 http://jonathanstray.com/feed
 http://kylehalladay.com/atom.xml
@@ -122,7 +123,6 @@ http://www.inthecheapseats.co.uk/feed/
 http://www.irisheconomy.ie/index.php/feed/
 http://www.janeslondon.com/feeds/posts/default
 http://www.jazzscan.com/feeds/posts/default
-http://joe-steel.com/feed
 http://www.jtoy.net/atom.xml
 http://www.kaidez.com/feed.xml
 http://www.learningclojure.com/feeds/posts/default
@@ -1633,7 +1633,6 @@ https://blog.safia.rocks/feed.xml
 https://blog.sakugabooru.com/feed/
 https://blog.samaltman.com/posts.atom
 https://blog.samwhited.com/atom.xml
-https://blog.scottlogic.com/feed.xml
 https://blog.scottlowe.org/feed.xml
 https://blog.scottnonnenberg.com/rss.xml
 https://blog.seanbonner.com/feed/
@@ -3247,6 +3246,7 @@ https://ewpratten.com/rss.xml
 https://exceptionnotfound.net/rss/
 https://excess.org/feed.xml
 https://excited-pixels.com/feed/
+https://expensive.toys/rss.xml
 https://explainingmaths.wordpress.com/feed/
 https://exple.tive.org/blarg/feed/
 https://explicitly.me/feed/
@@ -5073,6 +5073,7 @@ https://kernelcurry.com/index.xml
 https://kernelshaman.blogspot.com/feeds/posts/default
 https://kersed.net/index.xml
 https://ketansingh.me/index.xml
+https://kettanaito.com/blog/rss.xml
 https://keunwoo.com/feed.atom
 https://keunwoochoi.wordpress.com/feed/
 https://kevin.burke.dev/feed/
@@ -7344,6 +7345,7 @@ https://samyak.me/index.xml
 https://sander.ai/feed.xml
 https://sandervenema.ch/feed/
 https://sandrino.dev/blog/feed
+https://sandroroth.com/feeds/blog.xml
 https://sandsoftwaresound.net/feed/
 https://sandymaguire.me/atom.xml
 https://saneef.com/feed.xml
@@ -7611,6 +7613,7 @@ https://sinclairtrails.com/feed/
 https://sindre.is/feed/feed.xml
 https://sindresorhus.com/rss.xml
 https://singhkays.com/index.xml
+https://sinja.io/rss
 https://sinrega.org/index.xml
 https://sintraworks.github.io/feed.xml
 https://sippey.com/rss.xml
@@ -9640,6 +9643,7 @@ https://www.joshhorne.com/rss/
 https://www.joshkasuboski.com/index.xml
 https://www.joshuakennon.com/feed/
 https://www.joshualyman.com/feed/
+https://www.joshuawootonn.com/rss.xml
 https://www.joshwcomeau.com/rss.xml
 https://www.journalofnomads.com/feed/
 https://www.joyfulbikeshedding.com/feed.xml
@@ -10433,6 +10437,7 @@ https://www.topbug.net/feed/
 https://www.traingeek.ca/wp/feed/
 https://www.travelwritingworld.com/feed/
 https://www.trickjarrett.com/feed.rss
+https://www.trickster.dev/post/index.xml
 https://www.triple-aye.com/atom.xml
 https://www.trivedigaurav.com/blog/feed/
 https://www.trovster.com/movies/watched.xml
