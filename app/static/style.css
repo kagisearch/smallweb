@@ -298,14 +298,14 @@ svg {
 .stumble-link button {
     pointer-events: none;
     opacity: 0.4;
-    animation: enableButton 0s forwards 3s;
+    animation: enableButton 0s forwards 2.5s;
 }
 
 
 #header {
     pointer-events: none;
     opacity: 0.85;
-    animation: enableButton 0s forwards 3s;
+    animation: enableButton 0s forwards 2.5s;
 }
 
 @keyframes enableButton {
