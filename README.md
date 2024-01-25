@@ -46,10 +46,10 @@ Add a new personal blog RSS feed to the list. Rules:
 
 - Do not submit your own website unless you submit 2 other sites that are not yours (and are not in list).
 - Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
-- Content must be in English (currently, other languages are not accepted).
+- Content must be in English (currently, other languages are not accepted). No NSFW content.
 - Only personal blogs may be submitted.
-- The blog must have a recent post, no older than 6 months, to meet the recency criteria for inclusion.
-- The site must not contain any forms of advertisements or undisclosed affilaite links
+- The blog must have a recent post, no older than 12 months, to meet the recency criteria for inclusion.
+- The site must not contain any forms of advertisements or undisclosed affiliate links
 - Site should not have newsletter signup popups
 
 [Add website RSS
