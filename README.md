@@ -49,7 +49,8 @@ Add a new personal blog RSS feed to the list. Rules:
 - Content must be in English (currently, other languages are not accepted).
 - Only personal blogs may be submitted.
 - The blog must have a recent post, no older than 6 months, to meet the recency criteria for inclusion.
-- The site must not contain any forms of monetization, such as advertisements, newsletter signup popups, etc.
+- The site must not contain any forms of advertisements or undisclosed affilaite links
+- Site should not have newsletter signup popups
 
 [Add website RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
