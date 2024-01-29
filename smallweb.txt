@@ -5,19 +5,16 @@ http://antirez.com/rss
 http://arches.io/index.xml
 http://archimago.blogspot.com/feeds/posts/default?alt=rss
 http://awfullibrarybooks.wordpress.com/feed/
-https://baty.net/feed
 http://bearlamp.com.au/feed/
 http://benjaminrosshoffman.com/feed/
 http://bit-player.org/feed
 http://blog.behnel.de/rss.xml
 http://blog.colinmarshall.org/?feed=rss2
-http://blog.ericgregorich.com/feed.xml
 http://blog.fivecentsplease.org/feeds/posts/default
 http://blog.increa.com/feed/
 http://blog.itdxer.com/feed.xml
 http://blog.jackphelan.xyz/feed
 http://blog.macrolet.net/rss.xml
-https://blog.numericcitizen.me/feed.xml
 http://blog.petersobot.com/feed
 http://blog.pythonaro.com/feeds/posts/default
 http://blog.rickumali.com/feeds/posts/default
@@ -54,7 +51,6 @@ http://jeff-barr.com/feed.xml
 http://joe-steel.com/feed
 http://johnj.com/index.xml
 http://jonathanstray.com/feed
-https://kevquirk.com/feed
 http://kylehalladay.com/atom.xml
 http://lambda-the-ultimate.org/rss.xml
 http://linesandcolors.com/feed/
@@ -906,6 +902,7 @@ https://battellemedia.com/feed
 https://battesonb.github.io/feed.xml
 https://battlepenguin.com/feed.xml
 https://baturin.org/blog/atom.xml
+https://baty.net/feed
 https://baus.net/rss/
 https://bavatuesdays.com/feed/
 https://bayesianbiologist.com/feed/
@@ -1282,6 +1279,7 @@ https://blog.emilburzo.com/index.xml
 https://blog.eowyn.net/feed.xml
 https://blog.eq8.eu/feed.xml
 https://blog.erethon.com/index.xml
+https://blog.ericgregorich.com/feed.xml
 https://blog.erk.dev/index.xml
 https://blog.erlend.sh/feed/
 https://blog.erlware.org/index.xml
@@ -2058,6 +2056,7 @@ https://cancandan.github.io/feed.xml
 https://candace.dev/rss.xml
 https://candlerblog.com/atom.xml
 https://candychang.com/feed/
+https://canneddragons.net/blog/rss/
 https://cannonalexander.writeas.com/feed/
 https://canolcer.com/index.xml
 https://caolan.uk/feed/notes/
