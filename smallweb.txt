@@ -44,7 +44,6 @@ http://feeds.fosketts.net/StephenFoskettPackRat
 http://feeds.scottmuc.com/scottmucblog
 http://fleen.com/feed/
 http://freerangestats.info/feed.xml
-https://www.fromjason.xyz/p/notebook/feed/feed.xml
 http://gavinandresen.ninja/feed
 http://iftheshoefritz.com/feed.xml
 http://inclem.net/feeds/all.atom.xml
@@ -89,7 +88,6 @@ http://spawn.link/index.xml
 http://storagegaga.com/feed/
 http://techsnuffle.com/feed.xml
 http://tedquarters.net/feed/
-https://thepoetsky.com/feed.xml
 http://therenaissancetroll.blogspot.com/feeds/posts/default
 http://theroadchoseme.com/feed
 http://thestone.zone/feed.xml
@@ -8198,6 +8196,7 @@ https://theperfumedgarden.blogspot.com/feeds/posts/default
 https://thephd.dev/feed.xml
 https://thephilbert.io/feed/
 https://theplaysthethinguk.com/feed/
+https://thepoetsky.com/feed.xml
 https://theprivacydad.com/feed/
 https://theprofessionalspoint.blogspot.com/feeds/posts/default
 https://theprofessorisin.com/feed/
@@ -9231,6 +9230,7 @@ https://www.data-is-plural.com/feed.xml
 https://www.databasesandlife.com/index.xml
 https://www.datachomp.com/atom.xml
 https://www.datadeluge.com/feeds/posts/default
+https://www.datagubbe.se/atom.xml
 https://www.dataquest.io/feed/
 https://www.datarobot.com/feed/
 https://www.dataschool.io/rss/
@@ -9407,6 +9407,7 @@ https://www.freerangekids.com/feed/
 https://www.freewheelingfrance.com/freewheeling-france-rss-feed.xml
 https://www.friendlyskies.net/atom/
 https://www.frogtoss.com/labs/feeds/all.atom.xml
+https://www.fromjason.xyz/p/notebook/feed/feed.xml
 https://www.fromthemurkydepths.co.uk/feed/
 https://www.ft.io/blog/feed.xml
 https://www.fullmoonfiberart.com/feed/
@@ -10714,4 +10715,3 @@ https://zupzup.org/index.xml
 https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed
-https://www.datagubbe.se/atom.xml
