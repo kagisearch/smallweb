@@ -46,24 +46,18 @@ Add a new personal blog RSS feed to the list. Rules:
 
 - Do not submit your own website unless you submit 2 other sites that are not yours (and are not in list).
 - Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
-- Content must be in English (currently, other languages are not accepted). No NSFW content.
+- Content must be in English (currently, other languages are not accepted).
+- No illegal or NSFW content.
+- No auto generated or spam content.
 - Only personal blogs may be submitted.
 - The blog must have a recent post, no older than 12 months, to meet the recency criteria for inclusion.
 - The site must not contain any forms of advertisements or undisclosed affiliate links
 - Site should not have newsletter signup popups
+- A YT channel must not post more than twice a week.
+- A YT channel must have fewer than 400,000 subscribers.
 
 [Add website RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
-
-
-Add a new YouTube channel RSS feed to the list. Rules:
-
-- Do not submit your own YouTube channel unless you submit 2 other channels that are not yours (and are not in list).
-- Locate and submit the RSS feed of the YouTube channel.  Place in the file so that it remains sorted.
-- Content must be in English (currently, other languages are not accepted).
-- Preference is given to channels focusing on hobbies or passions.
-- The channel must not post more than twice a week.
-- The channel must have fewer than 400,000 subscribers.
 
 Hint: To extract the RSS link from a YouTube channel, you can use [this tool](https://youtube-rss-nu.vercel.app/).
 
@@ -74,24 +68,12 @@ feed](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
 
 Remove a website if :
 
-- Content is not in English.
-- Website has poor quality content ( spam, LLM generated...)
-- Website contains intrusive monetization such as ads or newsletter popups.
-- Website purpose is monetization rather than education.
-
+- It does not adhere to the above guidelines
+- In the removal request, state which guideline does it break
 
 Clicking "Remove website" will edit small web list in new tab, where you can locate and remove the website feed in question. Make sure to add in comments the rason for removal.
 
 [Remove website](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
-
-
-Remove a YouTube channel if :
-
-- Content is not in English.
-- Channel has poor quality content  (spam, LLM generated...)
-- Channel's purpose is monetization rather than education.
-
-Clicking "Remove" will edit small youtube list in new tab, where you can locate and remove the YouTube channel feed in question. Make sure to add in comments the reason for removal.
 
 [Remove channel](https://github.com/kagisearch/smallweb/edit/main/smallt.txt)
 
