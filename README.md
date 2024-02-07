@@ -75,7 +75,7 @@ feed](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
 Remove a website if :
 
 - Content is not in English.
-- Website has poor quality content.
+- Website has poor quality content ( spam, LLM generated...)
 - Website contains intrusive monetization such as ads or newsletter popups.
 - Website purpose is monetization rather than education.
 
@@ -88,7 +88,7 @@ Clicking "Remove website" will edit small web list in new tab, where you can loc
 Remove a YouTube channel if :
 
 - Content is not in English.
-- Channel has poor quality content.
+- Channel has poor quality content  (spam, LLM generated...)
 - Channel's purpose is monetization rather than education.
 
 Clicking "Remove" will edit small youtube list in new tab, where you can locate and remove the YouTube channel feed in question. Make sure to add in comments the reason for removal.
