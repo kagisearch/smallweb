@@ -1,5 +1,4 @@
 http://336699.org/feed
-https://aless.co/rss.xml
 http://amaldev.blog/feed/
 http://amid.fish/feed.xml
 http://anhvn.com/feed.xml
@@ -73,7 +72,6 @@ http://peteashton.com/feed/
 http://plasticbag.org/feed/
 http://postabdn.com/feed/
 http://prithvirajva.com/feed.xml
-https://prma.dev/index.xml
 http://radar.spacebar.org/f/a/weblog/rss/1
 http://redino.net/blog/feed/
 http://ritaottramstad.com/feed/
@@ -414,6 +412,7 @@ https://alemann.dev/rss.xml
 https://aleph.se/andart2/feed/
 https://alesandroortiz.com/feed.xml
 https://alesruzicka.eu/blog/eng/index.xml
+https://aless.co/rss.xml
 https://alex-hhh.github.io/feeds/all.atom.xml
 https://alex.flounder.online/gemlog/atom.xml
 https://alex.kirk.at/feed/
@@ -2132,6 +2131,7 @@ https://cemeteryclub.wordpress.com/feed/
 https://cendyne.dev/feed.xml
 https://cennydd.com/writing?format=rss
 https://centiskor.ch/rss.xml
+https://cep.dev/posts/index.xml
 https://cernezan.com/rss.xml
 https://ceronman.com/feed/
 https://cesarbrun.xyz/index.xml
@@ -6846,6 +6846,7 @@ https://princestreet.wordpress.com/feed/
 https://principia.blog/feed/
 https://privacylog.blogspot.com/feeds/posts/default
 https://priyankvex.com/feed/
+https://prma.dev/index.xml
 https://probably.co.uk/index.xml
 https://probablydance.com/feed/
 https://procedural-generation.tumblr.com/rss
