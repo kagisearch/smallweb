@@ -33,9 +33,11 @@
       <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
       <a href="{{ prefix }}favorite?url={{ url }}{{ '&' if request.query_string else '' }}{{ request.query_string.decode()|safe }}"
       class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</a>
+      <a href="{{ prefix }}flag_content?url={{ url }}{{ '&' if request.query_string else '' }}{{ request.query_string.decode()|safe }}"
+      class="favorite-link">Flag{{ ' (' ~ flag_content_count ~ ')' if flag_content_count > 0 else '' }}</a>
       <!-- Note Popup -->
       <div class="popup-container">
-        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Leave a note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
+        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
         <input type="radio" id="note-popup" name="popup" class="popup-radio">
         <div class="popup">
           {% for note, timestamp in notes_list %}
@@ -236,11 +238,27 @@ end.</p>
   </div>
   {% if is_youtube %}
     <div id="content-yt">
-      <iframe width="840" height="472" src="https://www.youtube.com/embed/{{videoid}}" title="{{title}} video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe 
+        width="840" 
+        height="472" 
+        src="https://www.youtube.com/embed/{{videoid}}" 
+        title="{{title}} 
+        video" frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        allowfullscreen
+        {% if flag_content_count >= 5 %}
+          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}">View Flagged Video</a>'
+        {% endif %}
+      ></iframe>
     </div>
   {% else %}
     <div id="content">
-      <iframe src="{{url}}"></iframe>
+      <iframe 
+        src="{{url}}"
+        {% if flag_content_count >= 5 %}
+          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target=_blank>View Flagged Content</a>'
+        {% endif %}
+      ></iframe>
     </div>
   {% endif %}
 </body>

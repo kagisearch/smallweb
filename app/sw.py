@@ -198,6 +198,9 @@ def index():
     notes_count = len(notes_dict.get(url, []))
     notes_list = notes_dict.get(url, [])
 
+    # get flagged content
+    flag_content_count = flagged_content_dict.get(url, 0)
+
     if url.startswith("http://"):
         url = url.replace(
             "http://", "https://"
@@ -217,6 +220,7 @@ def index():
         favorites_count=favorites_count,
         notes_count=notes_count,
         notes_list=notes_list,
+        flag_content_count=flag_content_count,
     )
 
 
@@ -282,6 +286,33 @@ def note():
         return redirect(prefix + f"/?url={url}")
 
 
+@app.route("/flag_content")
+def flag_content():
+    global flagged_content_dict, time_saved_flagged_content
+    url = request.args.get("url")
+
+    if url:
+        # Increment favorites count
+        flagged_content_dict[url] = flagged_content_dict.get(url, 0) + 1
+
+        # Save to disk
+        if (datetime.now() - time_saved_flagged_content).total_seconds() > 60:
+            time_saved_flagged_content = time_saved_flagged_content
+            try:
+                with open("data/flagged_content.pkl", "wb") as file:
+                    pickle.dump(flagged_content_dict, file)
+            except:
+                print("can not write flagged content file")
+
+    # Preserve all query parameters except 'url'
+
+    query_params = request.args.copy()
+    query_params.pop("url")
+    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
+
+    return redirect(prefix + "/")# + f"/?url={url}&{query_string}") # we do not want to redir to same url, as that allows them to flag again
+
+
 @app.route("/appreciated")
 def appreciated():
     global master_feed
@@ -315,6 +346,7 @@ def appreciated():
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
+time_saved_flagged_content = datetime.now()
 
 urls_cache = []
 urls_yt_cache = []
@@ -337,6 +369,15 @@ try:
         print("Loaded notes", len(notes_dict))
 except:
     print("No notes data found.")
+
+flagged_content_dict = {}  # Dictionary to store favorites count
+
+try:
+    with open("data/flagged_content.pkl", "rb") as file:
+        flagged_content_dict = pickle.load(file)
+        print("Loaded flagged content", len(flagged_content_dict))
+except:
+    print("No flagged content data found.")
 
 
 # get feeds
