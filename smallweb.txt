@@ -126,6 +126,7 @@ http://www.janeslondon.com/feeds/posts/default
 http://www.jazzscan.com/feeds/posts/default
 http://www.jtoy.net/atom.xml
 http://www.kaidez.com/feed.xml
+http://www.kroah.com/log/index.xml
 http://www.learningclojure.com/feeds/posts/default
 http://www.lostdecadegames.com/rss.xml
 http://www.machinedlearnings.com/feeds/posts/default
@@ -287,6 +288,7 @@ https://adamsheffer.wordpress.com/feed/
 https://adamsitnik.com/feed.xml
 https://adamthewan.com/rss.xml
 https://adamwathan.me/rss/index.xml
+https://adamwiggins.com/feed.rss
 https://adamzerner.bearblog.dev/feed/?type=rss
 https://adarkhighway.com/feed/
 https://adashofdata.com/feed/
@@ -1278,6 +1280,7 @@ https://blog.eiler.eu/index.xml
 https://blog.einval.com/index.rss
 https://blog.einval.eu/index.xml
 https://blog.eldrid.ge/post/index.xml
+https://blog.ellenhp.me/feed/
 https://blog.emacsen.net/atom.xml
 https://blog.emilburzo.com/index.xml
 https://blog.eowyn.net/feed.xml
@@ -4899,6 +4902,7 @@ https://josephm.dev/rss.xml
 https://josh.blog/feed
 https://josh.works/atom.xml
 https://joshblog.net/feed/
+https://joshcollinsworth.com/rss
 https://joshcrain.io/feed.xml
 https://joshghent.com/rss.xml
 https://joshmanders.com/rss/
@@ -5751,6 +5755,7 @@ https://mattsegal.dev/feeds/all.atom.xml
 https://mattslifebytes.com/feed/
 https://mattspitz.me/feed.xml
 https://mattstauffer.com/blog/feed.atom
+https://mattstuchlik.com/feed.xml
 https://mattthequick.bearblog.dev/feed/?type=rss
 https://mattturck.com/feed/
 https://mattwynne.net/feed/
@@ -8298,6 +8303,7 @@ https://thoughtfulatlas.bearblog.dev/feed/?type=rss
 https://thoughts.greyh.at/index.xml
 https://thoughts.hnr.fyi/index.xml
 https://thoughts.melonking.net/atom
+https://thoughtspile.github.io/atom.xml
 https://thousandmovieproject.com/feed/
 https://thraxil.org/feeds/main
 https://threedots.ovh/blog/feed/
