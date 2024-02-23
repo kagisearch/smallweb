@@ -35,6 +35,7 @@ PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.pkl")
 PATH_NOTES = os.path.join(DIR_DATA, "notes.pkl")
 PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.pkl")
 
+
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
     seconds = delta.total_seconds()
@@ -259,8 +260,8 @@ def favorite():
     # Preserve all query parameters except 'url'
 
     query_params = request.args.copy()
-    if 'url' in query_params:
-        del query_params['url']
+    if "url" in query_params:
+        del query_params["url"]
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
     redirect_path = f"{prefix}/?url={url}"
@@ -292,8 +293,8 @@ def note():
                 print("can not write notes file")
     # Preserve all query parameters except 'url' and 'note_content'
     query_params = request.args.copy()
-    if 'url' in query_params:
-        del query_params['url']
+    if "url" in query_params:
+        del query_params["url"]
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
     redirect_path = f"{prefix}/?url={url}"
@@ -323,8 +324,8 @@ def flag_content():
     # Preserve all query parameters except 'url'
 
     query_params = request.args.copy()
-    if 'url' in query_params:
-        del query_params['url']
+    if "url" in query_params:
+        del query_params["url"]
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
     # we do not want to redirect to same url
