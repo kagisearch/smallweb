@@ -29,7 +29,7 @@ body {
   align-items: center;
 }
 
-#header button, .ok-button {
+.next-button, .ok-button {
   background-color: #3498db;
   border: none;
   padding: 8px !important;
@@ -65,18 +65,38 @@ body {
   min-width:10px;
 }
 
-#header a {
+#header a, .favorite-link, .flag-link {
   color: white;
   text-decoration: none;
 }
 
-#header .middle a, #header .right a {
+.flag-danger {
+  color: red;
+}
+
+#header .middle a, #header .right a, .favorite-link, .flag-link {
   padding: 0 10px;
+}
+
+.favorite-link, .flag-link {
+  font-family: pixel, Arial, sans-serif;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#header .favorite-link:hover, #header .flag-link:hover {
+  background-color: transparent;
 }
 
 .middle {
   flex: 1;
   text-align: center;
+}
+
+.middle form {
+  display: inline-block;
 }
 
 .right {
@@ -194,12 +214,12 @@ body {
   text-decoration: none;
   color: #ecf0f1;
   cursor: pointer;
-  text-weight : 700
+  font-weight : 700
 }
 
 .share-option:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  text-weight: 700;
+  font-weight: 700;
 }
 
 .spread-love {
