@@ -10,6 +10,8 @@ Few things to note:
 
 - You can also use the [RSS feed](https://kagi.com/api/v1/smallweb/feed) or access these results as a part of a broader [Kagi News Enrichment API](https://help.kagi.com/kagi/api/enrich.html). 
 
+- There is an [OPML file](https://kagi.com/smallweb/opml) of the sites which make up the above RSS feed
+
 ## Criteria for posts to show on the KSW website
 
 If the blog is included in small web feed list (which means it has content in English, it is informational/educational by nature and it is not trying to sell anything) we check for these two things to show it on the site:

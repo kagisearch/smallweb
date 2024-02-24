@@ -25,6 +25,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
+from opml import OpmlDocument
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
@@ -129,6 +130,31 @@ def update_entries(url):
     else:
         return False
 
+def update_opml(get_urls=True):
+    global opml_document
+
+    print("Create OPML document")
+
+    # metadata
+    opml_document.date_created = datetime.now()
+    opml_document.title = "Kagi Smallweb Feeds"
+
+    with open("smallweb.txt") as f:
+        for url in f:
+            if get_urls:
+                feed = feedparser.parse(url)
+                desc = None
+                title = None
+                html_url = None
+                if 'description' in feed['feed']:
+                    desc = feed['feed']['description']
+                if 'title' in feed['feed']:
+                    title = feed['feed']['title']
+                if 'link' in feed['feed']:
+                    html_url = feed['feed']['link']
+                opml_document = opml_document.add_rss(url, url, title=title, description=desc, html_url=html_url, language="en_US")
+            else:
+                opml_document = opml_document.add_rss(url, url, language="en_US")
 
 def load_public_suffix_list(file_path):
     public_suffix_list = set()
@@ -363,6 +389,9 @@ def appreciated():
 
     return Response(feed.to_string(), mimetype="application/atom+xml")
 
+@app.route("/opml")
+def opml():
+    return Response(opml_document.dumps(), mimetype="text/x-opml")
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
@@ -372,6 +401,8 @@ urls_cache = []
 urls_yt_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
+
+opml_document = OpmlDocument()
 
 try:
     with open(PATH_FAVORITES, "rb") as file:
@@ -402,6 +433,9 @@ except:
 
 # get feeds
 update_all()
+
+# create opml document (only needs to run once)
+update_opml()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
