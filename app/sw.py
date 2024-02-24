@@ -26,6 +26,14 @@ import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
 
+DIR_DATA = "data"
+if not os.path.isdir(DIR_DATA):
+    # trying to write a file in a non-existent dir
+    # will fail, so we need to make sure this exists
+    os.makedirs(DIR_DATA)
+PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.pkl")
+PATH_NOTES = os.path.join(DIR_DATA, "notes.pkl")
+PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.pkl")
 
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
@@ -57,19 +65,25 @@ def update_all():
     # url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
 
-    check_feed = feedparser.parse(url)
-    if check_feed:
-        master_feed = check_feed
+    try:
+        print("begin update_all")
+        check_feed = feedparser.parse(url)
+        if check_feed:
+            master_feed = check_feed
 
-    new_entries = update_entries(url + "?nso")  # no same origin sites feed
+        new_entries = update_entries(url + "?nso")  # no same origin sites feed
 
-    if not bool(urls_cache) or bool(new_entries):
-        urls_cache = new_entries
+        if not bool(urls_cache) or bool(new_entries):
+            urls_cache = new_entries
 
-    new_entries = update_entries(url + "?yt")  # youtube sites
+        new_entries = update_entries(url + "?yt")  # youtube sites
 
-    if not bool(urls_yt_cache) or bool(new_entries):
-        urls_yt_cache = new_entries
+        if not bool(urls_yt_cache) or bool(new_entries):
+            urls_yt_cache = new_entries
+    except:
+        print("something went wrong during update_all")
+    finally:
+        print("end update_all")
 
 
 def parse_date(date_string):
@@ -224,10 +238,10 @@ def index():
     )
 
 
-@app.route("/favorite")
+@app.post("/favorite")
 def favorite():
     global favorites_dict, time_saved_favorites
-    url = request.args.get("url")
+    url = request.form.get("url")
 
     if url:
         # Increment favorites count
@@ -235,9 +249,9 @@ def favorite():
 
         # Save to disk
         if (datetime.now() - time_saved_favorites).total_seconds() > 60:
-            time_saved_favorites = time_saved_favorites
+            time_saved_favorites = datetime.now()
             try:
-                with open("favorites.pkl", "wb") as file:
+                with open(PATH_FAVORITES, "wb") as file:
                     pickle.dump(favorites_dict, file)
             except:
                 print("can not write fav file")
@@ -245,17 +259,21 @@ def favorite():
     # Preserve all query parameters except 'url'
 
     query_params = request.args.copy()
-    query_params.pop("url")
+    if 'url' in query_params:
+        del query_params['url']
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
-    return redirect(prefix + f"/?url={url}&{query_string}")
+    redirect_path = f"{prefix}/?url={url}"
+    if query_string:
+        redirect_path += f"&{query_string}"
+    return redirect(redirect_path)
 
 
-@app.route("/note")
+@app.post("/note")
 def note():
     global notes_dict, time_saved_notes
-    url = request.args.get("url")
-    note_content = request.args.get("note_content")
+    url = request.form.get("url")
+    note_content = request.form.get("note_content")
 
     # Add the new note to the notes list for this URL
     if url and note_content:
@@ -266,30 +284,28 @@ def note():
 
         # Save to disk
         if (datetime.now() - time_saved_notes).total_seconds() > 60:
-            time_saved_notes = time_saved_favorites
+            time_saved_notes = datetime.now()
             try:
-                with open("data/notes.pkl", "wb") as file:
+                with open(PATH_NOTES, "wb") as file:
                     pickle.dump(notes_dict, file)
             except:
                 print("can not write notes file")
     # Preserve all query parameters except 'url' and 'note_content'
     query_params = request.args.copy()
-    query_params.pop("url")
-    query_params.pop("note_content", None)  # Remove the note content
+    if 'url' in query_params:
+        del query_params['url']
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
+
+    redirect_path = f"{prefix}/?url={url}"
     if query_string:
-        query_string = "?" + query_string
-
-    if query_string:
-        return redirect(prefix + f"/?url={url}&{query_string}")
-    else:
-        return redirect(prefix + f"/?url={url}")
+        redirect_path += f"&{query_string}"
+    return redirect(redirect_path)
 
 
-@app.route("/flag_content")
+@app.post("/flag_content")
 def flag_content():
     global flagged_content_dict, time_saved_flagged_content
-    url = request.args.get("url")
+    url = request.form.get("url")
 
     if url:
         # Increment favorites count
@@ -297,9 +313,9 @@ def flag_content():
 
         # Save to disk
         if (datetime.now() - time_saved_flagged_content).total_seconds() > 60:
-            time_saved_flagged_content = time_saved_flagged_content
+            time_saved_flagged_content = datetime.now()
             try:
-                with open("data/flagged_content.pkl", "wb") as file:
+                with open(PATH_FLAGGED, "wb") as file:
                     pickle.dump(flagged_content_dict, file)
             except:
                 print("can not write flagged content file")
@@ -307,10 +323,13 @@ def flag_content():
     # Preserve all query parameters except 'url'
 
     query_params = request.args.copy()
-    query_params.pop("url")
+    if 'url' in query_params:
+        del query_params['url']
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
-    return redirect(prefix + "/")# + f"/?url={url}&{query_string}") # we do not want to redir to same url, as that allows them to flag again
+    # we do not want to redirect to same url
+    # as that allows them to flag again
+    return redirect(f"{prefix}/?{query_string}")
 
 
 @app.route("/appreciated")
@@ -354,7 +373,7 @@ urls_yt_cache = []
 favorites_dict = {}  # Dictionary to store favorites count
 
 try:
-    with open("data/favorites.pkl", "rb") as file:
+    with open(PATH_FAVORITES, "rb") as file:
         favorites_dict = pickle.load(file)
         print("Loaded favorites", len(favorites_dict))
 except:
@@ -364,7 +383,7 @@ except:
 notes_dict = {}  # Dictionary to store notes
 
 try:
-    with open("data/notes.pkl", "rb") as file:
+    with open(PATH_NOTES, "rb") as file:
         notes_dict = pickle.load(file)
         print("Loaded notes", len(notes_dict))
 except:
@@ -373,7 +392,7 @@ except:
 flagged_content_dict = {}  # Dictionary to store favorites count
 
 try:
-    with open("data/flagged_content.pkl", "rb") as file:
+    with open(PATH_FLAGGED, "rb") as file:
         flagged_content_dict = pickle.load(file)
         print("Loaded flagged content", len(flagged_content_dict))
 except:

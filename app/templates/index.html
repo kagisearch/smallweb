@@ -13,7 +13,7 @@
   <div id="header">
     <div id="controls">
       <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
-        <button>Next Post</button>
+        <button class="next-button">Next Post</button>
       </a>
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
@@ -31,10 +31,14 @@
     </div>
     <div class="middle">
       <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
-      <a href="{{ prefix }}favorite?url={{ url }}{{ '&' if request.query_string else '' }}{{ request.query_string.decode()|safe }}"
-      class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</a>
-      <a href="{{ prefix }}flag_content?url={{ url }}{{ '&' if request.query_string else '' }}{{ request.query_string.decode()|safe }}"
-      class="favorite-link">Flag{{ ' (' ~ flag_content_count ~ ')' if flag_content_count > 0 else '' }}</a>
+      <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
+        <input type="hidden" name="url" value="{{ url }}">
+        <button type="submit" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
+      </form>
+      <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
+        <input type="hidden" name="url" value="{{ url }}">
+        <button type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+      </form>
       <!-- Note Popup -->
       <div class="popup-container">
         <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
@@ -45,7 +49,7 @@
               <span class="note-time">({{ timestamp|time_ago }})</span> {{ note }}
             </div>
           {% endfor %}
-          <form action="{{ prefix }}note" method="get">
+          <form action="{{ prefix }}note" method="post">
             <p style="text-align:left">Got thoughts on this post? Share them in a public note.</p>
             <textarea name="note_content" class="note-textarea"></textarea>
             <input type="hidden" name="url" value="{{ url }}" />
@@ -75,11 +79,7 @@
           target="_blank">Email</a>
           <a href="https://kagi.com/summarizer/index.html?url={{url}}" class="share-option"
           target="_blank">Universal Summarizer</a>
-          {% if is_youtube %} 
-            <a href="{{ prefix }}{{ query_string }}&url={{url}}" class="share-option" target="_blank">Link here</a> 
-         {% else %}
-            <a href="{{ prefix }}{{ query_string }}?url={{url}}" class="share-option" target="_blank">Link here</a>
-         {% endif %}
+          <a href="{{ prefix }}?url={{url}}&{{query_string}}" class="share-option" target="_blank">Link here</a>
 
 
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>
