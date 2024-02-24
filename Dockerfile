@@ -27,6 +27,8 @@ RUN chmod +x gcsfuse_run.sh
 COPY app/requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+COPY smallweb.txt smallweb.txt
+
 COPY app/ .
 EXPOSE $PORT
 
