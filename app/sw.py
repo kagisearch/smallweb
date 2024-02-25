@@ -155,6 +155,7 @@ def update_opml(get_urls=True):
                 opml_document = opml_document.add_rss(url, url, title=title, description=desc, html_url=html_url, language="en_US")
             else:
                 opml_document = opml_document.add_rss(url, url, language="en_US")
+    print("All OPML documents imported")
 
 def load_public_suffix_list(file_path):
     public_suffix_list = set()
