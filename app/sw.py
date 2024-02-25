@@ -130,7 +130,7 @@ def update_entries(url):
     else:
         return False
 
-def update_opml(get_urls=True):
+def update_opml(get_urls=False):
     global opml_document
 
     print("Create OPML document")
