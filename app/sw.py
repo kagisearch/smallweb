@@ -64,8 +64,8 @@ master_feed = False
 def update_all():
     global urls_cache, urls_yt_cache, master_feed
 
-    # url = "http://127.0.0.1:4000"  # testing with local feed
-    url = "https://kagi.com/api/v1/smallweb/feed/"
+    url = "http://127.0.0.1:4000"  # testing with local feed
+    # url = "https://kagi.com/api/v1/smallweb/feed/"
 
     try:
         print("begin update_all")
@@ -393,7 +393,7 @@ def appreciated():
 
 @app.route("/opml")
 def opml():
-    return Response(opml_document.dumps(), mimetype="text/x-opml")
+    return Response(opml_document.dumps(), headers={"content-disposition":"attachment; filename=smallweb.opml"}, mimetype="text/x-opml")
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
