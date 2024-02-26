@@ -7,7 +7,6 @@ from flask import (
     request,
     redirect,
     jsonify,
-    Markup,
     render_template,
     make_response,
     Response,
@@ -25,7 +24,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
-from opml import OpmlDocument
+#from opml import OpmlDocument
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
@@ -64,8 +63,8 @@ master_feed = False
 def update_all():
     global urls_cache, urls_yt_cache, master_feed
 
-    # url = "http://127.0.0.1:4000"  # testing with local feed
-    url = "https://kagi.com/api/v1/smallweb/feed/"
+    url = "http://127.0.0.1:4000"  # testing with local feed
+    #url = "https://kagi.com/api/v1/smallweb/feed/"
 
     try:
         print("begin update_all")
@@ -403,7 +402,7 @@ urls_yt_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 
-opml_document = OpmlDocument()
+#opml_document = OpmlDocument()
 
 try:
     with open(PATH_FAVORITES, "rb") as file:
@@ -436,7 +435,7 @@ except:
 update_all()
 
 # create opml document (only needs to run once)
-update_opml()
+#update_opml()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
