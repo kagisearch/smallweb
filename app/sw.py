@@ -152,9 +152,10 @@ def update_opml(get_urls=False):
                     title = feed['feed']['title']
                 if 'link' in feed['feed']:
                     html_url = feed['feed']['link']
-                opml_document = opml_document.add_rss(url, url, title=title, description=desc, html_url=html_url, language="en_US")
+                opml_document.add_rss(url, url, title=title, description=desc, html_url=html_url, language="en_US")
             else:
-                opml_document = opml_document.add_rss(url, url, language="en_US")
+                opml_document.add_rss(url, url, language="en_US")
+
     print("All OPML documents imported")
 
 def load_public_suffix_list(file_path):
