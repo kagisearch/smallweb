@@ -100,6 +100,11 @@ sources including:
 - https://tech-blogs.dev
 - https://hn-blogs.kronis.dev/all-blogs.html
 - https://dm.hn
+- https://uses.tech
+- https://nownownow.com
+- https://personalsit.es
+
+
 
 
 ### YouTube channels
