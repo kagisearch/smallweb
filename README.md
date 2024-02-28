@@ -50,11 +50,11 @@ Add a new personal blog RSS feed to the list. Rules:
 - Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - No illegal or NSFW content.
-- No auto generated or spam content.
-- Only personal blogs may be submitted.
+- No auto generated, LLM generated or spam content.
+- Only personal blogs may be submitted. 
 - The blog must have a recent post, no older than 12 months, to meet the recency criteria for inclusion.
 - The site must not contain any forms of advertisements or undisclosed affiliate links
-- Site should not have newsletter signup popups
+- Site should not have newsletter signup popups (substack sites are not accepted too)
 - A YT channel must not post more than twice a week.
 - A YT channel must have fewer than 400,000 subscribers.
 
