@@ -237,7 +237,6 @@ http://www.ryanglover.net/feed.xml
 http://www.smashcompany.com/feed
 http://www.softmachines.org/wordpress/?feed=rss2
 http://www.symbolicforest.com/blog/feed.xml
-http://www.thebirdist.com/feeds/posts/default
 http://www.thefamilystage.co.uk/feed/
 http://www.thefunctionalart.com/feeds/posts/default
 http://www.theincredibleinman.com/feeds/posts/default
@@ -1540,6 +1539,7 @@ https://blog.frankmtaylor.com/feed/
 https://blog.fredrb.com/index.xml
 https://blog.freeradical.zone/index.xml
 https://blog.frizk.net/feeds/posts/default
+https://blog.frost.kiwi/feed.xml
 https://blog.futtta.be/feed/
 https://blog.gadflyllc.com/feed/
 https://blog.gardeviance.org/feeds/posts/default
@@ -4578,7 +4578,6 @@ https://h313.info/feed.xml
 https://h3artbl33d.nl/blog.atom
 https://haacked.com/atom.xml
 https://habd.as/feed/
-https://habitsatwork.nl/feed/
 https://hacdias.com/articles/feed.xml
 https://hacdias.com/feed.xml
 https://hachibu.net/index.xml
@@ -6713,7 +6712,6 @@ https://minhajuddin.com/atom.xml
 https://minimaxir.com/index.xml
 https://minireference.com/blog/feed/
 https://minnenratta.wordpress.com/feed/
-https://minorliteratures.com/feed/
 https://minuscule.space/feed/
 https://minutestomidnight.co.uk/feed.xml
 https://miparnisariblog.wordpress.com/feed/
@@ -7046,6 +7044,7 @@ https://nhigham.com/feed/
 https://nibblestew.blogspot.com/feeds/posts/default
 https://nibnalin.me/feed.xml
 https://nical.github.io/feeds/all.atom.xml
+https://nicf.net/feed.xml
 https://nicholas.carlini.com/writing/feed.xml
 https://nicholaslewis.org/feed/
 https://nick.groenen.me/feed.xml
@@ -7843,7 +7842,6 @@ https://rachelbythebay.com/w/atom.xml
 https://rachelcarmena.github.io/feed.xml
 https://rachelsruminations.com/feed/
 https://rachelzampino.com/feed/
-https://rachitsingh.com/rss.xml
 https://rachsmith.com/rss
 https://radek.io/feed.xml
 https://radfordneal.wordpress.com/feed/
@@ -9140,6 +9138,7 @@ https://thathelpfuldad.com/feed/
 https://thatonegamedev.com/feed/
 https://thatsn0tmy.site/index.xml
 https://thatxliner.github.io/blog/rss.xml
+https://the-engi-nerd.github.io/index.xml
 https://the-life-i-read.blogspot.com/feeds/posts/default
 https://the-null-log.org/rss
 https://the-rosenrot.com/feed/
@@ -10599,7 +10598,6 @@ https://www.engineersneedart.com/rss.xml
 https://www.engraved.blog/rss/
 https://www.enricozini.org/blog/index.rss
 https://www.eod.com/meta/full.xml
-https://www.eranstern.co.il/feed/
 https://www.ericdsnider.com/feed/
 https://www.erisianrite.com/index.xml
 https://www.ermlikeyeah.com/feed.xml
@@ -12221,4 +12219,3 @@ https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed
 https://マリウス.com/index.xml
-https://the-engi-nerd.github.io/index.xml
