@@ -15,6 +15,10 @@
       <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
         <button class="next-button">Next Post</button>
       </a>
+      <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
+        <input type="hidden" name="url" value="{{ url }}">
+        <button type="submit" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
+      </form>
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
         <span id="author" title="author">{{author}}</span> @ 
@@ -31,14 +35,8 @@
     </div>
     <div class="middle">
       <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
-      <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
-        <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
-      </form>
-      <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
-        <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
-      </form>
+
+      
       <!-- Note Popup -->
       <div class="popup-container">
         <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
@@ -58,6 +56,10 @@
           </form>
         </div>
       </div>
+      <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
+        <input type="hidden" name="url" value="{{ url }}">
+        <button type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+      </form>
       <!-- Share Popup -->
       <div class="popup-container">
         <label for="spread-love" class="popup-link">Share</label>
