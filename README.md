@@ -125,3 +125,9 @@ The seed list for YouTube channels has been assembled from these HN discussions.
 
 
 
+### Useful commands
+
+Show duplicate domains:
+```
+awk -F/ '{print $3}' smallweb.txt | sort | uniq -d | while read domain; do echo "$domain"; grep "$domain" smallweb.txt; echo ""; done
+```
