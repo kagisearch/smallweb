@@ -155,6 +155,7 @@ http://spawn.link/index.xml
 http://storagegaga.com/feed/
 http://techsnuffle.com/feed.xml
 http://tedquarters.net/feed/
+http://theprogrammersparadox.blogspot.com/feeds/posts/default
 http://therenaissancetroll.blogspot.com/feeds/posts/default
 http://theroadchoseme.com/feed
 http://thestone.zone/feed.xml
@@ -4477,8 +4478,6 @@ https://grahamwahlberg.com/feed/
 https://gralefrit.weebly.com/1/feed
 https://gralhix.com/feed/
 https://grammaticus.blog/feed/
-https://granary.io/url?input=html&output=rss&url=https://jamesg.blog
-https://granary.io/url?url=https://werd.io/content/all/&input=html&output=atom&hub=https://bridgy-fed.superfeedr.com/
 https://grandmawilliams.com/feed/
 https://grandoldmovies.wordpress.com/feed/
 https://grantisom.com/feed.xml
@@ -5500,6 +5499,7 @@ https://jouni.kantola.se/feed.xml
 https://journal.buzzusborne.com/rss
 https://journal.dinobansigan.com/feed/
 https://journal.infinitenegativeutility.com/feed/
+https://journal.jatan.space/rss/
 https://journal.paoloamoroso.com/feed/
 https://journal.robbi.my/index.xml
 https://journal.stuffwithstuff.com/rss.xml
@@ -10715,7 +10715,6 @@ https://www.globalnerdy.com/feed/
 https://www.gmarik.info/blog/index.xml
 https://www.gnoack.org/post/index.xml
 https://www.gnufmuffin.com/feed.xml
-https://www.goatorama.com/feed/
 https://www.goggleheadedhacker.com/feed.xml
 https://www.going-flying.com/blog/feed.xml
 https://www.goland.org/feed/
