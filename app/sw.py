@@ -453,7 +453,7 @@ update_opml()
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
 scheduler.start()
-scheduler.add_job(update_all, "interval", minutes=1)
+scheduler.add_job(update_all, "interval", minutes=5)
 
 
 atexit.register(lambda: scheduler.shutdown())
