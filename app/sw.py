@@ -61,7 +61,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_yt_cache, master_feed
+    global urls_cache, urls_app_cache, urls_yt_cache, master_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -81,6 +81,12 @@ def update_all():
 
         if not bool(urls_yt_cache) or bool(new_entries):
             urls_yt_cache = new_entries
+        
+        new_entries = update_entries("https://kagi.com/smallweb/appreciated")  # youtube sites
+        if not bool(urls_app_cache) or bool(new_entries):
+            urls_app_cache = new_entries
+            
+       
     except:
         print("something went wrong during update_all")
     finally:
@@ -181,14 +187,20 @@ def get_registered_domain(url):
 
 @app.route("/")
 def index():
-    global urls_cache, urls_yt_cache
+    global urls_cache, urls_yt_cache,urls_app_cache
 
     url = request.args.get("url")
     title = None
+    current_mode = 0
     if "yt" in request.args:
         cache = urls_yt_cache
+        current_mode = 1
+    elif "app" in request.args:
+        cache= urls_app_cache
+        current_mode = 2
     else:
         cache = urls_cache
+        
 
     if url is not None:
         http_url = url.replace("https://", "http://")
@@ -218,10 +230,9 @@ def index():
     domain = re.sub(r"^(www\.)?", "", domain)
 
     videoid = ""
-    is_youtube = 0
+    
 
     if "youtube.com" in short_url:
-        is_youtube = 1
         parsed_url = urlparse(url)
         videoid = parse_qs(parsed_url.query)["v"][0]
 
@@ -257,7 +268,7 @@ def index():
         domain=domain,
         prefix=prefix + "/",
         videoid=videoid,
-        is_youtube=is_youtube,
+        current_mode=current_mode,
         favorites_count=favorites_count,
         notes_count=notes_count,
         notes_list=notes_list,
@@ -399,10 +410,11 @@ time_saved_flagged_content = datetime.now()
 
 urls_cache = []
 urls_yt_cache = []
+urls_app_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 
-opml_document = OpmlDocument()
+
 
 try:
     with open(PATH_FAVORITES, "rb") as file:
@@ -435,12 +447,13 @@ except:
 update_all()
 
 # create opml document (only needs to run once)
+opml_document = OpmlDocument()
 update_opml()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
 scheduler.start()
-scheduler.add_job(update_all, "interval", minutes=5)
+scheduler.add_job(update_all, "interval", minutes=1)
 
 
 atexit.register(lambda: scheduler.shutdown())

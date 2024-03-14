@@ -37,7 +37,7 @@
       <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
 
       
-      <!-- Note Popup -->
+      <!-- Note Popup 
       <div class="popup-container">
         <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
         <input type="radio" id="note-popup" name="popup" class="popup-radio">
@@ -56,25 +56,19 @@
           </form>
         </div>
       </div>
-      <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
-        <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
-      </form>
+      -->
+     
       <!-- Share Popup -->
       <div class="popup-container">
         <label for="spread-love" class="popup-link">Share</label>
         <input type="radio" id="spread-love" name="popup" class="popup-radio">
         <div class="popup spread-love">
-          <p>Share with the rest of the world.</p>
-          <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option"
-          target="_blank">Hacker News</a>
-          <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option"
-          target="_blank">Reddit</a>
+          <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option" target="_blank">Hacker News</a>
+          <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option" target="_blank">Reddit</a>
+          <a href="https://twitter.com/share?url={{url}}&text={{title}}" class="share-option" target="_blank">Twitter</a>
+          <a href="https://mastodon.social/share?text={{ (title + '\n\n' + url)|urlencode }}" class="share-option" target="_blank">Mastodon</a>
           <a href="https://lemmy.world/create_post?url={{url}}&title={{title}}" class="share-option"
           target="_blank">Lemmy</a>
-          <a href="https://twitter.com/share?url={{url}}&text={{title}}" class="share-option"
-          target="_blank">Twitter</a>
-          <a href="https://mastodon.social/share?text={{ (title + '\n\n' + url)|urlencode }}" class="share-option" target="_blank">Mastodon</a>
           <a href="https://lobste.rs/stories/new?url={{url}}&title={{title}}" class="share-option" target="_blank">Lobsters</a>
           <a href="https://cohost.org"  class="share-option"  target="_blank">Cohost</a>
           <a href="mailto:?subject={{title}}&body=Check%20out%20this%20link:%20{{url}}" class="share-option"
@@ -87,14 +81,25 @@
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>
         </div>
       </div>
-      {% if is_youtube %} 
-        <a id="switch" href="{{ prefix }}">Small&nbsp;Web</a>
+       <!-- Flag Popup -->
+      <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
+        <input type="hidden" name="url" value="{{ url }}">
+        <button type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+      </form>
+
+      {% if current_mode==1 %} 
+        <a id="switch"  href="{{ prefix }}">Web</a>
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
+      {% elif current_mode==2 %}
+        <a id="switch"  href="{{ prefix }}">Web</a>
+        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
       {% else %}
-        <a id="switch" href="{{ prefix }}?yt">Small&nbsp;YouTube</a>
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
+        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
       {% endif %}      
     </div>
     <div class="right">
-      {% if is_youtube %} 
+      {% if current_mode == 1 %} 
       <div class="popup-container right-popup-container">
           <label for="report-popup" class="popup-link">Report</label>
           <input type="radio" id="report-popup" name="popup" class="popup-radio">
@@ -240,7 +245,7 @@ end.</p>
     <a href="https://kagi.com"><img id="logo" src="{{ url_for('static', filename='doggo_px.png') }}" alt="Kagi Doggo
     mascot"/></a>
   </div>
-  {% if is_youtube %}
+  {% if current_mode == 1 %}
     <div id="content-yt">
       <iframe 
         width="840" 
