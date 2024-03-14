@@ -96,6 +96,7 @@
       {% else %}
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
+        
       {% endif %}      
     </div>
     <div class="right">
@@ -196,10 +197,12 @@
         <input type="radio" id="rss-popup" name="popup" class="popup-radio">
         <div class="popup spread-love rss-popup">
           <p>Grab the RSS feed you like.</p>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">All posts</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">Small Web All (very large)</a>
          <a
          class="share-option" target="_blank"
          href="https://kagi.com/smallweb/appreciated">Appreciated/Notable</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code</a>
          <a
          class="share-option" target="_blank" href="https://kagi.com/smallweb/opml">OPML</a>
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>

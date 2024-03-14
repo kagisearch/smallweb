@@ -24,7 +24,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
-from opml import OpmlDocument
+#from opml import OpmlDocument
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
@@ -61,7 +61,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, master_feed
+    global urls_cache, urls_app_cache, urls_yt_cache,urls_gh_cache,  master_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -81,10 +81,16 @@ def update_all():
 
         if not bool(urls_yt_cache) or bool(new_entries):
             urls_yt_cache = new_entries
+
+        new_entries = update_entries(url + "?gh")  # github sites
+
+        if not bool(urls_gh_cache) or bool(new_entries):
+            urls_gh_cache = new_entries    
         
         new_entries = update_entries("https://kagi.com/smallweb/appreciated")  # youtube sites
         if not bool(urls_app_cache) or bool(new_entries):
             urls_app_cache = new_entries
+
             
        
     except:
@@ -187,7 +193,7 @@ def get_registered_domain(url):
 
 @app.route("/")
 def index():
-    global urls_cache, urls_yt_cache,urls_app_cache
+    global urls_cache, urls_yt_cache,urls_app_cache, urls_gh_cache
 
     url = request.args.get("url")
     title = None
@@ -198,6 +204,9 @@ def index():
     elif "app" in request.args:
         cache= urls_app_cache
         current_mode = 2
+    elif "gh" in request.args:
+        cache= urls_gh_cache
+        current_mode = 3    
     else:
         cache = urls_cache
         
@@ -412,6 +421,7 @@ time_saved_flagged_content = datetime.now()
 urls_cache = []
 urls_yt_cache = []
 urls_app_cache = []
+urls_gh_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 
@@ -448,8 +458,8 @@ except:
 update_all()
 
 # create opml document (only needs to run once)
-opml_document = OpmlDocument()
-update_opml()
+#opml_document = OpmlDocument()
+#update_opml()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
