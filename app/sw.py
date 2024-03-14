@@ -235,6 +235,7 @@ def index():
     if "youtube.com" in short_url:
         parsed_url = urlparse(url)
         videoid = parse_qs(parsed_url.query)["v"][0]
+        current_mode=1
 
     # get favorites
     favorites_count = favorites_dict.get(url, 0)
