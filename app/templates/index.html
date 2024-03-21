@@ -254,13 +254,13 @@ end.</p>
       <iframe 
         width="840" 
         height="472" 
-        src="https://www.youtube.com/embed/{{videoid}}" 
+        src="https://www.youtube.com/embed/{{videoid}}?rel=0" 
         title="{{title}} 
         video" frameborder="0" 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
         allowfullscreen
         {% if flag_content_count >= 5 %}
-          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}">View Flagged Video</a>'
+          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
         {% endif %}
       ></iframe>
     </div>
