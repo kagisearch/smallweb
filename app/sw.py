@@ -87,7 +87,7 @@ def update_all():
         if not bool(urls_gh_cache) or bool(new_entries):
             urls_gh_cache = new_entries    
         
-        new_entries = update_entries("https://kagi.com/smallweb/appreciated")  # youtube sites
+        new_entries = update_entries("https://kagi.com/smallweb/appreciated")  # appreciated sites
         if not bool(urls_app_cache) or bool(new_entries):
             urls_app_cache = new_entries
 
