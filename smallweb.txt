@@ -152,6 +152,7 @@ http://q.pfiffer.org/feed.xml
 http://radar.spacebar.org/f/a/weblog/rss/1
 http://rado.bg/feed
 http://ratfactor.com/atom.xml
+http://research.swtch.com/feed.atom
 http://ritaottramstad.com/feed/
 http://robertfiorentino.com/feed/
 http://rolandtanglao.com/feed.xml
@@ -4278,6 +4279,7 @@ https://frankrausch.com/feed/rss
 https://frankrenold.ch/index.xml
 https://frankwiles.com/posts/index.xml
 https://frankz.hu/rss/
+https://frankzliu.com/feed.xml
 https://frantic.im/feed.xml
 https://franziflows.de/feed/
 https://freakingrectangle.wordpress.com/feed/
@@ -4669,6 +4671,7 @@ https://hardmath123.github.io/feed.xml
 https://haris-aziz.blogspot.com/feeds/posts/default
 https://harj.posthaven.com/posts.atom
 https://haroldtreen.com/feed.xml
+https://harrisongoldste.in/feed.xml
 https://harrisonsand.com/index.xml
 https://harrisroxashealth.com/feed/
 https://harry-lewis.blogspot.com/feeds/posts/default
@@ -5655,6 +5658,7 @@ https://justin.poehnelt.com/feed/all.xml
 https://justin.searls.co/atom.xml
 https://justinas.org/feeds/all.atom.xml
 https://justindomke.wordpress.com/feed/
+https://justine.lol/rss.xml
 https://justinferriman.com/feed/
 https://justingarrison.com/index.xml
 https://justinhj.github.io/feed.xml
@@ -6847,6 +6851,7 @@ https://momentsingraphics.de/RSS.xml
 https://momi.ca/feed.xml
 https://momjian.us/main/rss/blog.xml
 https://momo5502.com/index.xml
+https://momo5502.com/posts/index.xml
 https://mondaykickoff.com/feed/
 https://monicalent.com/index.xml
 https://monikaratan.com/feed/
@@ -11719,6 +11724,7 @@ https://www.rubypigeon.com/feed.xml
 https://www.ruder.io/rss/
 https://www.runningcode.net/feed.xml
 https://www.rup12.net/index.xml
+https://www.rupertparry.com/feed.xml
 https://www.russ.foo/index.xml
 https://www.rutschle.net/feed.xml
 https://www.rvalles.net/feeds/all.atom.xml
@@ -12264,6 +12270,7 @@ https://yolken.net/feed.xml
 https://yoongkang.com/feed.xml
 https://yordi.me/feed.xml
 https://yorickpeterse.com/feed.xml
+https://yosefk.com/blog/feed
 https://yoshuabengio.org/feed/
 https://yotam.net/index.xml
 https://yourbarnabas.com/feed/
@@ -12353,10 +12360,3 @@ https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed
 https://マリウス.com/index.xml
-https://www.rupertparry.com/feed.xml
-https://justine.lol/rss.xml
-https://frankzliu.com/feed.xml
-https://yosefk.com/blog/feed
-https://momo5502.com/posts/index.xml
-http://research.swtch.com/feed.atom
-https://harrisongoldste.in/feed.xml
