@@ -22,6 +22,7 @@ http://blog.alvarezp.org/feed
 http://blog.behnel.de/rss.xml
 http://blog.colinmarshall.org/?feed=rss2
 http://blog.fivecentsplease.org/feeds/posts/default
+http://blog.genericwhite.com/posts.atom
 http://blog.increa.com/feed/
 http://blog.itdxer.com/feed.xml
 http://blog.jackphelan.xyz/feed
@@ -3017,6 +3018,7 @@ https://davekrunal.com/feed/
 https://davelee.uk/index.xml
 https://davemullenjnr.co.uk/feed.xml
 https://daveon.design/atom.xml
+https://daveon.design/rss.xml
 https://davepeck.org/feed/master.xml
 https://daveredfern.com/feed.xml
 https://daverupert.com/atom.xml
@@ -3695,6 +3697,7 @@ https://evannickel.com/feed/
 https://evanp.me/feed/
 https://evantatemusic.com/blogs/10-ways-to-improve-your-jazz-soloing.atom
 https://evantravers.com/feed.xml
+https://evaparish.com/blog?format=rss
 https://eve.gd/feed/feed.atom
 https://evencleveland.blogspot.com/feeds/posts/default
 https://evennia.blogspot.com/feeds/posts/default
@@ -7255,6 +7258,7 @@ https://notes.ashsmash.com/rss.xml
 https://notes.atomutek.org/feeds/all.atom.xml
 https://notes.billmill.org/atom.xml
 https://notes.eatonphil.com/rss.xml
+https://notes.ghed.in/feed.xml
 https://notes.husk.org/rss
 https://notes.neeasade.net/rss.xml
 https://notes.npilk.com/feed.xml
@@ -10841,6 +10845,7 @@ https://www.georgesequeira.com/index.xml
 https://www.georgetoledo.com/feeds/posts/default
 https://www.georgettetan.com/feed/
 https://www.georgeyw.com/rss/
+https://www.ggnotes.com/rss/
 https://www.ghostinthepixel.com/?feed=rss2
 https://www.gibney.org/atomfeed
 https://www.gijsvandam.nl/rss.xml
@@ -11340,6 +11345,7 @@ https://www.maune.me/feed
 https://www.maurits.ch/index.php?x=atom
 https://www.maxburstein.com/rss/
 https://www.maxpou.fr/rss.xml
+https://www.mayerowitz.io/rss
 https://www.mcmillen.dev/feed.atom
 https://www.mcnulty.blog/feed.xml
 https://www.meaningfulmoney.life/blog-feed.xml
@@ -11855,6 +11861,7 @@ https://www.sorinp.com/rss/
 https://www.soulcutter.com/feed.xml
 https://www.soundstep.com/feed.xml
 https://www.southernrockiesnatureblog.com/feeds/posts/default
+https://www.spakhm.com/feed.rss
 https://www.sparklytrainers.com/feed/
 https://www.sparringmind.com/feed/
 https://www.spectrecollie.com/feed/
@@ -12358,10 +12365,3 @@ https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed
 https://マリウス.com/index.xml
-http://blog.genericwhite.com/posts.atom
-https://www.mayerowitz.io/rss
-https://notes.ghed.in/feed.xml
-https://www.ggnotes.com/rss/
-https://daveon.design/rss.xml
-https://www.spakhm.com/feed.rss
-https://evaparish.com/blog?format=rss
