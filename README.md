@@ -1,18 +1,20 @@
 # Kagi Small Web
 
-Kagi's mission is to humanize the web and this project is built to help surface recent (7 day old or newer) results from the small web - people and stories that typically zip by in legacy search engines. Read more about it in the announcement [blog post](https://blog.kagi.com/small-web).
+Kagi Small Web is an initiative by [Kagi](https://kagi.com).
+
+Kagi's mission is to humanize the web and this project is built to help surface recent results from the small web - people and stories that typically zip by in legacy search engines. Read more about it in the announcement [blog post](https://blog.kagi.com/small-web).
 
 Few things to note:
 
-- [Kagi search engine](https://kagi.com) now surfaces posts from the small web for relevant queries in its search results. 
+- [Kagi search engine](https://kagi.com) surfaces posts from the small web for relevant queries in its search results. 
 
-- Try the [Kagi Small Web](https://kagi.com/smallweb) website to read and appreciate the posts directly.
+- Try the [Kagi Small Web](https://kagi.com/smallweb) website.
 
 - You can also use the [RSS feed](https://kagi.com/api/v1/smallweb/feed) or access these results as a part of a broader [Kagi News Enrichment API](https://help.kagi.com/kagi/api/enrich.html). 
 
 - There is an [OPML file](https://kagi.com/smallweb/opml) of the sites which make up the above RSS feed
 
-## Criteria for posts to show on the KSW website
+## Criteria for posts to show on the website
 
 If the blog is included in small web feed list (which means it has content in English, it is informational/educational by nature and it is not trying to sell anything) we check for these two things to show it on the site:
 
@@ -42,11 +44,11 @@ What is Small Web exactly? Recommend reading:
 app/ - App powering the Kagi Small Web website
 
 
-## Add a site or channel to the list
+## Guidelines for adding a site or channel to the list
 
 Add a new personal blog RSS feed to the list. Rules:
 
-- Do not submit your own website unless you submit 2 other sites that are not yours (and are not in list).
+- **Do not submit your own website unless you submit 2 other sites that are not yours (and are not in list).**
 - Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - No illegal or NSFW content.
