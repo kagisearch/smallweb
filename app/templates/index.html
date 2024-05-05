@@ -60,8 +60,8 @@
      
       <!-- Share Popup -->
       <div class="popup-container">
-        <label for="spread-love" class="popup-link">Share</label>
-        <input type="radio" id="spread-love" name="popup" title="Share this post" class="popup-radio">
+        <label for="spread-love" class="popup-link" title="Share this post">Share</label>
+        <input type="radio" id="spread-love" name="popup"  class="popup-radio">
         <div class="popup spread-love">
           <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option" target="_blank">Hacker News</a>
           <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option" target="_blank">Reddit</a>
@@ -84,7 +84,7 @@
        <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button title="Flag this post" type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+        <button title="Flag this post" type="submit" style="border-right: 1px solid; padding-right: 18px;" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
       </form>
 
       {% if current_mode==1 %} 
