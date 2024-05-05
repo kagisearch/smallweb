@@ -13,11 +13,11 @@
   <div id="header">
     <div id="controls">
       <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
-        <button class="next-button">Next Post</button>
+        <button class="next-button" title="Show next post">Next Post</button>
       </a>
       <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
+        <button type="submit" title="Appreciate this post" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
       </form>
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
@@ -61,7 +61,7 @@
       <!-- Share Popup -->
       <div class="popup-container">
         <label for="spread-love" class="popup-link">Share</label>
-        <input type="radio" id="spread-love" name="popup" class="popup-radio">
+        <input type="radio" id="spread-love" name="popup" title="Share this post" class="popup-radio">
         <div class="popup spread-love">
           <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option" target="_blank">Hacker News</a>
           <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option" target="_blank">Reddit</a>
@@ -84,7 +84,7 @@
        <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+        <button title="Flag this post" type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
       </form>
 
       {% if current_mode==1 %} 
@@ -101,107 +101,18 @@
       {% endif %}      
     </div>
     <div class="right">
-      {% if current_mode == 1 %} 
-      <div class="popup-container right-popup-container">
-          <label for="report-popup" class="popup-link">Report</label>
-          <input type="radio" id="report-popup" name="popup" class="popup-radio">
-          <div class="popup right-popup">
-            <p>Need to report a YouTube channel? Here's when to hit that 'Report' button:</p>
-            <ul>
-              <li>If the channel's not in English, give us a heads-up.</li>
-              <li>Stumbled on low-quality content? Let us know.</li>
-              <li>If the channel seems more about making money than sharing
-              a passion or education, report it.</li>
-            </ul>
-            <p>When you click "Report," a new tab will open with our YouTube list. Just find the channel you're iffy about and take it off. And hey, jot down why you're reporting
-            it.</p>
-              <br/>
-
-              <a
-              href="https://github.com/kagisearch/smallweb/edit/main/smallyt.txt" class="button ok-button"
-              target="_blank">Report</a>
-              <label for="close-popup" class="button cancel-button">Cancel</label>
-          </div>
-        </div>
-
-        <div class="popup-container right-popup-container">
-          <label for="add-channel-popup" class="popup-link">Add channel</label>
-          <input type="radio" id="add-channel-popup" name="popup" class="popup-radio">
-          <div class="popup right-popup">
-            <p>Found a cool YouTube channel you want to add? Just a couple of things to keep in mind:</p>
-            <ul>
-              <li>It's about discovery, not self-promo. So, please don't add your own channel unless you add two other channels that are not in list.</li>
-              <li>Grab the RSS feed from the channel and submit that.</li>
-              <li>We're an English-only zone for now.</li>
-              <li>We love channels about hobbies and personal interests.</li>
-              <li>Let's not overwhelm folks—channels that post no more than twice a week, please.</li>
-              <li>If the channel has more than 400,000 subscribers, it's too big for our little corner of the web.</li>
-            </ul>
-            <p>Once you hit "Add Channel," a new tab will pop up. Add the channel RSS feed to the end of the list there. We'll sort things out after a quick review.</p>
-            <br/>
-              <a href="https://github.com/kagisearch/smallweb/edit/main/smallyt.txt" class="button ok-button" target="_blank">Add
-              Channel</a>
-              <label for="close-popup" class="button cancel-button">Cancel</label>
-          </div>
-        </div>
-
-       
-      {% else %}
-         <div class="popup-container right-popup-container">
-          <label for="report-popup" class="popup-link">Report</label>
-          <input type="radio" id="report-popup" name="popup" class="popup-radio">
-          <div class="popup right-popup">
-          <p>Got a site to report? Here's when you might want to:</p>
-          <ul>
-            <li>The site isn't in English.</li>
-            <li>You're finding the content a bit lackluster.</li>
-            <li>It's throwing ads or newsletter pop-ups at you.</li>
-            <li>The main goal of writing seems to be making money, not
-            informing or sharing knowledge.</li>
-          </ul>
-          <p>When you hit "Report," a new tab will open up with our small web list. Just find the site you're concerned about and take it off the list. Don't forget to jot down why you're
-          reporting it.</p>
-          <br/>
-              <a
-              href="https://github.com/kagisearch/smallweb/edit/main/smallweb.txt" class="button ok-button"
-              target="_blank">Report</a>
-              <label for="close-popup" class="button cancel-button">Cancel</label>
-          </div>
-        </div>
-
-        <div class="popup-container right-popup-container">
-          <label for="add-site-popup" class="popup-link">Add site</label>
-          <input type="radio" id="add-site-popup" name="popup" class="popup-radio">
-          <div class="popup right-popup">
-          
-            <p>Want to add a new personal blog RSS feed? Here are some ground rules:</p>
-            <ul>
-              <li>Let's keep it about sharing, not self-promotion. You can submit your own if you submit two other sites that are not in the list.</li>
-              <li>Find and submit the site's RSS feed.</li>
-              <li>We're sticking to English for now—sorry, no other languages.</li>
-              <li>Only personal blogs, please. No companies or big publishers.</li>
-              <li>Make sure the blog has a post that's been published in the last 6 months. We like to keep things fresh!</li>
-              <li>No ads, pop-ups for newsletters, or any of that money-making stuff.</li>
-            </ul>
-            <p>Hit "Add Site," and a new tab will open where you can add the feed to the end of our list. We'll sort it out after we take a look.</p>
-            <br/>
-
-              <a
-              href="https://github.com/kagisearch/smallweb/edit/main/smallweb.txt" class="button ok-button" target="_blank">Add Site</a>
-              <label for="close-popup" class="button cancel-button">Cancel</label>
-          </div>
-        </div>        
-      {% endif %}
-       <a href="https://kagifeedback.org">Feedback</a>
+     
+       <a href="https://kagi.com" title="Visit Kagi Search">Kagi Search</a>
+       <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository">Contribute</a>
        <div class="popup-container">
-        <label for="rss-popup" class="popup-link">RSS</label>
+        <label for="rss-popup" class="popup-link" title="Subscribe to RSS">RSS</label>
         <input type="radio" id="rss-popup" name="popup" class="popup-radio">
         <div class="popup spread-love rss-popup">
           <p>Grab the RSS feed you like.</p>
          <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">Small Web All (very large)</a>
          <a
          class="share-option" target="_blank"
-         href="https://kagi.com/smallweb/appreciated">Appreciated/Notable</a>
+         href="https://kagi.com/smallweb/appreciated">Appreciated</a>
          <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos</a>
          <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code</a>
          <a
