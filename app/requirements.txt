@@ -17,7 +17,7 @@ sgmllib3k==1.0.0
 six==1.16.0
 tzlocal==5.0.1
 urllib3==2.0.7
-Werkzeug==3.0.1
+Werkzeug==3.0.3
 feedwerk==1.1.0
 python-dateutil
 pyopml==1.0.0
