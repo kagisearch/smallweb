@@ -266,6 +266,7 @@ http://www.thefunctionalart.com/feeds/posts/default
 http://www.theincredibleinman.com/feeds/posts/default
 http://www.thelrm.org/entries.atom
 http://www.theuntourists.com/feed/
+http://www.tikalon.com/blog/rss.xml
 http://www.toomanywires.co.uk/feeds/posts/default
 http://www.tsipaswan.com/offers?format=rss
 http://www.unofficialbritain.com/feed/
@@ -1869,6 +1870,7 @@ https://blog.pingoured.fr/index.php?feed/atom
 https://blog.pkh.me/rss.xml
 https://blog.planethawleywood.com/feed/
 https://blog.ploeh.dk/atom.xml
+https://blog.plover.com/index.rss
 https://blog.pnkfx.org/atom.xml
 https://blog.polyhaven.com/feed/
 https://blog.pragmaticengineer.com/rss/
@@ -12431,4 +12433,3 @@ https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed
 https://zzamboni.org/post/index.xml
 https://マリウス.com/index.xml
-http://www.tikalon.com/blog/rss.xml
