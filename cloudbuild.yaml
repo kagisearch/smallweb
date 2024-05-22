@@ -16,7 +16,7 @@ steps:
       '--service-account', 'smallweb@${PROJECT_ID}.iam.gserviceaccount.com',
       '--cpu=2',
       '--memory=2Gi',
-      '--min-instances', '1'
+      '--min-instances', '1',
       '--max-instances', '10'
     ]
 images:
