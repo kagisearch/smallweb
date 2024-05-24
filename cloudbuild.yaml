@@ -14,9 +14,10 @@ steps:
       '--allow-unauthenticated',
       '--set-env-vars', 'URL_PREFIX=/smallweb',
       '--service-account', 'smallweb@${PROJECT_ID}.iam.gserviceaccount.com',
-      '--cpu=1',
-      '--memory=1Gi',
-      '--min-instances', '1'
+      '--cpu=2',
+      '--memory=2Gi',
+      '--min-instances', '1',
+      '--max-instances', '10'
     ]
 images:
   - us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}
