@@ -75,7 +75,7 @@ Remove a website if :
 - It does not adhere to the above guidelines
 - In the removal request, state which guideline does it break
 
-Clicking "Remove website" will edit small web list in new tab, where you can locate and remove the website feed in question. Make sure to add in comments the rason for removal.
+Clicking "Remove website" will edit small web list in new tab, where you can locate and remove the website feed in question. Make sure to add in comments the reason for removal.
 
 [Remove website](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 
