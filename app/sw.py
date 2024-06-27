@@ -193,23 +193,29 @@ def get_registered_domain(url):
 
 @app.route("/")
 def index():
-    global urls_cache, urls_yt_cache,urls_app_cache, urls_gh_cache
+    global urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache
 
     url = request.args.get("url")
+    search_query = request.args.get("search", "").lower()
     title = None
     current_mode = 0
     if "yt" in request.args:
         cache = urls_yt_cache
         current_mode = 1
     elif "app" in request.args:
-        cache= urls_app_cache
+        cache = urls_app_cache
         current_mode = 2
     elif "gh" in request.args:
-        cache= urls_gh_cache
+        cache = urls_gh_cache
         current_mode = 3    
     else:
         cache = urls_cache
-        
+
+    if search_query:
+        cache = [
+            (url, title, author) for url, title, author in cache
+            if search_query in url.lower() or search_query in title.lower() or search_query in author.lower()
+        ]
 
     if url is not None:
         http_url = url.replace("https://", "http://")
@@ -239,12 +245,11 @@ def index():
     domain = re.sub(r"^(www\.)?", "", domain)
 
     videoid = ""
-    
 
     if "youtube.com" in short_url:
         parsed_url = urlparse(url)
         videoid = parse_qs(parsed_url.query)["v"][0]
-        current_mode=1
+        current_mode = 1
 
     # get favorites
     favorites_count = favorites_dict.get(url, 0)
@@ -283,6 +288,7 @@ def index():
         notes_count=notes_count,
         notes_list=notes_list,
         flag_content_count=flag_content_count,
+        search_query=search_query,
     )
 
 
