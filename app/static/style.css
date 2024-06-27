@@ -46,6 +46,8 @@ body {
   border: none;
   border-radius: 5px 0 0 5px;
   width: 200px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .clear-search {
