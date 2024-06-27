@@ -220,6 +220,25 @@ def index():
             any(search_query.lower() == word.lower() for word in author.split()) or 
             any(search_query.lower() == word.lower() for word in description.split())
         ]
+        if not cache:
+            return render_template(
+                "index.html",
+                url="",
+                short_url="",
+                query_string="",
+                title="No results found",
+                author="",
+                domain="",
+                prefix=prefix + "/",
+                videoid="",
+                current_mode=current_mode,
+                favorites_count=0,
+                notes_count=0,
+                notes_list=[],
+                flag_content_count=0,
+                search_query=search_query,
+                no_results=True
+            )
 
     if url is not None:
         http_url = url.replace("https://", "http://")
