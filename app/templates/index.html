@@ -23,7 +23,7 @@
       {% endif %}
       <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" title="Appreciate this post" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
+        <button type="submit" title="Appreciate this post" class="favorite-link">Appreciate{{ (' (' ~ favorites_count ~ ')') | safe if favorites_count > 0 else '' }}</button>
       </form>
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
@@ -90,7 +90,7 @@
        <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button title="Flag this post" type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+        <button title="Flag this post" type="submit" class="flag-link">Flag{{ (' <span class="flag-danger">(' ~ flag_content_count ~ ')</span>') | safe if flag_content_count > 0 else '' }}</button>
       </form>
 
       {% if current_mode==1 %} 
@@ -183,7 +183,8 @@ end.</p>
         {% if flag_content_count >= 5 %}
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
         {% endif %}
-      ></iframe>
+      >
+      </iframe>
     </div>
   {% else %}
     <div id="content">
@@ -192,7 +193,8 @@ end.</p>
         {% if flag_content_count >= 5 %}
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target=_blank>View Flagged Content</a>'
         {% endif %}
-      ></iframe>
+      >
+      </iframe>
     </div>
   {% endif %}
 </body>
