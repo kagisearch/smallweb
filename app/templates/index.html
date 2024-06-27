@@ -88,7 +88,7 @@
        <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button title="Flag this post" type="submit" style="border-right: 1px solid; padding-right: 18px;" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
+        <button title="Flag this post" type="submit" class="flag-link">Flag{{ ' <span class="flag-danger">('|safe ~ flag_content_count ~ ')</span>'|safe if flag_content_count > 0 else '' }}</button>
       </form>
 
       {% if current_mode==1 %} 
