@@ -215,7 +215,10 @@ def index():
     if search_query:
         cache = [
             (url, title, author, description) for url, title, author, description in cache
-            if search_query in url.lower() or search_query in title.lower() or search_query in author.lower() or search_query in description.lower()
+            if search_query in url.lower() or 
+            any(search_query.lower() == word.lower() for word in title.split()) or 
+            any(search_query.lower() == word.lower() for word in author.split()) or 
+            any(search_query.lower() == word.lower() for word in description.split())
         ]
 
     if url is not None:
