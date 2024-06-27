@@ -129,11 +129,12 @@ def update_entries(url):
                     "title": entry.title,
                     "link": entry.link,
                     "author": entry.author,
+                    "description": entry.get('description', ''),
                 }
             )
 
         cache = [
-            (entry["link"], entry["title"], entry["author"])
+            (entry["link"], entry["title"], entry["author"], entry["description"])
             for entry in formatted_entries
         ]
         print(len(cache), "entries")
@@ -213,29 +214,30 @@ def index():
 
     if search_query:
         cache = [
-            (url, title, author) for url, title, author in cache
-            if search_query in url.lower() or search_query in title.lower() or search_query in author.lower()
+            (url, title, author, description) for url, title, author, description in cache
+            if search_query in url.lower() or search_query in title.lower() or search_query in author.lower() or search_query in description.lower()
         ]
 
     if url is not None:
         http_url = url.replace("https://", "http://")
-        title, author = next(
+        title, author, description = next(
             (
-                (url_tuple[1], url_tuple[2])
+                (url_tuple[1], url_tuple[2], url_tuple[3])
                 for url_tuple in cache
                 if url_tuple[0] == url or url_tuple[0] == http_url
             ),
-            (None, None),
+            (None, None, None),
         )
 
     if title is None:
         if cache and len(cache):
-            url, title, author = random.choice(cache)
+            url, title, author, description = random.choice(cache)
         else:
-            url, title, author = (
+            url, title, author, description = (
                 "https://blog.kagi.com/small-web",
                 "Nothing to see",
                 "Feed not active, try later",
+                "",
             )
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
