@@ -132,7 +132,13 @@ body {
 .right {
   flex: 1;
   text-align: right;
-  max-width:340px;
+  max-width: 340px;
+  display: flex;
+  align-items: center;
+}
+
+#search-form {
+  margin-right: 10px;
 }
 
 #content {
