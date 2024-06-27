@@ -212,7 +212,7 @@ def index():
     else:
         cache = urls_cache
 
-    if search_query:
+    if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
             (url, title, author, description) for url, title, author, description in cache
             if search_query in url.lower() or 
