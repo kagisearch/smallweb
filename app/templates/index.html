@@ -12,6 +12,10 @@
 <body>
   <div id="header">
     <div id="controls">
+      <form action="{{ prefix }}" method="get" id="search-form">
+        <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input">
+        <button type="submit" class="search-button" title="Search">Search</button>
+      </form>
       <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
         <button class="next-button" title="Show next post">Next Post</button>
       </a>
