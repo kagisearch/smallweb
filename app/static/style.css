@@ -68,7 +68,7 @@ body {
 .search-button {
   background-color: #3498db;
   border: none;
-  padding: 8px !important;
+  padding: 7px !important;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
