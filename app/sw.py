@@ -12,6 +12,7 @@ from flask import (
     Response,
 )
 import feedparser
+import feedparser
 from dateutil.parser import parse
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
@@ -297,6 +298,12 @@ def index():
             "http://", "https://"
         )  # force https as http will not work inside https iframe anyway
 
+    # Calculate counts
+    all_count = len(urls_cache) if urls_cache else 0
+    appreciated_count = len(urls_app_cache) if urls_app_cache else 0
+    videos_count = len(urls_yt_cache) if urls_yt_cache else 0
+    code_count = len(urls_gh_cache) if urls_gh_cache else 0
+
     return render_template(
         "index.html",
         url=url,
@@ -313,6 +320,10 @@ def index():
         notes_list=notes_list,
         flag_content_count=flag_content_count,
         search_query=search_query,
+        all_count=all_count,
+        appreciated_count=appreciated_count,
+        videos_count=videos_count,
+        code_count=code_count,
     )
 
 
