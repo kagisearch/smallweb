@@ -105,7 +105,10 @@
     <div class="right">
      
        <form action="{{ prefix }}" method="get" id="search-form">
-        <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
+        <div class="search-container">
+          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
+          <span class="clear-search" id="clear-search">&times;</span>
+        </div>
         <button type="submit" class="search-button" title="Search">Search</button>
       </form>
        <a href="https://kagi.com" title="Visit Kagi">Kagi</a>
@@ -197,5 +200,17 @@ end.</p>
       </iframe>
     </div>
   {% endif %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const clearSearch = document.getElementById('clear-search');
+    const searchForm = document.getElementById('search-form');
+
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        searchForm.submit();
+    });
+});
+</script>
 </body>
 </html>

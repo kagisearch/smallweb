@@ -34,13 +34,33 @@ body {
   margin-right: 10px;
 }
 
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+
 #search-input {
   font-family: pixel, Arial, sans-serif;
   font-size: 18px;
-  padding: 5px;
+  padding: 5px 25px 5px 5px;
   border: none;
   border-radius: 5px 0 0 5px;
   width: 200px;
+}
+
+.clear-search {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #999;
+  font-size: 18px;
+  display: none;
+}
+
+#search-input:not(:placeholder-shown) + .clear-search {
+  display: block;
 }
 
 .search-button {
