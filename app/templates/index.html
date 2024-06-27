@@ -16,9 +16,11 @@
         <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input">
         <button type="submit" class="search-button" title="Search">Search</button>
       </form>
+      {% if not no_results %}
       <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
         <button class="next-button" title="Show next post">Next Post</button>
       </a>
+      {% endif %}
       <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
         <button type="submit" title="Appreciate this post" class="favorite-link">Appreciate{{ ' (' ~ favorites_count ~ ')' if favorites_count > 0 else '' }}</button>
@@ -164,7 +166,11 @@ end.</p>
     <a href="https://kagi.com"><img id="logo" src="{{ url_for('static', filename='doggo_px.png') }}" alt="Kagi Doggo
     mascot"/></a>
   </div>
-  {% if current_mode == 1 %}
+  {% if no_results %}
+    <div id="content" style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 60px);">
+      <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50;">No results found for "{{ search_query }}"</h2>
+    </div>
+  {% elif current_mode == 1 %}
     <div id="content-yt">
       <iframe 
         width="840" 
