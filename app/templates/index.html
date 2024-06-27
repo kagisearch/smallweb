@@ -12,10 +12,6 @@
 <body>
   <div id="header">
     <div id="controls">
-      <form action="{{ prefix }}" method="get" id="search-form">
-        <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input">
-        <button type="submit" class="search-button" title="Search">Search</button>
-      </form>
       {% if not no_results %}
       <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
         <button class="next-button" title="Show next post">Next Post</button>
@@ -108,7 +104,11 @@
     </div>
     <div class="right">
      
-       <a href="https://kagi.com" title="Visit Kagi Search">Kagi Search</a>
+       <form action="{{ prefix }}" method="get" id="search-form">
+        <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
+        <button type="submit" class="search-button" title="Search">Search</button>
+      </form>
+       <a href="https://kagi.com" title="Visit Kagi">Kagi</a>
        <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository">Contribute</a>
        <div class="popup-container">
         <label for="rss-popup" class="popup-link" title="Subscribe to RSS">RSS</label>
