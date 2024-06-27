@@ -29,6 +29,36 @@ body {
   align-items: center;
 }
 
+#search-form {
+  display: flex;
+  margin-right: 10px;
+}
+
+#search-input {
+  font-family: pixel, Arial, sans-serif;
+  font-size: 18px;
+  padding: 5px;
+  border: none;
+  border-radius: 5px 0 0 5px;
+  width: 200px;
+}
+
+.search-button {
+  background-color: #3498db;
+  border: none;
+  padding: 8px !important;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 0 5px 5px 0;
+  font-size: 18px;
+  font-family: pixel, Arial;
+}
+
+.search-button:hover {
+  background-color: #2980b9;
+}
+
 .next-button, .ok-button {
   background-color: #3498db;
   border: none;
