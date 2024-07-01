@@ -21,29 +21,6 @@ If the blog is included in small web feed list (which means it has content in En
 - Blog has recent posts (<7 days old)
 - The website can appear in an iframe
   
-## Small web is beautiful
-
-What is Small Web exactly? Recommend reading:
-
-- https://neustadt.fr/essays/the-small-web/
-- https://benhoyt.com/writings/the-small-web-is-beautiful/
-- https://smallweb.page/why
-- https://ar.al/2020/08/07/what-is-the-small-web/
-- https://news.ycombinator.com/item?id=29768197
-
-
-
-## Info
-
-[smallweb.txt](https://github.com/kagisearch/smallweb/blob/main/smallweb.txt) - Contains the feeds of indexed blogs
-
-[smallyt.txt](https://github.com/kagisearch/smallweb/blob/main/smallyt.txt) - Contains the feeds of indexed YouTube channels
-
-[yt_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/yt_rejected.txt) - Contains the list of YouTube channels that were reviewed (in an automated way) and rejected 
-
-app/ - App powering the Kagi Small Web website
-
-
 ## Guidelines for adding a site or channel to the list
 
 Add a new personal blog RSS feed to the list. Rules:
@@ -80,6 +57,31 @@ Clicking "Remove website" will edit small web list in new tab, where you can loc
 [Remove website](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 
 [Remove channel](https://github.com/kagisearch/smallweb/edit/main/smallt.txt)
+
+
+## Small web is beautiful
+
+What is Small Web exactly? Recommend reading:
+
+- https://neustadt.fr/essays/the-small-web/
+- https://benhoyt.com/writings/the-small-web-is-beautiful/
+- https://smallweb.page/why
+- https://ar.al/2020/08/07/what-is-the-small-web/
+- https://news.ycombinator.com/item?id=29768197
+
+
+
+## Info
+
+[smallweb.txt](https://github.com/kagisearch/smallweb/blob/main/smallweb.txt) - Contains the feeds of indexed blogs
+
+[smallyt.txt](https://github.com/kagisearch/smallweb/blob/main/smallyt.txt) - Contains the feeds of indexed YouTube channels
+
+[yt_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/yt_rejected.txt) - Contains the list of YouTube channels that were reviewed (in an automated way) and rejected 
+
+app/ - App powering the Kagi Small Web website
+
+
 
 ## Sources
 ### Small web 
