@@ -17,7 +17,9 @@ steps:
       '--cpu=2',
       '--memory=2Gi',
       '--min-instances', '1',
-      '--max-instances', '10'
+      # NOTE(Luan): Smallweb seems to have an issue with running more than 1
+      # instance, let's keep it as max = 1
+      '--max-instances', '1'
     ]
 images:
   - us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}
