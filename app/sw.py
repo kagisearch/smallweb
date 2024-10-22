@@ -70,7 +70,7 @@ def update_all():
     try:
         print("begin update_all")
         check_feed = feedparser.parse(url)
-        if check_feed:
+        if check_feed and check_feed.entries and len(check_feed.entries):
             master_feed = check_feed
 
         new_entries = update_entries(url + "?nso")  # no same origin sites feed
