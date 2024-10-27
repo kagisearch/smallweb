@@ -62,7 +62,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, master_feed, favorites_dict
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, master_feed, favorites_dict, appreciated_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -94,6 +94,9 @@ def update_all():
         
         # Build urls_app_cache from appreciated entries in urls_cache
         urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
+        
+        # Generate the appreciated feed
+        generate_appreciated_feed()
        
     except:
         print("something went wrong during update_all")
@@ -330,7 +333,7 @@ def index():
 
 @app.post("/favorite")
 def favorite():
-    global favorites_dict, time_saved_favorites
+    global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
     url = request.form.get("url")
 
     if url:
@@ -338,8 +341,10 @@ def favorite():
         favorites_dict[url] = favorites_dict.get(url, 0) + 1
 
         # Update urls_app_cache with the new favorite
-        global urls_app_cache
         urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
+        
+        # Regenerate the appreciated feed
+        generate_appreciated_feed()
 
         # Save to disk
         if (datetime.now() - time_saved_favorites).total_seconds() > 60:
@@ -428,24 +433,8 @@ def flag_content():
 
 @app.route("/appreciated")
 def appreciated():
-    feed = AtomFeed(
-        "Kagi Small Web Appreciated",
-        feed_url="https://kagi.com/smallweb/appreciated"
-    )
-
-    # Add appreciated entries from urls_cache to the feed
-    for url, title, author, description in urls_cache:
-        if url in favorites_dict:
-            feed.add(
-                title=title,
-                content=description,
-                content_type="html",
-                url=url,
-                updated=datetime.utcnow(),
-                author=author,
-            )
-
-    return Response(feed.to_string(), mimetype="application/atom+xml")
+    global appreciated_feed
+    return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
 
 @app.route("/opml")
 def opml():
@@ -473,6 +462,7 @@ except:
 finally:
     # Initialize urls_app_cache based on favorites_dict
     urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
+    generate_appreciated_feed()  # Initialize the appreciated feed
 
 
 notes_dict = {}  # Dictionary to store notes
