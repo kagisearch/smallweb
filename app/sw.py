@@ -108,8 +108,8 @@ def update_all():
         if not bool(urls_gh_cache) or bool(new_entries):
             urls_gh_cache = new_entries    
         
-        # Prune favorites_dict to only include URLs present in urls_cache
-        current_urls = set(entry[0] for entry in urls_cache)
+        # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
+        current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
         favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
         
         # Build urls_app_cache from appreciated entries in urls_cache
