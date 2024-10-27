@@ -27,6 +27,26 @@ from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
 #from opml import OpmlDocument
 
+appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
+
+def generate_appreciated_feed():
+    """Generate Atom feed for appreciated posts"""
+    global appreciated_feed
+    appreciated_feed = AtomFeed(
+        "Kagi Small Web Appreciated",
+        feed_url="https://kagi.com/smallweb/appreciated"
+    )
+    for url_entry in urls_app_cache:
+        url_item, title, author, description = url_entry
+        appreciated_feed.add(
+            title=title,
+            content=description,
+            content_type="html",
+            url=url_item,
+            updated=datetime.utcnow(),
+            author=author,
+        )
+
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
     # trying to write a file in a non-existent dir
