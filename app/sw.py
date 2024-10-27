@@ -83,7 +83,7 @@ def update_all():
         if not bool(urls_yt_cache) or bool(new_entries):
             urls_yt_cache = new_entries
 
-        new_entries = update_entries(url + "?gh")  # github sites
+        new_entries = update_entries(url + "?gh")  # github sitesgit push
 
         if not bool(urls_gh_cache) or bool(new_entries):
             urls_gh_cache = new_entries    
