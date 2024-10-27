@@ -360,8 +360,8 @@ def favorite():
         # Increment favorites count
         favorites_dict[url] = favorites_dict.get(url, 0) + 1
 
-        # Update urls_app_cache with the new favorite
-        urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
+        # Update urls_app_cache with the new favorite from both regular and YouTube feeds
+        urls_app_cache = [entry for entry in (urls_cache + urls_yt_cache) if entry[0] in favorites_dict]
         
         # Regenerate the appreciated feed
         generate_appreciated_feed()
