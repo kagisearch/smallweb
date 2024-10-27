@@ -88,11 +88,8 @@ def update_all():
         if not bool(urls_gh_cache) or bool(new_entries):
             urls_gh_cache = new_entries    
         
-        new_entries = update_entries("https://kagi.com/smallweb/appreciated")  # appreciated sites
-        if not bool(urls_app_cache) or bool(new_entries):
-            urls_app_cache = new_entries
-
-            
+        # Build urls_app_cache from appreciated entries in urls_cache
+        urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
        
     except:
         print("something went wrong during update_all")
@@ -336,6 +333,10 @@ def favorite():
         # Increment favorites count
         favorites_dict[url] = favorites_dict.get(url, 0) + 1
 
+        # Update urls_app_cache with the new favorite
+        global urls_app_cache
+        urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
+
         # Save to disk
         if (datetime.now() - time_saved_favorites).total_seconds() > 60:
             time_saved_favorites = datetime.now()
@@ -423,31 +424,22 @@ def flag_content():
 
 @app.route("/appreciated")
 def appreciated():
-    global master_feed
-
     feed = AtomFeed(
-        "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
+        "Kagi Small Web Appreciated",
+        feed_url="https://kagi.com/smallweb/appreciated"
     )
-    count = 1
 
-    if master_feed:
-        for entry in master_feed.entries:
-            url = entry.link
-            http_url = url.replace("https://", "http://")
-
-            if (url in favorites_dict or url in notes_dict) or (
-                http_url in favorites_dict or http_url in notes_dict
-            ):
-                count = count + 1
-                feed.add(
-                    entry.title,
-                    getattr(entry, "summary", ""),
-                    content_type="html",
-                    url=entry.link,
-                    updated=parse(entry.updated),
-                    published=parse(entry.published),
-                    author=getattr(entry, "author", ""),
-                )
+    # Add appreciated entries from urls_cache to the feed
+    for url, title, author, description in urls_cache:
+        if url in favorites_dict:
+            feed.add(
+                title=title,
+                content=description,
+                content_type="html",
+                url=url,
+                updated=datetime.utcnow(),
+                author=author,
+            )
 
     return Response(feed.to_string(), mimetype="application/atom+xml")
 
@@ -474,6 +466,9 @@ try:
         print("Loaded favorites", len(favorites_dict))
 except:
     print("No favorites data found.")
+finally:
+    # Initialize urls_app_cache based on favorites_dict
+    urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
 
 
 notes_dict = {}  # Dictionary to store notes
