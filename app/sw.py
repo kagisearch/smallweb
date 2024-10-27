@@ -62,7 +62,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache,urls_gh_cache,  master_feed
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, master_feed, favorites_dict
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -87,6 +87,10 @@ def update_all():
 
         if not bool(urls_gh_cache) or bool(new_entries):
             urls_gh_cache = new_entries    
+        
+        # Prune favorites_dict to only include URLs present in urls_cache
+        current_urls = set(entry[0] for entry in urls_cache)
+        favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
         
         # Build urls_app_cache from appreciated entries in urls_cache
         urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
