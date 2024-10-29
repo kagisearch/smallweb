@@ -92,12 +92,15 @@
       {% if current_mode==1 %} 
         <a id="switch"  href="{{ prefix }}">Web</a>
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
+        <a id="switch" href="{{ prefix }}browse?mode=videos">Browse</a>
       {% elif current_mode==2 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
+        <a id="switch" href="{{ prefix }}browse">Browse</a>
       {% else %}
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
+        <a id="switch" href="{{ prefix }}browse?mode=web">Browse</a>
 
         
       {% endif %}      

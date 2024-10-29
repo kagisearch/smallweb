@@ -106,18 +106,18 @@ def update_all():
         new_entries = update_entries(url + "?gh")  # github sitesgit push
 
         if not bool(urls_gh_cache) or bool(new_entries):
-            urls_gh_cache = new_entries    
-        
+            urls_gh_cache = new_entries
+
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
         favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
-        
+
         # Build urls_app_cache from appreciated entries in urls_cache
         urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
-        
+
         # Generate the appreciated feed
         generate_appreciated_feed()
-       
+
     except:
         print("something went wrong during update_all")
     finally:
@@ -233,16 +233,16 @@ def index():
         current_mode = 2
     elif "gh" in request.args:
         cache = urls_gh_cache
-        current_mode = 3    
+        current_mode = 3
     else:
         cache = urls_cache
 
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
             (url, title, author, description) for url, title, author, description in cache
-            if search_query in url.lower() or 
-            any(search_query.lower() == word.lower() for word in title.split()) or 
-            any(search_query.lower() == word.lower() for word in author.split()) or 
+            if search_query in url.lower() or
+            any(search_query.lower() == word.lower() for word in title.split()) or
+            any(search_query.lower() == word.lower() for word in author.split()) or
             any(search_query.lower() == word.lower() for word in description.split())
         ]
         if not cache:
@@ -362,7 +362,7 @@ def favorite():
 
         # Update urls_app_cache with the new favorite from both regular and YouTube feeds
         urls_app_cache = [entry for entry in (urls_cache + urls_yt_cache) if entry[0] in favorites_dict]
-        
+
         # Regenerate the appreciated feed
         generate_appreciated_feed()
 
@@ -459,6 +459,59 @@ def appreciated():
 @app.route("/opml")
 def opml():
     return Response(opml_document.dumps(), headers={"content-disposition":"attachment; filename=smallweb.opml"}, mimetype="text/x-opml")
+
+@app.route("/browse")
+def browse():
+    search_query = request.args.get("search", "").lower()
+    mode = request.args.get("mode", "web")  # default to web view
+
+    # Choose cache based on mode
+    if mode == "videos":
+        cache = urls_yt_cache
+        current_mode = 1
+    else:
+        cache = urls_cache
+        current_mode = 0
+
+    # Filter by search if query exists
+    if search_query.strip():
+        cache = [
+            (url, title, author, description) for url, title, author, description in cache
+            if search_query in url.lower() or
+            search_query in title.lower() or
+            search_query in author.lower() or
+            search_query in description.lower()
+        ]
+
+    # Format the entries
+    entries = []
+    for url, title, author, description in cache:
+        domain = get_registered_domain(url)
+        domain = re.sub(r"^(www\.)?", "", domain)
+
+        videoid = ""
+        if "youtube.com" in url:
+            parsed_url = urlparse(url)
+            videoid = parse_qs(parsed_url.query)["v"][0]
+
+        entries.append({
+            'url': url,
+            'title': title,
+            'author': author,
+            'domain': domain,
+            'videoid': videoid,
+            'favorites_count': favorites_dict.get(url, 0),
+            'flag_count': flagged_content_dict.get(url, 0)
+        })
+
+    return render_template(
+        "browse.html",
+        entries=entries,
+        mode=mode,
+        search_query=search_query,
+        prefix=prefix + "/",
+        current_mode=current_mode
+    )
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()

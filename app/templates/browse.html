@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Browse - Kagi Small Web</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <style>
+            .browse-container {
+                max-width: 1200px;
+                margin: 40px auto 20px auto;
+                padding: 0 20px;
+            }
+
+            .controls {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .mode-switch {
+                display: flex;
+                gap: 10px;
+            }
+
+            .entries-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+
+            .entry-card {
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 15px;
+                background: white;
+                position: relative;
+            }
+
+            .entry-card:hover {
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .entry-title {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+                color: #333;
+            }
+
+            .entry-meta {
+                font-size: 0.9em;
+                color: #666;
+                margin-bottom: 15px;
+            }
+
+            .entry-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .preview-container {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+            }
+
+            .preview-iframe {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                height: 90%;
+                background: white;
+            }
+
+            .close-preview {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+            }
+
+            .stats {
+                display: flex;
+                gap: 15px;
+                font-size: 0.9em;
+                color: #666;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <a href="{{ prefix }}">← Back to Main</a>
+        </div>
+
+        <div class="browse-container">
+            <div class="controls">
+                <div class="mode-switch">
+                    <a
+                        href="{{ prefix }}browse?mode=web"
+                        class="button {% if mode == 'web' %}active{% endif %}"
+                        >Web</a
+                    >
+                    <a
+                        href="{{ prefix }}browse?mode=videos"
+                        class="button {% if mode == 'videos' %}active{% endif %}"
+                        >Videos</a
+                    >
+                </div>
+
+                <form
+                    action="{{ prefix }}browse"
+                    method="get"
+                    class="search-form"
+                >
+                    <input type="hidden" name="mode" value="{{ mode }}" />
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search..."
+                        value="{{ search_query }}"
+                    />
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+
+            <div class="entries-grid">
+                {% for entry in entries %}
+                <div class="entry-card">
+                    <div class="entry-title">{{ entry.title }}</div>
+                    <div class="entry-meta">
+                        {% if entry.author %}
+                        <div>By: {{ entry.author }}</div>
+                        {% endif %}
+                        <div>Domain: {{ entry.domain }}</div>
+                    </div>
+                    <div class="stats">
+                        <span>❤️ {{ entry.favorites_count }}</span>
+                        {% if entry.flag_count > 0 %}
+                        <span>🚩 {{ entry.flag_count }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="entry-actions">
+                        <button
+                            onclick="previewContent('{{ entry.url }}', '{{ entry.videoid }}')"
+                            class="button"
+                        >
+                            Preview
+                        </button>
+                        <a href="{{ entry.url }}" target="_blank" class="button"
+                            >Open in New Tab</a
+                        >
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="preview-container" id="previewContainer">
+            <div class="close-preview" onclick="closePreview()">×</div>
+            <iframe class="preview-iframe" id="previewFrame"></iframe>
+        </div>
+
+        <script>
+            function previewContent(url, videoId) {
+                const container = document.getElementById("previewContainer");
+                const iframe = document.getElementById("previewFrame");
+
+                if (videoId) {
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0`;
+                } else {
+                    iframe.src = url;
+                }
+
+                container.style.display = "block";
+            }
+
+            function closePreview() {
+                const container = document.getElementById("previewContainer");
+                const iframe = document.getElementById("previewFrame");
+                iframe.src = "";
+                container.style.display = "none";
+            }
+        </script>
+    </body>
+</html>
