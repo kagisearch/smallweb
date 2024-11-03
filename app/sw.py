@@ -25,7 +25,6 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
-from pyopml import OpmlDocument
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 
@@ -167,47 +166,6 @@ def update_entries(url):
     else:
         return False
 
-def update_opml():
-    """Generate OPML document from smallweb.txt feed list"""
-    global opml_document
-    
-    # Create new document
-    opml_document = OpmlDocument(
-        title="Kagi Smallweb Feeds",
-        date_created=datetime.now(),
-        owner_name="Kagi Small Web",
-        owner_email="smallweb@kagi.com"
-    )
-
-    # Add feeds from smallweb.txt
-    try:
-        with open("smallweb.txt") as f:
-            for url in f:
-                url = url.strip()
-                if url:
-                    try:
-                        # Try to get feed metadata
-                        feed = feedparser.parse(url)
-                        feed_info = feed.get('feed', {})
-                        
-                        opml_document.add_rss(
-                            text=feed_info.get('title', url),
-                            xml_url=url,
-                            title=feed_info.get('title'),
-                            description=feed_info.get('description'),
-                            html_url=feed_info.get('link'),
-                            language="en_US"
-                        )
-                    except:
-                        # Fallback to basic entry if feed parsing fails
-                        opml_document.add_rss(
-                            text=url,
-                            xml_url=url,
-                            language="en_US"
-                        )
-        print("OPML document generated successfully")
-    except Exception as e:
-        print(f"Error generating OPML: {str(e)}")
 
 def load_public_suffix_list(file_path):
     public_suffix_list = set()
@@ -473,20 +431,8 @@ def appreciated():
 
 @app.route("/opml")
 def opml():
-    """Serve the OPML document"""
-    try:
-        # Ensure we have latest feeds
-        update_opml()
-        
-        return Response(
-            opml_document.dumps(),
-            headers={
-                "Content-Type": "text/x-opml",
-                "Content-Disposition": "attachment; filename=kagi_smallweb.opml"
-            }
-        )
-    except Exception as e:
-        return f"Error generating OPML: {str(e)}", 500
+    """OPML endpoint"""
+    return "Currently not supported", 404
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
@@ -535,9 +481,6 @@ except:
 # get feeds
 update_all()
 
-# Initialize OPML document
-opml_document = OpmlDocument()
-update_opml()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
