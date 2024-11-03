@@ -25,7 +25,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
-#from opml import OpmlDocument
+from opml import OpmlDocument
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 
@@ -507,9 +507,9 @@ except:
 # get feeds
 update_all()
 
-# create opml document (only needs to run once)
-#opml_document = OpmlDocument()
-#update_opml()
+# Initialize OPML document
+opml_document = OpmlDocument()
+update_opml()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
