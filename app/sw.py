@@ -25,7 +25,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed, FeedEntry
-from opml import OpmlDocument
+from pyopml import OpmlDocument
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 
