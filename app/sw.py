@@ -167,32 +167,47 @@ def update_entries(url):
     else:
         return False
 
-def update_opml(get_urls=False):
+def update_opml():
+    """Generate OPML document from smallweb.txt feed list"""
     global opml_document
+    
+    # Create new document
+    opml_document = OpmlDocument(
+        title="Kagi Smallweb Feeds",
+        date_created=datetime.now(),
+        owner_name="Kagi Small Web",
+        owner_email="smallweb@kagi.com"
+    )
 
-    print("Create OPML document")
-
-    # metadata
-    opml_document.date_created = datetime.now()
-    opml_document.title = "Kagi Smallweb Feeds"
-
-    with open("smallweb.txt") as f:
-        for url in f:
-            if get_urls:
-                feed = feedparser.parse(url)
-                desc = None
-                title = None
-                html_url = None
-                if 'description' in feed['feed']:
-                    desc = feed['feed']['description']
-                if 'title' in feed['feed']:
-                    title = feed['feed']['title']
-                if 'link' in feed['feed']:
-                    html_url = feed['feed']['link']
-                opml_document.add_rss(url, url, title=title, description=desc, html_url=html_url, language="en_US")
-            else:
-                opml_document.add_rss(url, url, language="en_US")
-    print("All OPML documents imported")
+    # Add feeds from smallweb.txt
+    try:
+        with open("smallweb.txt") as f:
+            for url in f:
+                url = url.strip()
+                if url:
+                    try:
+                        # Try to get feed metadata
+                        feed = feedparser.parse(url)
+                        feed_info = feed.get('feed', {})
+                        
+                        opml_document.add_rss(
+                            text=feed_info.get('title', url),
+                            xml_url=url,
+                            title=feed_info.get('title'),
+                            description=feed_info.get('description'),
+                            html_url=feed_info.get('link'),
+                            language="en_US"
+                        )
+                    except:
+                        # Fallback to basic entry if feed parsing fails
+                        opml_document.add_rss(
+                            text=url,
+                            xml_url=url,
+                            language="en_US"
+                        )
+        print("OPML document generated successfully")
+    except Exception as e:
+        print(f"Error generating OPML: {str(e)}")
 
 def load_public_suffix_list(file_path):
     public_suffix_list = set()
@@ -458,7 +473,20 @@ def appreciated():
 
 @app.route("/opml")
 def opml():
-    return Response(opml_document.dumps(), headers={"content-disposition":"attachment; filename=smallweb.opml"}, mimetype="text/x-opml")
+    """Serve the OPML document"""
+    try:
+        # Ensure we have latest feeds
+        update_opml()
+        
+        return Response(
+            opml_document.dumps(),
+            headers={
+                "Content-Type": "text/x-opml",
+                "Content-Disposition": "attachment; filename=kagi_smallweb.opml"
+            }
+        )
+    except Exception as e:
+        return f"Error generating OPML: {str(e)}", 500
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
