@@ -29,13 +29,13 @@ def generate_appreciated_feed():
         feed_url="https://kagi.com/smallweb/appreciated"
     )
     for url_entry in urls_app_cache:
-        url_item, title, author, description = url_entry
+        url_item, title, author, description, updated = url_entry
         appreciated_feed.add(
             title=title,
             content=description,
             content_type="html",
             url=url_item,
-            updated=datetime.utcnow(),
+            updated=updated,
             author=author,
         )
 
@@ -125,6 +125,14 @@ def update_entries(url):
         for entry in entries:
             domain = entry.link.split("//")[-1].split("/")[0]
             domain = domain.replace("www.", "")
+            updated = entry.get("updated_parsed", entry.get("published_parsed"))
+            if updated:
+                try:
+                    updated = datetime.fromtimestamp(time.mktime(updated))
+                except Exception:
+                    pass
+            updated = updated or datetime.utcnow()
+
             formatted_entries.append(
                 {
                     "domain": domain,
@@ -132,11 +140,12 @@ def update_entries(url):
                     "link": entry.link,
                     "author": entry.author,
                     "description": entry.get('description', ''),
+                    "updated": updated,
                 }
             )
 
         cache = [
-            (entry["link"], entry["title"], entry["author"], entry["description"])
+            (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"])
             for entry in formatted_entries
         ]
         print(len(cache), "entries")
@@ -190,10 +199,10 @@ def index():
 
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
-            (url, title, author, description) for url, title, author, description in cache
             if search_query in url.lower() or 
             any(search_query.lower() == word.lower() for word in title.split()) or 
             any(search_query.lower() == word.lower() for word in author.split()) or 
+            (url, title, author, description, _date) for url, title, author, description in cache
             any(search_query.lower() == word.lower() for word in description.split())
         ]
         if not cache:
@@ -229,13 +238,12 @@ def index():
 
     if title is None:
         if cache and len(cache):
-            url, title, author, description = random.choice(cache)
+            url, title, author, _description, _date = random.choice(cache)
         else:
-            url, title, author, description = (
+            url, title, author = (
                 "https://blog.kagi.com/small-web",
                 "Nothing to see",
-                "Feed not active, try later",
-                "",
+                "Feed not active, try later"
             )
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
