@@ -199,10 +199,10 @@ def index():
 
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
-            if search_query in url.lower() or 
-            any(search_query.lower() == word.lower() for word in title.split()) or 
-            any(search_query.lower() == word.lower() for word in author.split()) or 
             (url, title, author, description, _date) for url, title, author, description in cache
+            if search_query in url.lower() or
+            any(search_query.lower() == word.lower() for word in title.split()) or
+            any(search_query.lower() == word.lower() for word in author.split()) or
             any(search_query.lower() == word.lower() for word in description.split())
         ]
         if not cache:
