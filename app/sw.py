@@ -125,13 +125,13 @@ def update_entries(url):
         for entry in entries:
             domain = entry.link.split("//")[-1].split("/")[0]
             domain = domain.replace("www.", "")
-            updated = entry.get("updated_parsed", entry.get("published_parsed"))
-            if updated:
+            updated = datetime.utcnow()
+            updated_time = entry.get("updated_parsed", entry.get("published_parsed"))
+            if updated_time:
                 try:
-                    updated = datetime.fromtimestamp(time.mktime(updated))
+                    updated = datetime.fromtimestamp(time.mktime(updated_time))
                 except Exception:
                     pass
-            updated = updated or datetime.utcnow()
 
             formatted_entries.append(
                 {
