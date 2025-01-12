@@ -1,30 +1,23 @@
 import pickle
-import requests
 import re
 from flask import (
     Flask,
-    render_template_string,
     request,
     redirect,
-    jsonify,
     render_template,
-    make_response,
     Response,
 )
 import feedparser
 import feedparser
-from dateutil.parser import parse
 from apscheduler.schedulers.background import BackgroundScheduler
-import pytz
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import atexit
-from datetime import datetime
 import os
 import time
 from urllib.parse import urlparse
-from feedwerk.atom import AtomFeed, FeedEntry
+from feedwerk.atom import AtomFeed
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 
@@ -36,13 +29,13 @@ def generate_appreciated_feed():
         feed_url="https://kagi.com/smallweb/appreciated"
     )
     for url_entry in urls_app_cache:
-        url_item, title, author, description = url_entry
+        url_item, title, author, description, updated = url_entry
         appreciated_feed.add(
             title=title,
             content=description,
             content_type="html",
             url=url_item,
-            updated=datetime.utcnow(),
+            updated=updated,
             author=author,
         )
 
@@ -123,21 +116,6 @@ def update_all():
         print("end update_all")
 
 
-def parse_date(date_string):
-    # Manually parse the date string to handle the timezone offset
-    date_format = "%a, %d %b %Y %H:%M:%S"
-    date, offset_string = date_string.rsplit(" ", 1)
-    offset_hours = int(offset_string[:-2])
-    offset_minutes = int(offset_string[-2:])
-    offset = timedelta(hours=offset_hours, minutes=offset_minutes)
-    parsed_date = datetime.strptime(date, date_format)
-    if offset_hours > 0:
-        parsed_date -= offset
-    else:
-        parsed_date += offset
-    return parsed_date.replace(tzinfo=timezone.utc)
-
-
 def update_entries(url):
     feed = feedparser.parse(url)
     entries = feed.entries
@@ -147,6 +125,14 @@ def update_entries(url):
         for entry in entries:
             domain = entry.link.split("//")[-1].split("/")[0]
             domain = domain.replace("www.", "")
+            updated = datetime.utcnow()
+            updated_time = entry.get("updated_parsed", entry.get("published_parsed"))
+            if updated_time:
+                try:
+                    updated = datetime.fromtimestamp(time.mktime(updated_time))
+                except Exception:
+                    pass
+
             formatted_entries.append(
                 {
                     "domain": domain,
@@ -154,11 +140,12 @@ def update_entries(url):
                     "link": entry.link,
                     "author": entry.author,
                     "description": entry.get('description', ''),
+                    "updated": updated,
                 }
             )
 
         cache = [
-            (entry["link"], entry["title"], entry["author"], entry["description"])
+            (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"])
             for entry in formatted_entries
         ]
         print(len(cache), "entries")
@@ -212,10 +199,10 @@ def index():
 
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
-            (url, title, author, description) for url, title, author, description in cache
-            if search_query in url.lower() or 
-            any(search_query.lower() == word.lower() for word in title.split()) or 
-            any(search_query.lower() == word.lower() for word in author.split()) or 
+            (url, title, author, description, _date) for url, title, author, description in cache
+            if search_query in url.lower() or
+            any(search_query.lower() == word.lower() for word in title.split()) or
+            any(search_query.lower() == word.lower() for word in author.split()) or
             any(search_query.lower() == word.lower() for word in description.split())
         ]
         if not cache:
@@ -251,13 +238,12 @@ def index():
 
     if title is None:
         if cache and len(cache):
-            url, title, author, description = random.choice(cache)
+            url, title, author, _description, _date = random.choice(cache)
         else:
-            url, title, author, description = (
+            url, title, author = (
                 "https://blog.kagi.com/small-web",
                 "Nothing to see",
-                "Feed not active, try later",
-                "",
+                "Feed not active, try later"
             )
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
