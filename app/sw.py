@@ -11,10 +11,9 @@ import feedparser
 import feedparser
 from apscheduler.schedulers.background import BackgroundScheduler
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import atexit
-from datetime import datetime
 import os
 import time
 from urllib.parse import urlparse
@@ -115,21 +114,6 @@ def update_all():
         print("something went wrong during update_all")
     finally:
         print("end update_all")
-
-
-def parse_date(date_string):
-    # Manually parse the date string to handle the timezone offset
-    date_format = "%a, %d %b %Y %H:%M:%S"
-    date, offset_string = date_string.rsplit(" ", 1)
-    offset_hours = int(offset_string[:-2])
-    offset_minutes = int(offset_string[-2:])
-    offset = timedelta(hours=offset_hours, minutes=offset_minutes)
-    parsed_date = datetime.strptime(date, date_format)
-    if offset_hours > 0:
-        parsed_date -= offset
-    else:
-        parsed_date += offset
-    return parsed_date.replace(tzinfo=timezone.utc)
 
 
 def update_entries(url):
