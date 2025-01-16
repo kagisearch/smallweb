@@ -74,7 +74,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, master_feed, favorites_dict, appreciated_feed
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -95,10 +95,19 @@ def update_all():
         if not bool(urls_yt_cache) or bool(new_entries):
             urls_yt_cache = new_entries
 
-        new_entries = update_entries(url + "?gh")  # github sitesgit push
+        new_entries = update_entries(url + "?gh")  # github sites
 
         if not bool(urls_gh_cache) or bool(new_entries):
-            urls_gh_cache = new_entries    
+            urls_gh_cache = new_entries
+
+        new_entries = update_entries(url + "?comic")  # comic sites
+        
+        if not bool(urls_comic_cache) or bool(new_entries):
+            # Filter entries that have images in content
+            urls_comic_cache = [
+                entry for entry in new_entries 
+                if entry[3] and ('<img' in entry[3] or '.png' in entry[3] or '.jpg' in entry[3] or '.jpeg' in entry[3])
+            ]
         
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
@@ -193,7 +202,10 @@ def index():
         current_mode = 2
     elif "gh" in request.args:
         cache = urls_gh_cache
-        current_mode = 3    
+        current_mode = 3
+    elif "comic" in request.args:
+        cache = urls_comic_cache
+        current_mode = 4
     else:
         cache = urls_cache
 
@@ -428,6 +440,7 @@ urls_cache = []
 urls_yt_cache = []
 urls_app_cache = []
 urls_gh_cache = []
+urls_comic_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 

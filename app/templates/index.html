@@ -91,15 +91,20 @@
 
       {% if current_mode==1 %} 
         <a id="switch"  href="{{ prefix }}">Web</a>
-        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
       {% elif current_mode==2 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
+        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
+      {% elif current_mode==4 %}
+        <a id="switch"  href="{{ prefix }}">Web</a>
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
       {% else %}
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
-
-        
+        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
       {% endif %}      
     </div>
     <div class="right">
