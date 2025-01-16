@@ -37,6 +37,11 @@ Add a new personal blog RSS feed to the list. Rules:
 - A YT channel must not post more than twice a week.
 - A YT channel must have fewer than 400,000 subscribers.
 
+For comics:
+- Must be independently created art (no AI generated content)
+- RSS feed must show the full comic in the feed
+- No commercial syndicated comics
+
 [Add website RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 
@@ -44,6 +49,9 @@ Hint: To extract the RSS link from a YouTube channel, you can use [this tool](ht
 
 [Add YouTube channel RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
+
+[Add Comic RSS
+feed](https://github.com/kagisearch/smallweb/edit/main/smallcomic.txt)
 
 ## Remove a site or a channel
 
@@ -76,6 +84,8 @@ What is Small Web exactly? Recommend reading:
 [smallweb.txt](https://github.com/kagisearch/smallweb/blob/main/smallweb.txt) - Contains the feeds of indexed blogs
 
 [smallyt.txt](https://github.com/kagisearch/smallweb/blob/main/smallyt.txt) - Contains the feeds of indexed YouTube channels
+
+[smallcomic.txt](https://github.com/kagisearch/smallweb/blob/main/smallcomic.txt) - Contains the feeds of indexed independent comics
 
 [yt_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/yt_rejected.txt) - Contains the list of YouTube channels that were reviewed (in an automated way) and rejected 
 
