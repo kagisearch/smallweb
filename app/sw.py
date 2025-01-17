@@ -211,11 +211,11 @@ def index():
 
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
-            (url, title, author, description, _date) for url, title, author, description in cache
-            if search_query in url.lower() or
-            any(search_query.lower() == word.lower() for word in title.split()) or
-            any(search_query.lower() == word.lower() for word in author.split()) or
-            any(search_query.lower() == word.lower() for word in description.split())
+            entry for entry in cache
+            if (search_query in entry[0].lower() or  # url
+                any(search_query.lower() == word.lower() for word in entry[1].split()) or  # title
+                any(search_query.lower() == word.lower() for word in entry[2].split()) or  # author
+                any(search_query.lower() == word.lower() for word in entry[3].split()))  # description
         ]
         if not cache:
             return render_template(
