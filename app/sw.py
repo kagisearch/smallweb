@@ -1,30 +1,23 @@
 import pickle
-import requests
 import re
 from flask import (
     Flask,
-    render_template_string,
     request,
     redirect,
-    jsonify,
     render_template,
-    make_response,
     Response,
 )
 import feedparser
 import feedparser
-from dateutil.parser import parse
 from apscheduler.schedulers.background import BackgroundScheduler
-import pytz
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import atexit
-from datetime import datetime
 import os
 import time
 from urllib.parse import urlparse
-from feedwerk.atom import AtomFeed, FeedEntry
+from feedwerk.atom import AtomFeed
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 
@@ -36,13 +29,13 @@ def generate_appreciated_feed():
         feed_url="https://kagi.com/smallweb/appreciated"
     )
     for url_entry in urls_app_cache:
-        url_item, title, author, description = url_entry
+        url_item, title, author, description, updated = url_entry
         appreciated_feed.add(
             title=title,
             content=description,
             content_type="html",
             url=url_item,
-            updated=datetime.utcnow(),
+            updated=updated,
             author=author,
         )
 
@@ -81,7 +74,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, master_feed, favorites_dict, appreciated_feed
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -102,10 +95,19 @@ def update_all():
         if not bool(urls_yt_cache) or bool(new_entries):
             urls_yt_cache = new_entries
 
-        new_entries = update_entries(url + "?gh")  # github sitesgit push
+        new_entries = update_entries(url + "?gh")  # github sites
 
         if not bool(urls_gh_cache) or bool(new_entries):
-            urls_gh_cache = new_entries    
+            urls_gh_cache = new_entries
+
+        new_entries = update_entries(url + "?comic")  # comic sites
+        
+        if not bool(urls_comic_cache) or bool(new_entries):
+            # Filter entries that have images in content
+            urls_comic_cache = [
+                entry for entry in new_entries 
+                if entry[3] and ('<img' in entry[3] or '.png' in entry[3] or '.jpg' in entry[3] or '.jpeg' in entry[3])
+            ]
         
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
@@ -123,21 +125,6 @@ def update_all():
         print("end update_all")
 
 
-def parse_date(date_string):
-    # Manually parse the date string to handle the timezone offset
-    date_format = "%a, %d %b %Y %H:%M:%S"
-    date, offset_string = date_string.rsplit(" ", 1)
-    offset_hours = int(offset_string[:-2])
-    offset_minutes = int(offset_string[-2:])
-    offset = timedelta(hours=offset_hours, minutes=offset_minutes)
-    parsed_date = datetime.strptime(date, date_format)
-    if offset_hours > 0:
-        parsed_date -= offset
-    else:
-        parsed_date += offset
-    return parsed_date.replace(tzinfo=timezone.utc)
-
-
 def update_entries(url):
     feed = feedparser.parse(url)
     entries = feed.entries
@@ -147,6 +134,14 @@ def update_entries(url):
         for entry in entries:
             domain = entry.link.split("//")[-1].split("/")[0]
             domain = domain.replace("www.", "")
+            updated = datetime.utcnow()
+            updated_time = entry.get("updated_parsed", entry.get("published_parsed"))
+            if updated_time:
+                try:
+                    updated = datetime.fromtimestamp(time.mktime(updated_time))
+                except Exception:
+                    pass
+
             formatted_entries.append(
                 {
                     "domain": domain,
@@ -154,11 +149,12 @@ def update_entries(url):
                     "link": entry.link,
                     "author": entry.author,
                     "description": entry.get('description', ''),
+                    "updated": updated,
                 }
             )
 
         cache = [
-            (entry["link"], entry["title"], entry["author"], entry["description"])
+            (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"])
             for entry in formatted_entries
         ]
         print(len(cache), "entries")
@@ -206,17 +202,20 @@ def index():
         current_mode = 2
     elif "gh" in request.args:
         cache = urls_gh_cache
-        current_mode = 3    
+        current_mode = 3
+    elif "comic" in request.args:
+        cache = urls_comic_cache
+        current_mode = 4
     else:
         cache = urls_cache
 
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
-            (url, title, author, description) for url, title, author, description in cache
-            if search_query in url.lower() or 
-            any(search_query.lower() == word.lower() for word in title.split()) or 
-            any(search_query.lower() == word.lower() for word in author.split()) or 
-            any(search_query.lower() == word.lower() for word in description.split())
+            entry for entry in cache
+            if (search_query in entry[0].lower() or  # url
+                any(search_query.lower() == word.lower() for word in entry[1].split()) or  # title
+                any(search_query.lower() == word.lower() for word in entry[2].split()) or  # author
+                any(search_query.lower() == word.lower() for word in entry[3].split()))  # description
         ]
         if not cache:
             return render_template(
@@ -251,13 +250,12 @@ def index():
 
     if title is None:
         if cache and len(cache):
-            url, title, author, description = random.choice(cache)
+            url, title, author, _description, _date = random.choice(cache)
         else:
-            url, title, author, description = (
+            url, title, author = (
                 "https://blog.kagi.com/small-web",
                 "Nothing to see",
-                "Feed not active, try later",
-                "",
+                "Feed not active, try later"
             )
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
@@ -442,6 +440,7 @@ urls_cache = []
 urls_yt_cache = []
 urls_app_cache = []
 urls_gh_cache = []
+urls_comic_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 

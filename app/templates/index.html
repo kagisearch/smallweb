@@ -91,15 +91,20 @@
 
       {% if current_mode==1 %} 
         <a id="switch"  href="{{ prefix }}">Web</a>
-        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
       {% elif current_mode==2 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
+        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
+      {% elif current_mode==4 %}
+        <a id="switch"  href="{{ prefix }}">Web</a>
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
       {% else %}
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
-
-        
+        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
       {% endif %}      
     </div>
     <div class="right">
@@ -118,12 +123,10 @@
         <input type="radio" id="rss-popup" name="popup" class="popup-radio">
         <div class="popup spread-love rss-popup">
           <p>Grab the RSS feed you like.</p>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({{ all_count }})</a>
-         <a
-         class="share-option" target="_blank"
-         href="https://kagi.com/smallweb/appreciated">Appreciated ({{ appreciated_count }})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos ({{ videos_count }})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code ({{ code_count }})</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({% if all_count is defined %}{{ all_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/smallweb/appreciated">Appreciated ({% if appreciated_count is defined %}{{ appreciated_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos ({% if videos_count is defined %}{{ videos_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code ({% if code_count is defined %}{{ code_count }}{% else %}0{% endif %})</a>
          <a
          class="share-option" target="_blank" href="https://kagi.com/smallweb/opml">OPML</a>
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>
@@ -170,8 +173,9 @@ end.</p>
     mascot"/></a>
   </div>
   {% if no_results %}
-    <div id="content" style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 60px);">
-      <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50;">No results found for "{{ search_query }}"</h2>
+    <div id="content" class="no-results" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: calc(100vh - 60px);">
+      <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No results found for "{{ search_query }}"</h2>
+      <a href="{{ prefix }}" class="clear-search-button">Clear Search</a>
     </div>
   {% elif current_mode == 1 %}
     <div id="content-yt">

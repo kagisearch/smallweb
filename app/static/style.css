@@ -61,6 +61,31 @@ body {
   display: none;
 }
 
+.clear-search-button {
+  background-color: #3498db;
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+  font-size: 22px;
+  font-family: pixel, Arial;
+  text-decoration: none;
+}
+
+.clear-search-button:hover {
+  background-color: #2980b9;
+}
+
+.no-results #controls .stumble-link,
+.no-results #controls .favorite-link,
+.no-results #controls .flag-link,
+.no-results #url-display,
+.no-results #url-display-phone {
+  display: none !important;
+}
+
 #search-input:not(:placeholder-shown) + .clear-search {
   display: block;
 }
