@@ -65,16 +65,14 @@
         <label for="spread-love" class="popup-link" title="Share this post">Share</label>
         <input type="radio" id="spread-love" name="popup"  class="popup-radio">
         <div class="popup spread-love">
-          <a href="https://news.ycombinator.com/submitlink?u={{url}}&t={{title}}" class="share-option" target="_blank">Hacker News</a>
-          <a href="https://www.reddit.com/submit?url={{url}}&title={{title}}" class="share-option" target="_blank">Reddit</a>
-          <a href="https://twitter.com/share?url={{url}}&text={{title}}" class="share-option" target="_blank">Twitter</a>
-          <a href="https://mastodon.social/share?text={{ (title + '\n\n' + url)|urlencode }}" class="share-option" target="_blank">Mastodon</a>
-          <a href="https://lemmy.world/create_post?url={{url}}&title={{title}}" class="share-option"
-          target="_blank">Lemmy</a>
-          <a href="https://lobste.rs/stories/new?url={{url}}&title={{title}}" class="share-option" target="_blank">Lobsters</a>
-          <a href="https://cohost.org"  class="share-option"  target="_blank">Cohost</a>
-          <a href="mailto:?subject={{title}}&body=Check%20out%20this%20link:%20{{url}}" class="share-option"
-          target="_blank">Email</a>
+          <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank">Hacker News</a>
+          <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Reddit</a>
+          <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank">Twitter</a>
+          <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank">Mastodon</a>
+          <a href="https://lemmy.world/create_post?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lemmy</a>
+          <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lobsters</a>
+          <a href="https://cohost.org" class="share-option" target="_blank">Cohost</a>
+          <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank">Email</a>
           <a href="https://kagi.com/summarizer/index.html?url={{url}}" class="share-option"
           target="_blank">Universal Summarizer</a>
           <a href="{{ prefix }}?url={{url}}&{{query_string}}" class="share-option" target="_blank">Link here</a>
