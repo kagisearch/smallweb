@@ -298,6 +298,7 @@ def index():
     appreciated_count = len(urls_app_cache) if urls_app_cache else 0
     videos_count = len(urls_yt_cache) if urls_yt_cache else 0
     code_count = len(urls_gh_cache) if urls_gh_cache else 0
+    comics_count = len(urls_comic_cache) if urls_comic_cache else 0
 
     return render_template(
         "index.html",
@@ -319,6 +320,7 @@ def index():
         appreciated_count=appreciated_count,
         videos_count=videos_count,
         code_count=code_count,
+        comics_count=comics_count,
     )
 
 
