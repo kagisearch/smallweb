@@ -465,6 +465,7 @@ http://www.richkeeble.com/feed/
 http://www.righto.com/feeds/posts/default
 http://www.robtatman.com/feed/
 http://www.rosspettit.com/feeds/posts/default
+http://www.rsbauer.com/feed
 http://www.ryanglover.net/feed.xml
 http://www.sanityinc.com/feed.xml
 http://www.serpentine.com/blog/feed/
@@ -946,6 +947,7 @@ https://allensblog.typepad.com/allensblog/atom.xml
 https://alliamaredhead.com/feed/
 https://allthathistory.com/feed/
 https://allthingslinguistic.com/rss
+https://allthingssmitty.com/atom.xml
 https://alm.website/blog.atom
 https://almad.blog/index.xml
 https://almostsuremath.com/feed/
@@ -2410,6 +2412,7 @@ https://blog.plover.com/index.atom
 https://blog.plover.com/index.rss
 https://blog.pnkfx.org/atom.xml
 https://blog.poggs.com/feed/
+https://blog.poisson.chat/rss.xml
 https://blog.polybdenum.com/feed.xml
 https://blog.polyhaven.com/feed/
 https://blog.pragmaticengineer.com/rss/
@@ -3323,6 +3326,7 @@ https://ckochis.com/feed.xml
 https://ckrao.wordpress.com/feed/
 https://cl.ar.ke/feed/
 https://clagnut.com/feeds/fullposts.xml
+https://clagnut.com/feeds/summaries.xml
 https://clairehu.com/feed/
 https://clamba.blogspot.com/feeds/posts/default
 https://clanhouse.com/feed
@@ -8436,6 +8440,7 @@ https://mrcoles.com/feeds/latest/
 https://mreduar.dev/blog/feed.atom
 https://mrfb.bearblog.dev/feed
 https://mrfrisby.com/feed.rss
+https://mridul.io/feed.xml
 https://mrjamesbell.com/feed/
 https://mrkaran.dev/posts/atom.xml
 https://mrmichael.co/feed.atom
@@ -8818,6 +8823,7 @@ https://nitinnain.com/feed/
 https://nition.momentstudio.co.nz/feed/
 https://nitrateglow.wordpress.com/feed/
 https://nivwords.wordpress.com/feed/
+https://nixcademy.com/feed.xml
 https://nixers.net/syndication.php
 https://nixon1333.com/rss/
 https://nizzlay.com/atom.xml
@@ -11979,6 +11985,7 @@ https://unix.dog/announcements.rss
 https://unixdigest.com/feed.rss
 https://unixism.net/feed/
 https://unixsheikh.com/feed.rss
+https://unlinkedlist.org/feed/
 https://unm-bioblog.blogspot.com/feeds/posts/default
 https://unmakeme.com/feed/
 https://unmitigatedrisk.com/?feed=rss2
@@ -12031,6 +12038,7 @@ https://vaclavsmil.com/feed/
 https://vadimkravcenko.com/feed/
 https://vadosware.io/post/index.xml
 https://vaghetti.dev/index.xml
+https://vagos.lamprou.xyz/feed/blog.xml
 https://vaidik.in/rss/
 https://val.demar.in/feed/
 https://val.packett.cool/feed.xml
@@ -15083,6 +15091,7 @@ https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed/
 https://zwit.link/atom.xml
+https://zwit.link/atom.xml  
 https://zypper.net/rss
 https://zythophile.co.uk/feed/
 https://zzamboni.org/post/index.xml
