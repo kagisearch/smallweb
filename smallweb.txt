@@ -30,7 +30,6 @@ http://bartvandersanden.com/feed.xml
 http://baseballanalysts.com/index.rdf
 http://bearlamp.com.au/feed/
 http://benjaminrosshoffman.com/feed/
-https://bit-101.com/blog/index.xml
 http://bit-player.org/feed
 http://blog.a-eon.biz/blog/index.php/feed/
 http://blog.alvarezp.org/feed
@@ -444,6 +443,7 @@ http://www.kaidez.com/feed.xml
 http://www.kleefeldoncomics.com/feeds/posts/default
 http://www.kolaayonrinde.com/blog/feed.xml
 http://www.learningclojure.com/feeds/posts/default
+http://www.lieberbiber.de/feed/
 http://www.linusakesson.net/rssfeed.php
 http://www.lostdecadegames.com/rss.xml
 http://www.machinedlearnings.com/feeds/posts/default
@@ -1726,6 +1726,7 @@ https://birchtree.me/rss/
 https://birming.com/feed
 https://birming.com/feed/?type=rss
 https://bisco.org/index.xml
+https://bit-101.com/blog/index.xml
 https://bitbashing.io/feed.xml
 https://bitboxer.de/atom.xml
 https://bitburners.com/rss/
@@ -4513,6 +4514,7 @@ https://endlessqueue.com/rss.xml
 https://endormi.io/index.xml
 https://endtimes.dev/feed.xml
 https://endtimes.dev/feed/
+https://eneigualauno.com/feed.xml
 https://energyflashbysimonreynolds.blogspot.com/feeds/posts/default
 https://eng.aurelienpierre.com/index.xml
 https://engaging-data.com/feed/
@@ -5412,6 +5414,7 @@ https://gallant.dev/rss.xml
 https://galogetlatorre.blogspot.com/feeds/posts/default
 https://galowicz.de/feed.xml
 https://gameidea.org/feed/
+https://gamesbymason.com/feed.xml
 https://gamozolabs.github.io/feed.xml
 https://ganji.bearblog.dev/feed/?type=rss
 https://ganzeer.today/feed/
@@ -7321,6 +7324,7 @@ https://lars.com/feed.xml
 https://lars.ingebrigtsen.no/feed/
 https://larslofgren.com/feed/
 https://larsmagnus.co/feed.xml
+https://larstofus.com/feed/
 https://lassala.net/feed/
 https://lastlights.net/feed/
 https://laststandonzombieisland.com/feed/
@@ -7880,6 +7884,7 @@ https://marksuth.dev/feed/posts.xml
 https://markus.hofer.rocks/feed
 https://markushatvan.com/rss.xml
 https://markusmeister.com/feed/
+https://markw.co.uk/rss.xml
 https://markwitton-com.blogspot.com/feeds/posts/default
 https://markwolff.name/wp/feed/
 https://markwrobel.dk/index.xml
@@ -7994,6 +7999,7 @@ https://matthewsaltz.wordpress.com/feed/
 https://matthewsheret.wordpress.com/feed/
 https://matthewshields.co.uk/rss.xml
 https://matthewstrom.com/feed.xml
+https://matthiasbussonnier.com/rss.xml
 https://matthiasnoback.nl/atom.xml
 https://matthiasott.com/feed
 https://matthiasott.com/rss
@@ -9401,6 +9407,7 @@ https://petergarner.net/feed.rss
 https://peterklipfel.com/index.xml
 https://peterloerincs.com/feed/
 https://peterlyons.com/rss.xml
+https://peterme.net/rss
 https://peterme.net/rss/
 https://petermolnar.net/feed/
 https://peternencini.blogspot.com/feeds/posts/default
@@ -11257,6 +11264,7 @@ https://tanmaymunigala.com/feed/
 https://tanmaysarkar.hashnode.dev/rss.xml
 https://tannerdolby.com/feed.xml
 https://tannerhelland.com/feed.xml
+https://tansanrao.com/blog.xml
 https://tante.cc/feed/
 https://tantek.com/updates.atom
 https://taogaming.wordpress.com/feed/
@@ -13104,6 +13112,7 @@ https://www.dogan-ucar.de/feed/
 https://www.domainnoob.com/blog/feed/
 https://www.domenechmilan.com/feed/
 https://www.dominikmayer.com/index.xml
+https://www.doobybrain.com/blog?format=rss
 https://www.doodlersanonymous.com/feed/
 https://www.door.link/rss.xml
 https://www.doscher.com/rss/
@@ -13399,6 +13408,8 @@ https://www.hawksworx.com/feed.xml
 https://www.haykranen.nl/feed/
 https://www.hazelmcnab.com/blogs/news.atom
 https://www.heal.dev/docs/blog/atom.xml
+https://www.hecfblog.com/feeds/posts/default
+https://www.hedonisticlearning.com/rss.xml
 https://www.hellbox.co.uk/feed/
 https://www.helmutgranda.com/feed/
 https://www.heltweg.org/index.xml
@@ -13862,7 +13873,6 @@ https://www.markhackett.com/writings?format=rss
 https://www.markhansen.co.nz/rss/
 https://www.markhorsell.com/feed/
 https://www.markhw.com/blog?format=rss
-https://markw.co.uk/rss.xml
 https://www.markllobrera.com/feed/feed.xml
 https://www.markloveless.net/blog?format=rss
 https://www.markmarshall.com/feed/
@@ -13898,7 +13908,6 @@ https://www.matthensley.io/rss/
 https://www.matthewbogart.net/rss/
 https://www.matthewhowell.net/atom.xml
 https://www.matthewroach.me/feed/
-https://matthiasbussonnier.com/rss.xml
 https://www.matthiasroder.com/feed/
 https://www.mattkeeter.com/atom.xml
 https://www.mattlayman.com/index.xml
