@@ -2929,6 +2929,7 @@ https://buttondown.com/ownyourweb/rss
 https://buttondown.email/alby/rss
 https://buttondown.email/carlzimmer/rss
 https://buttondown.email/hillelwayne/rss
+https://buttondown.email/jaffray/rss
 https://buttondown.email/linotypebook/rss
 https://buttondown.email/meticulous.serendipity/rss
 https://buttondown.email/ownyourweb/rss
@@ -3209,6 +3210,7 @@ https://chriskirknielsen.com/rss.xml
 https://chriskurdziel.com/feed.xml
 https://chrislovejoy.me/feed.xml
 https://chrislukic.com/feed/
+https://chrismalek.me/index.xml
 https://chrisman.github.io/rss.xml
 https://chrismanbrown.gitlab.io/rss.xml
 https://chrismasterjohnphd.com/feed
@@ -3498,6 +3500,7 @@ https://coryd.dev/feeds/links.xml
 https://coryd.dev/feeds/movies.xml
 https://coryd.dev/feeds/posts.xml
 https://coryknox.dev/index.xml
+https://corymiller.com/feed/
 https://coryrylan.com/feed.xml
 https://corywalker.me/feed.xml
 https://cosmicperspective.com/feed/
@@ -6430,6 +6433,7 @@ https://jenkuo.com/feed/
 https://jenniferlawler.com/feed/
 https://jennifermillsnews.tumblr.com/rss
 https://jenniferplusplus.com/rss/
+https://jennywanger.com/feed/
 https://jens.mooseyard.com/index.xml
 https://jenson.org/feed/
 https://jeradhill.com/feed/
@@ -11184,6 +11188,7 @@ https://tanmaysarkar.hashnode.dev/rss.xml
 https://tannerdolby.com/feed.xml
 https://tannerhelland.com/feed.xml
 https://tansanrao.com/blog.xml
+https://tansanrao.com/rss.xml
 https://tante.cc/feed/
 https://tantek.com/updates.atom
 https://taogaming.wordpress.com/feed/
@@ -12306,6 +12311,7 @@ https://wiremodal.net/atom.xml
 https://wiremodal.net/rss.xml
 https://wiresareobsolete.com/feed.atom
 https://witestlab.poly.edu/blog/rss/
+https://withinboredom.info/feed/
 https://without.boats/index.xml
 https://witness2fashion.wordpress.com/feed/
 https://wizardzines.com/comics/index.xml
@@ -13325,6 +13331,8 @@ https://www.haykranen.nl/feed/
 https://www.hazelmcnab.com/blogs/news.atom
 https://www.heal.dev/docs/blog/atom.xml
 https://www.hecfblog.com/feeds/posts/default
+https://www.hecfblog.com/feeds/posts/default?alt=rss
+https://www.hedonisticlearning.com/atom.xml
 https://www.hedonisticlearning.com/rss.xml
 https://www.hellbox.co.uk/feed/
 https://www.helmutgranda.com/feed/
@@ -13959,8 +13967,8 @@ https://www.nathanlustig.com/feed/
 https://www.nathanzeldes.com/feed/
 https://www.nationalelfservice.net/feed/
 https://www.naughtycomputer.uk/atom.xml
-https://www.navalgazing.net/?n=Main.HomePage?action=rss
 https://www.navalgazing.net/?action=rss
+https://www.navalgazing.net/?n=Main.HomePage?action=rss
 https://www.nearly42.org/feed/
 https://www.nedmcclain.com/rss/
 https://www.nedprod.com/index.xml
