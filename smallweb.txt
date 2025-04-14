@@ -31,7 +31,6 @@ http://bit-player.org/feed
 http://blog.a-eon.biz/blog/index.php/feed/
 http://blog.alvarezp.org/feed/
 http://blog.behnel.de/rss.xml
-https://blog.brakmic.com/feed/
 http://blog.colinmarshall.org/?feed=rss2
 http://blog.dimview.org/feed.xml
 http://blog.fivecentsplease.org/feeds/posts/default
@@ -165,7 +164,6 @@ http://highlowcomics.blogspot.com/feeds/posts/default
 http://hyperboleandahalf.blogspot.com/feeds/posts/default
 http://hyponymo.us/feed/atom.xml
 http://iftheshoefritz.com/feed.xml
-https://imaginarykarin.com/feed/
 http://inclem.net/feeds/all.atom.xml
 http://inthewilderness.net/feed/
 http://irace.me/feed.xml
@@ -269,7 +267,6 @@ http://robertfiorentino.com/feed/
 http://rolandtanglao.com/feed.xml
 http://rss.neosmart.net/neosmart
 http://russbishop.net/feed
-https://rys.io/en/feed.rss
 http://salmonbaywealthmanagement.com/feed/
 http://sam.zeloof.xyz/feed/
 http://samsaffron.com/posts.rss
@@ -323,7 +320,6 @@ http://webbyclare.com/feed/
 http://wilkins.io/feed.xml
 http://williamdurand.fr/atom.xml
 http://williamgallagher.com/selfdistract/feed/
-https://winnielim.org/feed/?cat=2%2C4%2C8
 http://wirelesstechthoughts.blogspot.com/feeds/posts/default
 http://words.steveklabnik.com/feed.xml
 http://wp.xin.at/feed
@@ -1138,8 +1134,8 @@ https://apachelog.wordpress.com/feed/
 https://aparker.io/feed/
 https://apenwarr.ca/log/rss.php
 https://aperiodical.com/feed/
-https://aperiodical.com/feed/atom/
 https://aperiodical.com/feed/
+https://aperiodical.com/feed/atom/
 https://aphascience.blog.gov.uk/feed/
 https://aphelis.net/feed/
 https://aphilosopherwalks.wordpress.com/feed/
@@ -1832,6 +1828,7 @@ https://blog.bmannconsulting.com/feed.xml
 https://blog.bofh.it/?format=atom
 https://blog.bonnieeisenman.com/feed.xml
 https://blog.borodutch.com/rss/
+https://blog.brakmic.com/feed/
 https://blog.brakmic.com/feed/
 https://blog.bramp.net/index.xml
 https://blog.breathingworld.com/rss/
@@ -6038,6 +6035,7 @@ https://im.salty.fish/index.php/feed/atom/
 https://image-sensors-world.blogspot.com/feeds/posts/default
 https://imagesofoldhawaii.com/feed/
 https://imagico.de/blog/en/feed/
+https://imaginarykarin.com/feed/
 https://imagineer.in/feed.xml
 https://imalittletester.com/feed/
 https://imapenguin.com/index.xml
@@ -8121,8 +8119,8 @@ https://method.ac/writing/index.xml
 https://metrics.blogg.gu.se/?feed=rss2
 https://metroid2remake.blogspot.com/feeds/posts/default
 https://mewo2.com/feed.xml
-https://meyerweb.com/eric/thoughts/feed/?scope=full
 https://meyerweb.com/eric/thoughts/feed/
+https://meyerweb.com/eric/thoughts/feed/?scope=full
 https://meyerweb.com/eric/thoughts/feed/?scope=full
 https://mezzantrop.wordpress.com/feed/
 https://mfashby.net/index.xml
@@ -10216,6 +10214,7 @@ https://ryantrimble.com/rss.xml
 https://ryanwaggoner.com/feed/
 https://rybakov.com/blog/index.xml
 https://rybicki.io/blog/feed.xml
+https://rys.io/en/feed.rss
 https://rys.sommefeldt.com/index.xml
 https://ryxcommar.com/feed/
 https://s-usih.org/feed/atom/
@@ -12305,6 +12304,7 @@ https://windowsontheory.org/feed/
 https://wingfelder.ca/feed/
 https://wingolog.org/feed/atom
 https://winnielim.org/feed/
+https://winnielim.org/feed/?cat=2%2C4%2C8
 https://winterbloed.be/feed/
 https://wion.com/index.php?rss=1&section=notes
 https://wiredream.com/atom.xml
@@ -15092,7 +15092,7 @@ https://zupzup.org/index.xml
 https://zverok.space/feed.xml
 https://zwclose.github.io/feed.xml
 https://zwischenzugs.com/feed/
-https://zwit.link/atom.xml  
+https://zwit.link/atom.xml
 https://zypper.net/rss/
 https://zythophile.co.uk/feed/
 https://zzamboni.org/post/index.xml
