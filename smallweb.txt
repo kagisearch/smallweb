@@ -358,6 +358,7 @@ http://www.cloudberryrecords.com/blog/?feed=rss2
 http://www.codersnotes.com/feed
 http://www.codersnotes.com/notes/feed
 http://www.cyrilmottier.com/atom.xml
+http://www.danvk.org/atom.xml
 http://www.dcscience.net/feed/
 http://www.drmichaeljoyner.com/feed/
 http://www.drusepth.com/feed/
@@ -492,6 +493,7 @@ https://3.14.by/en/rss
 https://30fps.net/atom.xml
 https://30squaresofontario.blogspot.com/feeds/posts/default
 https://35hunter.blog/feed/
+https://3fs.net.au/vk3fs-blog/feed/
 https://403forbiddenblog.blogspot.com/feeds/posts/default
 https://42gems.com/blog/?feed=rss2
 https://42m.me/feed.xml
@@ -2568,6 +2570,7 @@ https://blog.verbum.org/feed/
 https://blog.vero.site/index.xml
 https://blog.versioneye.com/feed/
 https://blog.vfiles.no/posts/index.xml
+https://blog.videah.net/atom.xml
 https://blog.videah.net/rss.xml
 https://blog.viditb.com/rss/
 https://blog.viktomas.com/index.xml
@@ -6411,6 +6414,7 @@ https://jeff.glass/index.xml
 https://jeff.klukas.net/index.xml
 https://jeff.noxon.cc/feed.xml
 https://jeffbridgforth.com/feed/
+https://jeffersonheard.com/rss/
 https://jeffikus.com/feed/
 https://jeffmackinnon.com/feeds/all.atom.xml
 https://jeffmcneill.com/feed/
@@ -10007,6 +10011,7 @@ https://robert.katzki.de/rss
 https://robert.kra.hn/feed.xml
 https://robert.ocallahan.org/feed.xml
 https://robert.sesek.com/feed.xml
+https://robert.winter.ink/feed
 https://robert.winter.ink/feed/
 https://robertbreen.com/feed/
 https://robertchen.cc/feed.xml
@@ -12135,7 +12140,9 @@ https://vivatiffany.wordpress.com/feed/
 https://vivin.net/feed/
 https://vivqu.com/feed.xml
 https://vjeran.crnjak.xyz/atom.xml
+https://vk5pas.org/feed/
 https://vk7.eu/photo/feed
+https://vk7tw.wordpress.com/feed/
 https://vkc.sh/feed/
 https://vlaaad.github.io/feed.xml
 https://vladfeinberg.com/feed.xml
@@ -12282,6 +12289,7 @@ https://williamhzo.me/rss.xml
 https://williamkennedy.ninja/feed.xml
 https://williamyaoh.com/feed.atom
 https://willj.net/rss.xml
+https://willpatrick.xyz/feed.xml
 https://willpresley.com/feed.xml
 https://willwolf.io/feeds/all.atom.xml
 https://wilsoniumite.com/feed/
@@ -14323,6 +14331,7 @@ https://www.ryangittings.co.uk/feed.xml
 https://www.ryankemper.io/index.xml
 https://www.ryanliptak.com/atom.xml
 https://www.ryansingel.net/rss/
+https://www.ryansinger.co/rss/
 https://www.rykap.com/feed.xml
 https://www.s-anand.net/blog/feed/
 https://www.s-config.com/feed/
@@ -14792,6 +14801,7 @@ https://www.visaalambalam.com/index.xml
 https://www.visakanv.com/blog/feed/
 https://www.visidata.org/feed.xml
 https://www.vitavonni.de/blog/feeds/en.atom
+https://www.vk7ben.au/feed/
 https://www.vladionescu.me/feed.xml
 https://www.vladsiv.com/feed.xml
 https://www.volcanocafe.org/feed/
@@ -15100,7 +15110,3 @@ https://zypper.net/rss/
 https://zythophile.co.uk/feed/
 https://zzamboni.org/post/index.xml
 https://zzncx.top/index.xml
-https://vk7tw.wordpress.com/feed/
-https://vk5pas.org/feed/
-https://3fs.net.au/vk3fs-blog/feed/
-https://www.vk7ben.au/feed/
