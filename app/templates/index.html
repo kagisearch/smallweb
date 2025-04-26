@@ -73,9 +73,10 @@
           <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lobsters</a>
           <a href="https://cohost.org" class="share-option" target="_blank">Cohost</a>
           <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank">Email</a>
-          <a href="https://kagi.com/summarizer/index.html?url={{url}}" class="share-option"
+          <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option"
           target="_blank">Universal Summarizer</a>
-          <a href="{{ prefix }}?url={{url}}&{{query_string}}" class="share-option" target="_blank">Link here</a>
+          <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
+             class="share-option" target="_blank">Link here</a>
 
 
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>
