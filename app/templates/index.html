@@ -7,13 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="prefetch"  href="{{ next_link }}">
+  <link rel="prerender" href="{{ next_link }}">
 </head>
 
 <body>
   <div id="header">
     <div id="controls">
-      {% if not no_results %}
-      <a href="{{ prefix }}{{ query_string }}" class="stumble-link">
+      {% if not no_results and next_link %}
+      <a href="{{ next_link }}" class="stumble-link" rel="prefetch">
         <button class="next-button" title="Show next post">Next Post</button>
       </a>
       {% endif %}

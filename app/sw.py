@@ -13,6 +13,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import random
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlencode
 import atexit
 import os
 import time
@@ -258,6 +259,18 @@ def index():
                 "Feed not active, try later"
             )
 
+    # -------------------------------------------------
+    # Build deterministic “next post” link and pre-load it
+    # -------------------------------------------------
+    next_link = None
+    if cache:                                     # we have something to show next
+        # try to pick a different entry from the same cache
+        next_candidates = [e for e in cache if e[0] != url] or cache
+        next_entry     = random.choice(next_candidates)
+        next_params    = request.args.to_dict(flat=True)
+        next_params["url"] = next_entry[0]        # set the url of the next post
+        next_link = prefix + "/?" + urlencode(next_params)
+
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
 
@@ -321,6 +334,7 @@ def index():
         videos_count=videos_count,
         code_count=code_count,
         comics_count=comics_count,
+        next_link=next_link
     )
 
 
