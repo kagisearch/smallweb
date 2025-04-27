@@ -44,7 +44,7 @@ body {
   font-size: 18px;
   padding: 5px 25px 5px 5px;
   border: none;
-  border-radius: 5px 0 0 5px;
+  border-radius: 5px;
   width: 200px;
   height: 38px;
   box-sizing: border-box;
@@ -357,7 +357,7 @@ svg {
  vertical-align:middle;
 }
 
-@media (max-width: 1500px) {
+@media (max-width: 1530px) {
   #header #url-display-phone {
     display: inline-block;
   }
