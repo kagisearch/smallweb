@@ -401,14 +401,14 @@ svg {
 .stumble-link button {
     pointer-events: none;
     opacity: 0.4;
-    animation: enableButton 0s forwards 1.875s;
+    animation: enableButton 0s forwards 1.3125s;   /* was 1.875s */
 }
 
 
 #header {
     pointer-events: none;
     opacity: 0.85;
-    animation: enableButton 0s forwards 1.875s;
+    animation: enableButton 0s forwards 1.3125s;   /* was 1.875s */
 }
 
 @keyframes enableButton {
