@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
+  {% if next_doc_url %}
+  <link rel="preconnect" href="{{ next_host }}"  crossorigin>
+  <link rel="prefetch"  href="{{ next_doc_url }}" as="document" crossorigin>
+  {% endif %}
 </head>
 
 <body>

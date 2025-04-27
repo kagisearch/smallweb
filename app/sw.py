@@ -263,6 +263,8 @@ def index():
     # Build deterministic “next post” link and pre-load it
     # -------------------------------------------------
     next_link = None
+    next_doc_url = None        # add this line (default)
+    next_host    = None
     if cache:                                     # we have something to show next
         # try to pick a different entry from the same cache
         next_candidates = [e for e in cache if e[0] != url] or cache
@@ -270,6 +272,9 @@ def index():
         next_params    = request.args.to_dict(flat=True)
         next_params["url"] = next_entry[0]        # set the url of the next post
         next_link = prefix + "/?" + urlencode(next_params)
+        next_doc_url = next_entry[0]                       # remote URL itself
+        host_parts   = urlparse(next_doc_url)
+        next_host    = f"{host_parts.scheme}://{host_parts.netloc}"
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
@@ -334,7 +339,9 @@ def index():
         videos_count=videos_count,
         code_count=code_count,
         comics_count=comics_count,
-        next_link=next_link
+        next_link=next_link,
+        next_doc_url=next_doc_url,      #  ← add
+        next_host=next_host             #  ← add
     )
 
 
