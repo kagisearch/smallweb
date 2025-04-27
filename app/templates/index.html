@@ -219,5 +219,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+  {% if next_doc_url %}
+  <iframe
+      src="{{ next_doc_url }}"
+      loading="lazy"
+      sandbox
+      referrerpolicy="no-referrer"
+      style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
+  {% endif %}
 </body>
 </html>
