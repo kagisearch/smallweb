@@ -60,11 +60,11 @@ while IFS="	" read -r url host exitcode url_effective response_code; do
     continue
   fi
 
-  # Trim scheme
+  # Trim scheme and leading 'www.'
   # shellcheck disable=SC2001
-  OLD_URL=$(sed 's>^https\?://>>g' <<<"$url")
+  OLD_URL=$(sed 's>^https\?://\(www\.\)\?>>g' <<<"$url")
   # shellcheck disable=SC2001
-  NEW_URL=$(sed 's>^https\?://>>g' <<<"$url_effective")
+  NEW_URL=$(sed 's>^https\?://\(www\.\)\?>>g' <<<"$url_effective")
   # Trim trailing slashes
   # shellcheck disable=SC2001
   OLD_URL=$(sed 's>/\+$>>g' <<<"$OLD_URL")
