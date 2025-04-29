@@ -117,8 +117,12 @@
        <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
-          <span class="clear-search" id="clear-search">&times;</span>
+          {% if search_query %}
+          <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
+          {% endif %}
         </div>
+        <!-- Add a visually hidden submit button for accessibility and explicit submission -->
+        <button type="submit" style="display: none;" aria-hidden="true">Search</button>
       </form>
        <a href="https://kagi.com" title="Visit Kagi">Kagi</a>
        <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository">Contribute</a>
@@ -207,18 +211,7 @@ end.</p>
       ></iframe>
     </div>
   {% endif %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-input');
-    const clearSearch = document.getElementById('clear-search');
-    const searchForm = document.getElementById('search-form');
 
-    clearSearch.addEventListener('click', function() {
-        searchInput.value = '';
-        searchForm.submit();
-    });
-});
-</script>
   {% if next_doc_url %}
   <iframe
       src="{{ next_doc_url }}"
