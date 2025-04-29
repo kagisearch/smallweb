@@ -357,6 +357,12 @@ svg {
  vertical-align:middle;
 }
 
+.kagi-gif {
+  height: 30px; /* Adjust height as needed */
+  vertical-align: middle; /* Align with other header elements */
+  margin: 0 5px; /* Add some spacing */
+}
+
 @media (max-width: 1530px) {
   #header #url-display-phone {
     display: inline-block;
