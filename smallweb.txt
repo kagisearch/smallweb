@@ -22,6 +22,7 @@ http://baseballanalysts.com/index.rdf
 http://bearlamp.com.au/feed/
 http://benjaminrosshoffman.com/feed/
 http://bit-player.org/feed
+http://bitsplitting.org/feed/
 http://blog.a-eon.biz/blog/index.php/feed/
 http://blog.alvarezp.org/feed/
 http://blog.behnel.de/rss.xml
@@ -499,6 +500,7 @@ https://acorneredgurl.com/feed/
 https://acorwin.com/feed/
 https://acoup.blog/feed/
 https://actually.fyi/feed.xml
+https://ada.rip/rss/
 https://adactio.com/journal/rss
 https://adactio.com/links/rss
 https://adactio.com/rss/
@@ -2156,6 +2158,7 @@ https://blog.martijnarts.com/rss/
 https://blog.martin-graesslin.com/blog/feed/
 https://blog.mastykarz.nl/feed.xml
 https://blog.mathieui.net/feeds/all.atom.xml
+https://blog.mattbearman.com/feed.xml
 https://blog.mattbierner.com/atom.xml
 https://blog.mattedgar.com/feed/
 https://blog.mattgauger.com/atom.xml
@@ -3688,6 +3691,7 @@ https://davecturner.github.io/feed.xml
 https://davedelong.com/feed.xml
 https://daveeargle.com/feed.xml
 https://davegallant.ca/index.xml
+https://daveinside.com/rss.xml
 https://davekrunal.com/feed/
 https://davelee.uk/index.xml
 https://davemullenjnr.co.uk/feed.xml
@@ -6323,6 +6327,7 @@ https://jawher.me/index.xml
 https://jay.jvf.cc/index.xml
 https://jayakody2000lk.blogspot.com/feeds/posts/default
 https://jaycarlson.net/feed/
+https://jayd.ml/feed.xml
 https://jayhulme.com/blog?format=rss
 https://jaykmody.com/feed.xml
 https://jaylittle.com/index.xml
@@ -7306,6 +7311,7 @@ https://lenholgate.com/index.xml
 https://lennygale.com/feed/
 https://lenslegend.com/feed/
 https://leoloso.com/feed.xml
+https://leon.bottou.org/feed.php
 https://leonardmaltin.com/feed/
 https://leoniewise.com/feed/
 https://leontrolski.github.io/leontrolski.rss
@@ -10208,6 +10214,7 @@ https://sadgrl.online/feed.xml
 https://sadman.ca/rss.xml
 https://saeedesmaili.com/rss.xml
 https://saesferd.wordpress.com/feed/
+https://saewitz.com/feed.xml
 https://safjan.com/feeds/all.atom.xml
 https://sagacioussuricata.com/feed.xml
 https://sagar.se/index.xml
@@ -10518,6 +10525,7 @@ https://shatteredpixel.com/feed.xml
 https://shaunlawrie.com/rss.xml
 https://shavinpeiries.com/rss/
 https://shawnhumphrey.com/feed/
+https://shawnmc.cool/rss
 https://shawnnapora.github.io/feed.xml
 https://shawnyeager.com/feed.xml
 https://shazow.net/index.xml
@@ -11898,7 +11906,6 @@ https://tylersticka.com/journal/feed.xml
 https://tylertringas.com/feed/
 https://tylur.blog/api/rss.xml
 https://tymoon.eu/api/reader/atom
-https://tympanus.net/codrops/feed/
 https://tynan.com/feed/
 https://type-writer.org/?feed=rss2
 https://type.cyhsu.xyz/feed.xml
@@ -13307,6 +13314,7 @@ https://www.grammarphobia.com/blog/feed
 https://www.grammarphobia.com/feed
 https://www.graphicmedicine.org/feed/
 https://www.greaterfool.ca/feed/
+https://www.greaterwrong.com/?format=rss
 https://www.greencaltrain.com/feed/
 https://www.greenm3.com/gdcblog?format=rss
 https://www.greenmountaindaily.com/feed/
@@ -13800,6 +13808,7 @@ https://www.marclittlemore.com/feed.xml
 https://www.marcnitzsche.de/rss/
 https://www.marcogomiero.com/index.xml
 https://www.marcozehe.de/rss.xml
+https://www.marcreilly.com/feeds/posts/default
 https://www.marcus-povey.co.uk/feed/
 https://www.marekrei.com/blog/feed/
 https://www.marginalia.nu/index.xml
@@ -15089,6 +15098,7 @@ https://zerocounts.net/rss.xml
 https://zeroindexed.com/feed.xml
 https://zerokspot.com/index.xml
 https://zeroone.micro.blog/feed.xml
+https://zerowidth.com/atom.xml
 https://zespia.me/atom.xml
 https://zettl.blog/feed/
 https://zeux.io/feed/
@@ -15129,4 +15139,3 @@ https://zypper.net/rss/
 https://zythophile.co.uk/feed/
 https://zzamboni.org/post/index.xml
 https://zzncx.top/index.xml
-https://jayd.ml/feed.xml
