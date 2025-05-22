@@ -114,7 +114,10 @@
     </div>
     <div class="right">
       <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
-          <span>🌙</span>
+        <!-- moon icon -->
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0121 12.79z"/>
+        </svg>
       </button>
        <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
@@ -223,27 +226,41 @@ end.</p>
       style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
   {% endif %}
 <script>
-const toggleBtn = document.getElementById('dark-mode-toggle');
-toggleBtn.addEventListener('click', () => {
-  (() => {                       // Dark-mode IIFE (slightly scoped)
-    const CSS_ID = "global-dark-mode-style";
-    const css = `
-      /* dark-mode only for embedded documents */
-      #content iframe,
-      #content-yt iframe {
-        filter: invert(90%) hue-rotate(180deg) brightness(105%) contrast(105%);
-      }`;
-    const s = document.getElementById(CSS_ID);
-    if (s) {                     // remove -> back to light
-      s.remove();
-      toggleBtn.firstElementChild.textContent = '🌙';
-    } else {                     // inject -> dark
-      const style = Object.assign(document.createElement('style'),{id:CSS_ID,textContent:css});
+(() => {               // IIFE – keeps global scope clean
+  const CSS_ID   = "global-dark-mode-style";
+  const DARK_CSS = `#content iframe, #content-yt iframe{filter:invert(90%) hue-rotate(180deg) brightness(105%) contrast(105%);}`;
+
+  // simple icons
+  const moonSVG = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0121 12.79z"/></svg>';
+  const sunSVG  = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></g></svg>';
+
+  const btn = document.getElementById('dark-mode-toggle');
+
+  function enableDark() {
+    if (!document.getElementById(CSS_ID)) {
+      const style = Object.assign(document.createElement('style'), {id: CSS_ID, textContent: DARK_CSS});
       document.head.appendChild(style);
-      toggleBtn.firstElementChild.textContent = '☀';
     }
-  })();
-});
+    btn.innerHTML = sunSVG;
+    localStorage.setItem('darkMode', 'on');
+  }
+
+  function disableDark() {
+    const style = document.getElementById(CSS_ID);
+    if (style) style.remove();
+    btn.innerHTML = moonSVG;
+    localStorage.setItem('darkMode', 'off');
+  }
+
+  // Apply saved preference on load
+  if (localStorage.getItem('darkMode') === 'on') enableDark();
+  else disableDark();
+
+  // Toggle on click
+  btn.addEventListener('click', () =>
+    (localStorage.getItem('darkMode') === 'on') ? disableDark() : enableDark()
+  );
+})();
 </script>
 </body>
 </html>

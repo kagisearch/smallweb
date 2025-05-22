@@ -134,6 +134,9 @@ body {
 #header button:hover {
   background-color: #2980b9;
 }
+#header button:not(#dark-mode-toggle):hover {
+  background-color: #2980b9;
+}
 
 #header #url-display, #header #url-display-phone {
   font-size: 20px;
