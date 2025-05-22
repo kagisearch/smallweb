@@ -131,11 +131,12 @@ body {
 }
 
 
-#header button:hover {
-  background-color: #2980b9;
-}
 #header button:not(#dark-mode-toggle):hover {
   background-color: #2980b9;
+}
+
+#dark-mode-toggle:hover {
+  background-color: transparent;   /* no blue highlight */
 }
 
 #header #url-display, #header #url-display-phone {
