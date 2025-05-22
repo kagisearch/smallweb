@@ -229,16 +229,13 @@ end.</p>
 (() => {                 // IIFE – keeps global scope clean
   const CSS_ID  = "global-dark-mode-style";
   const DARK_CSS = `
-    :root {                         /* global inversion */
+    /* apply dark filter ONLY to the embedded pages */
+    #content iframe,
+    #content-yt iframe {
       filter: invert(90%) hue-rotate(180deg);
-      background:#fff;
+      background:#fff;          /* keeps blank areas white pre-inversion */
     }
-    /* elements that must stay “normal” */
-    iframe, img, video,
-    [style*="background-image"]:not([data-no-dark-invert]) {
-      filter: invert(100%) hue-rotate(180deg)
-              brightness(105%) contrast(105%);
-    }`;
+  `;
 
   /* simpler icons */
   const moonSVG = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2a10 10 0 000 20 9.93 9.93 0 006.77-2.67A10 10 0 0112 2z"/></svg>';
