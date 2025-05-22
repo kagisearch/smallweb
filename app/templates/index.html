@@ -113,7 +113,9 @@
       {% endif %}      
     </div>
     <div class="right">
-     
+      <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
+          <span>🌙</span>
+      </button>
        <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
@@ -220,5 +222,28 @@ end.</p>
       referrerpolicy="no-referrer"
       style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
   {% endif %}
+<script>
+const toggleBtn = document.getElementById('dark-mode-toggle');
+toggleBtn.addEventListener('click', () => {
+  (() => {                       // Dark-mode IIFE (slightly scoped)
+    const CSS_ID = "global-dark-mode-style";
+    const css = `
+      /* dark-mode only for embedded documents */
+      #content iframe,
+      #content-yt iframe {
+        filter: invert(90%) hue-rotate(180deg) brightness(105%) contrast(105%);
+      }`;
+    const s = document.getElementById(CSS_ID);
+    if (s) {                     // remove -> back to light
+      s.remove();
+      toggleBtn.firstElementChild.textContent = '🌙';
+    } else {                     // inject -> dark
+      const style = Object.assign(document.createElement('style'),{id:CSS_ID,textContent:css});
+      document.head.appendChild(style);
+      toggleBtn.firstElementChild.textContent = '☀';
+    }
+  })();
+});
+</script>
 </body>
 </html>

@@ -106,6 +106,16 @@ body {
   background-color: #2980b9;
 }
 
+/* Dark-mode toggle */
+#dark-mode-toggle{
+  background:none;
+  border:none;
+  color:#ecf0f1;
+  cursor:pointer;
+  font-size:24px;
+  padding:0 10px;
+}
+
 .next-button, .ok-button {
   background-color: #3498db;
   border: none;
