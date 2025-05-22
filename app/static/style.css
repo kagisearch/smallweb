@@ -193,7 +193,7 @@ body {
 .right {
   flex: 1;
   text-align: right;
-  max-width: 370px;
+  max-width: 410px;
   display: flex;
   align-items: center;
 }
