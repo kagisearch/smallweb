@@ -106,6 +106,16 @@ body {
   background-color: #2980b9;
 }
 
+/* Dark-mode toggle */
+#dark-mode-toggle{
+  background:none;
+  border:none;
+  color:#ecf0f1;
+  cursor:pointer;
+  font-size:24px;
+  padding:0 10px;
+}
+
 .next-button, .ok-button {
   background-color: #3498db;
   border: none;
@@ -121,8 +131,12 @@ body {
 }
 
 
-#header button:hover {
+#header button:not(#dark-mode-toggle):hover {
   background-color: #2980b9;
+}
+
+#dark-mode-toggle:hover {
+  background-color: transparent;   /* no blue highlight */
 }
 
 #header #url-display, #header #url-display-phone {
@@ -179,7 +193,7 @@ body {
 .right {
   flex: 1;
   text-align: right;
-  max-width: 370px;
+  max-width: 410px;
   display: flex;
   align-items: center;
 }
