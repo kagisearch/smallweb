@@ -131,7 +131,7 @@ body {
 }
 
 
-#header button:not(#dark-mode-toggle):hover {
+#header button:not(#dark-mode-toggle):not(.favorite-link):not(.flag-link):hover {
   background-color: #2980b9;
 }
 
