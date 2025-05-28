@@ -91,7 +91,11 @@
        <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
-        <button title="Flag this post" type="submit" class="flag-link">Flag{% if flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
+        <button title="Flag this post"
+                type="submit"
+                class="flag-link"
+                onclick="return confirm('Are you sure you want to flag this post?');">
+                Flag{% if flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
       </form>
 
       {% if current_mode==1 %} 

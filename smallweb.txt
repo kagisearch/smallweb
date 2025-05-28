@@ -8,6 +8,7 @@ http://aegisknight.org/feed
 http://agentzh.org/index.xml
 http://airpigz.com/blog/atom.xml
 http://ais523.me.uk/blog/atom.xml
+https://alexanderell.is/index.xml
 http://alfredmegally.com/feed/
 http://allendowney.blogspot.com/feeds/posts/default
 http://allsoftwaresucks.blogspot.com/feeds/posts/default
@@ -16,6 +17,7 @@ http://amid.fish/feed.xml
 http://andersource.dev/feed.xml
 http://arches.io/index.xml
 http://archimago.blogspot.com/feeds/posts/default
+https://armanckeser.com/rss
 http://armueller.github.io/feed.xml
 http://awfullibrarybooks.wordpress.com/feed/
 http://bad-concurrency.blogspot.com/feeds/posts/default
@@ -37,6 +39,7 @@ http://blog.jonathanberkowitz.me/feed/
 http://blog.leahhanson.us/index.xml
 http://blog.lukasz.soluch.net/feeds/posts/default
 http://blog.macrolet.net/rss.xml
+https://blog.matthewbrunelle.com/feed
 http://blog.mattneary.com/feed
 http://blog.petersobot.com/feed
 http://blog.piotrnalepa.pl/feed/
@@ -114,6 +117,7 @@ http://hearttohearthcookery.wordpress.com/feed/
 http://higherorderfun.com/blog/feed/
 http://highlowcomics.blogspot.com/feeds/posts/default
 http://hyperboleandahalf.blogspot.com/feeds/posts/default
+https://ianreppel.org/feed.xml
 http://iftheshoefritz.com/feed.xml
 http://inthewilderness.net/feed/
 http://ithare.com/feed/
@@ -194,6 +198,7 @@ http://realgl.blogspot.com/feeds/posts/default
 http://relatedwork.blogspot.com/feeds/posts/default
 http://retro.hansotten.nl/feed/
 http://robertfiorentino.com/feed/
+https://robertoviola.cloud/feed
 http://rochus-keller.ch/?feed=atom
 http://rochus-keller.ch/?feed=rss2
 http://rolandtanglao.com/feed.xml
@@ -205,6 +210,8 @@ http://sarasoueidan.com/desk/index.xml/
 http://sawv.org/rss.xml
 http://schwitzsplinters.blogspot.com/feeds/posts/default
 http://sciruby.com/atom.xml
+https://scottaaronson.blog/?feed=rss2
+https://www.scottgoci.com/feed/
 http://scripting.com/rss.xml
 http://scytheassociation.org/feed/
 http://sdymchenko.com/rss.xml
@@ -457,7 +464,6 @@ https://aaronweb.net/feed/
 https://aartaka.me/rss.xml
 https://aaugh.com/wordpress/feed/
 https://abandoned.photos/rss
-https://abandonedonline.net/feed/
 https://abbbi.github.io/feed.xml
 https://abbesroad.blog/feed/
 https://abcl-dev.blogspot.com/feeds/posts/default
@@ -13629,7 +13635,6 @@ https://www.huy.dev/rss.xml
 https://www.huy.rocks/rss.xml
 https://www.hxa.name/hxa7241-latest.xml
 https://www.hypergeometric.com/feed/
-https://www.hyperorg.com/blogger/feed/atom/
 https://www.hypertesto.me/en/index.xml
 https://www.iainsinclair.org.uk/feed/
 https://www.iamadamlevy.com/feed/
