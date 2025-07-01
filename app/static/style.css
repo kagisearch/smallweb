@@ -144,7 +144,7 @@ body {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width:30vw;
+  max-width:28vw;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   padding: 5px 10px;
