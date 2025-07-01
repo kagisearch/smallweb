@@ -74,7 +74,7 @@ while IFS="	" read -r url host exitcode url_effective response_code; do
   # If the old and new URL only differ in these minor details, replace the
   # original url with the new one.
   if [[ "$OLD_URL" == "$NEW_URL" ]]; then
-    sed -i "s>^${url}\$>${url_effective}>g" "$SMALLWEB"
+    sed -i '' "s>^${url}\$>${url_effective}>g" "$SMALLWEB"
   else
     echo -e "${url}\t${host}\t${exitcode}\t${url_effective}\t${response_code}" >> "$TMP"
   fi
@@ -132,7 +132,7 @@ while IFS="	" read -r url host exitcode url_effective response_code; do
   if [[ $found == true ]] ; then
     echo -e "${url}\t${host}\t${exitcode}\t${url_effective}\t${response_code}" >> "$TMP"
   else
-    sed -i "\	^${url}\$	d" "$SMALLWEB"
+    sed -i '' "\	^${url}\$	d" "$SMALLWEB"
   fi
 done <<< "$(tail --lines=+2 "$URLS_CHANGED")"
 
