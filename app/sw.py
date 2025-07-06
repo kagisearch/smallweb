@@ -94,7 +94,8 @@ def update_all():
         new_entries = update_entries(url + "?yt")  # youtube sites
 
         if not bool(urls_yt_cache) or bool(new_entries):
-            urls_yt_cache = new_entries
+            # Filter out YouTube Shorts links
+            urls_yt_cache = [entry for entry in new_entries if "/shorts/" not in entry[0]]
 
         new_entries = update_entries(url + "?gh")  # github sites
 
