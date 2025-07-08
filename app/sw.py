@@ -355,11 +355,6 @@ def index():
 def favorite():
     global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
     url = request.form.get("url")
-
-    if url:
-
-    from collections import OrderedDict   # (put with imports)
-
     emoji = request.form.get("emoji", "👍")
 
     if url:
@@ -388,17 +383,19 @@ def favorite():
             except:
                 print("can not write fav file")
 
-    # Preserve all query parameters except 'url'
+        # Preserve all query parameters except 'url'
+        query_params = request.args.copy()
+        if "url" in query_params:
+            del query_params["url"]
+        query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
-    query_params = request.args.copy()
-    if "url" in query_params:
-        del query_params["url"]
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
-
-    redirect_path = f"{prefix}/?url={url}"
-    if query_string:
-        redirect_path += f"&{query_string}"
-    return redirect(redirect_path)
+        redirect_path = f"{prefix}/?url={url}"
+        if query_string:
+            redirect_path += f"&{query_string}"
+        return redirect(redirect_path)
+    else:
+        # If no URL, just redirect to prefix
+        return redirect(prefix + "/")
 
 
 @app.post("/note")
