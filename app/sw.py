@@ -503,6 +503,7 @@ def appreciated():
     return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
 
 @app.route("/opml")
+@app.route(f"{prefix}/opml")
 def opml():
     global opml_cache
     if opml_cache is None:          # first call before update_all ran?
