@@ -25,15 +25,28 @@
       {% endif %}
       <div id="reactions">
 
-        {% for emoji, cnt in reactions_list %}
-        <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post" class="emoji-form">
-            <input type="hidden" name="url" value="{{ url }}">
-            <input type="hidden" name="emoji" value="{{ emoji }}">
-            <button type="submit" class="emoji-badge" title="Add one more {{ emoji }}">
-                <span>{{ emoji }}</span><span>{{ cnt }}</span>
-            </button>
-        </form>
-        {% endfor %}
+{# --- always show the default 👍 button --- #}
+{% set thumb_cnt = reactions_dict.get('👍', 0) %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="👍">
+  <button type="submit" class="emoji-badge" title="Add one more 👍">
+      <span>👍</span>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
+  </button>
+</form>
+
+{# --- show the other (max-3) stored emojis, excluding 👍 --- #}
+{% for emoji, cnt in reactions_list if emoji != '👍' %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="{{ emoji }}">
+  <button type="submit" class="emoji-badge" title="Add one more {{ emoji }}">
+      <span>{{ emoji }}</span><span>{{ cnt }}</span>
+  </button>
+</form>
+{% endfor %}
 
         <!-- add-emoji picker -->
         <div class="popup-container">

@@ -346,7 +346,8 @@ def index():
         next_doc_url=next_doc_url,      #  ← add
         next_host=next_host,            #  ← add
         reactions_list=list(reactions_dict.items()),
-        favorites_total=favorites_total
+        favorites_total=favorites_total,
+        reactions_dict=reactions_dict,
     )
 
 
@@ -356,8 +357,6 @@ def favorite():
     url = request.form.get("url")
 
     if url:
-        # Increment favorites count
-        favorites_dict[url] = favorites_dict.get(url, 0) + 1
 
     from collections import OrderedDict   # (put with imports)
 
