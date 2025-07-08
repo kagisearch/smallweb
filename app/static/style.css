@@ -430,14 +430,18 @@ svg {
 .emoji-form   { display:inline-block; }
 .emoji-badge  {
   display:flex; align-items:center; gap:4px;
-  background:#f1f1f1; color:#000;
+  background:transparent;               /* no bg by default */
+  color:#ecf0f1;                        /* near-white text */
   border:none; border-radius:9999px;
   padding:2px 8px; font-size:18px; cursor:pointer;
 }
 body.dark .emoji-badge,
-.dark-mode .emoji-badge { background:#444; color:#fff; }
+.dark-mode .emoji-badge { background:transparent; color:#ecf0f1; }
 
-.emoji-badge:hover { box-shadow:0 0 0 1px #2980b9; }
+.emoji-badge:hover {
+  background:#2980b9;           /* blue hover background */
+  box-shadow:none;
+}
 
 .emoji-add-btn { cursor:pointer; display:inline-flex; }
 
