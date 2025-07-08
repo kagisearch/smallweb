@@ -19,6 +19,7 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed
+from collections import OrderedDict
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 
@@ -115,8 +116,9 @@ def update_all():
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
         favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
         
-        # Build urls_app_cache from appreciated entries in urls_cache
-        urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
+        # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
+        urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
+                          if e[0] in favorites_dict]
         
         # Generate the appreciated feed
         generate_appreciated_feed()
@@ -291,7 +293,8 @@ def index():
         current_mode = 1
 
     # get favorites
-    favorites_count = favorites_dict.get(url, 0)
+    reactions_dict = favorites_dict.get(url, OrderedDict())
+    favorites_total = sum(reactions_dict.values())
 
     # Preserve all query parameters except 'url'
     query_params = request.args.copy()
@@ -330,7 +333,6 @@ def index():
         prefix=prefix + "/",
         videoid=videoid,
         current_mode=current_mode,
-        favorites_count=favorites_count,
         notes_count=notes_count,
         notes_list=notes_list,
         flag_content_count=flag_content_count,
@@ -342,7 +344,9 @@ def index():
         comics_count=comics_count,
         next_link=next_link,
         next_doc_url=next_doc_url,      #  ← add
-        next_host=next_host             #  ← add
+        next_host=next_host,            #  ← add
+        reactions_list=list(reactions_dict.items()),
+        favorites_total=favorites_total
     )
 
 
@@ -355,8 +359,23 @@ def favorite():
         # Increment favorites count
         favorites_dict[url] = favorites_dict.get(url, 0) + 1
 
+    from collections import OrderedDict   # (put with imports)
+
+    emoji = request.form.get("emoji", "👍")
+
+    if url:
+        entry = favorites_dict.get(url)
+        if not isinstance(entry, OrderedDict):
+            entry = OrderedDict()                      # initialise
+        # enforce max 3 distinct emojis (drop oldest)
+        if emoji not in entry and len(entry) >= 3:
+            entry.popitem(last=False)
+        entry[emoji] = entry.get(emoji, 0) + 1
+        favorites_dict[url] = entry
+
         # Update urls_app_cache with the new favorite from both regular and YouTube feeds
-        urls_app_cache = [entry for entry in (urls_cache + urls_yt_cache) if entry[0] in favorites_dict]
+        urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
+                          if e[0] in favorites_dict]
         
         # Regenerate the appreciated feed
         generate_appreciated_feed()
@@ -474,6 +493,10 @@ try:
     with open(PATH_FAVORITES, "rb") as file:
         favorites_dict = pickle.load(file)
         print("Loaded favorites", len(favorites_dict))
+        # ---- migrate old int-only data to emoji dict -------------------
+        for u, v in list(favorites_dict.items()):
+            if isinstance(v, int):
+                favorites_dict[u] = OrderedDict({"👍": v})
 except:
     print("No favorites data found.")
 finally:

@@ -424,6 +424,30 @@ svg {
     animation: enableButton 0s forwards 1s;   /* was 1.3125s */
 }
 
+/* Emoji reactions */
+#reactions { display:flex; align-items:center; gap:6px; }
+
+.emoji-form   { display:inline-block; }
+.emoji-badge  {
+  display:flex; align-items:center; gap:4px;
+  background:#f1f1f1; color:#000;
+  border:none; border-radius:9999px;
+  padding:2px 8px; font-size:18px; cursor:pointer;
+}
+body.dark .emoji-badge,
+.dark-mode .emoji-badge { background:#444; color:#fff; }
+
+.emoji-badge:hover { box-shadow:0 0 0 1px #2980b9; }
+
+.emoji-add-btn { cursor:pointer; display:inline-flex; }
+
+.emoji-popup { width:200px; text-align:center; }
+
+.emoji-option {
+  background:none; border:none; font-size:24px; padding:4px; cursor:pointer;
+}
+.emoji-option:hover { background:rgba(255,255,255,0.1); }
+
 
 #header {
     pointer-events: none;
