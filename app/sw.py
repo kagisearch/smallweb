@@ -238,7 +238,14 @@ def index():
                 notes_list=[],
                 flag_content_count=0,
                 search_query=search_query,
-                no_results=True
+                no_results=True,
+                # --- NEW: satisfy template ---
+                reactions_dict=OrderedDict(),
+                reactions_list=[],
+                favorites_total=0,
+                next_link="",
+                next_doc_url="",
+                next_host="",
             )
 
     if url is not None:
