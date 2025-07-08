@@ -151,6 +151,10 @@ body {
   min-width:300px;
 }
 
+/* --- always show the compact “phone” url label --- */
+#header #url-display       { display:none !important; }
+#header #url-display-phone { display:inline-block !important; }
+
 #header #url-display-phone {
   display:none;
   min-width:10px;
@@ -377,16 +381,6 @@ svg {
   margin: 0 5px; /* Add some spacing */
 }
 
-@media (max-width: 1530px) {
-  #header #url-display-phone {
-    display: inline-block;
-  }
-
-  #header #url-display {
-    display: none;
-  }
-  
-}
 
 
 @media (max-width: 1330px) {
