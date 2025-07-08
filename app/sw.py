@@ -7,6 +7,7 @@ from flask import (
     render_template,
     Response,
 )
+from html import escape
 import feedparser
 import feedparser
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -22,6 +23,7 @@ from feedwerk.atom import AtomFeed
 from collections import OrderedDict
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
+opml_cache = None          # will hold generated OPML xml
 
 def generate_appreciated_feed():
     """Generate Atom feed for appreciated posts"""
@@ -40,6 +42,29 @@ def generate_appreciated_feed():
             updated=updated,
             author=author,
         )
+
+def generate_opml_feed() -> str:
+    """Return OPML text that lists all cached Small-Web posts as RSS items."""
+    outlines, seen = [], set()
+    for feed in (urls_cache, urls_yt_cache, urls_app_cache,
+                 urls_gh_cache, urls_comic_cache):
+        for link, title, *_ in feed or []:
+            if link in seen:
+                continue
+            seen.add(link)
+            safe_title = escape(title or link, quote=True)
+            outlines.append(
+                f'    <outline text="{safe_title}" title="{safe_title}" '
+                f'type="rss" xmlUrl="{link}" htmlUrl="{link}"/>'
+            )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<opml version="1.0">\n'
+        '  <head>\n'
+        '    <title>Kagi Small Web OPML</title>\n'
+        '  </head>\n'
+        '  <body>\n' + "\n".join(outlines) + '\n  </body>\n</opml>'
+    )
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
@@ -122,6 +147,10 @@ def update_all():
         
         # Generate the appreciated feed
         generate_appreciated_feed()
+
+        # ---- NEW: update cached OPML ----
+        global opml_cache
+        opml_cache = generate_opml_feed()
        
     except:
         print("something went wrong during update_all")
@@ -475,8 +504,10 @@ def appreciated():
 
 @app.route("/opml")
 def opml():
-    """OPML endpoint"""
-    return "Currently not supported", 404
+    global opml_cache
+    if opml_cache is None:          # first call before update_all ran?
+        opml_cache = generate_opml_feed()
+    return Response(opml_cache, mimetype="text/x-opml+xml")
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
@@ -530,6 +561,7 @@ except:
 # get feeds
 update_all()
 
+opml_cache = generate_opml_feed()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()
