@@ -56,7 +56,7 @@
             </label>
             <input type="radio" id="emoji-popup" name="popup" class="popup-radio">
             <div class="popup emoji-popup">
-              {% for e in ["👍","😍","😀","😘","😆","😜","🫶","😂","😱","🤔","👏","🚀","🥳","🔥"] %}
+              {% for e in favorite_emoji_list %}
               <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post" style="display:inline;">
                   <input type="hidden" name="url" value="{{ url }}">
                   <input type="hidden" name="emoji" value="{{ e }}">
