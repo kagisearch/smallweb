@@ -362,6 +362,12 @@ def index():
     code_count = len(urls_gh_cache) if urls_gh_cache else 0
     comics_count = len(urls_comic_cache) if urls_comic_cache else 0
 
+    # NOTE(z64): Some invalid reactions may be left over in the pkl file; filter them out.
+    reactions_list = []
+    for emoji, count in reactions_dict.items():
+        if emoji in favorite_emoji_list:
+            reactions_list.append((emoji, count))
+
     return render_template(
         "index.html",
         url=url,
@@ -385,7 +391,7 @@ def index():
         next_link=next_link,
         next_doc_url=next_doc_url,      #  ← add
         next_host=next_host,            #  ← add
-        reactions_list=list(reactions_dict.items()),
+        reactions_list=reactions_list,
         favorites_total=favorites_total,
         favorite_emoji_list=favorite_emoji_list,
         reactions_dict=reactions_dict,
