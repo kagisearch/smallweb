@@ -1,4 +1,4 @@
-FROM python:3.11-buster
+FROM python:3.11-bookworm
 
 ENV PYTHONUNBUFFERED=True
 ENV URL_PREFIX=/smallweb

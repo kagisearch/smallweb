@@ -25,6 +25,10 @@ from collections import OrderedDict
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None          # will hold generated OPML xml
 
+# NOTE(z64): List of emotes that can be used for favoriting.
+# Used to build the list in the template, and perform validation on the server.
+favorite_emoji_list = ["👍","😍","😀","😘","😆","😜","🫶","😂","😱","🤔","👏","🚀","🥳","🔥"]
+
 def generate_appreciated_feed():
     """Generate Atom feed for appreciated posts"""
     global appreciated_feed
@@ -358,6 +362,12 @@ def index():
     code_count = len(urls_gh_cache) if urls_gh_cache else 0
     comics_count = len(urls_comic_cache) if urls_comic_cache else 0
 
+    # NOTE(z64): Some invalid reactions may be left over in the pkl file; filter them out.
+    reactions_list = []
+    for emoji, count in reactions_dict.items():
+        if emoji in favorite_emoji_list:
+            reactions_list.append((emoji, count))
+
     return render_template(
         "index.html",
         url=url,
@@ -381,8 +391,9 @@ def index():
         next_link=next_link,
         next_doc_url=next_doc_url,      #  ← add
         next_host=next_host,            #  ← add
-        reactions_list=list(reactions_dict.items()),
+        reactions_list=reactions_list,
         favorites_total=favorites_total,
+        favorite_emoji_list=favorite_emoji_list,
         reactions_dict=reactions_dict,
     )
 
@@ -391,7 +402,11 @@ def index():
 def favorite():
     global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
     url = request.form.get("url")
-    emoji = request.form.get("emoji", "👍")
+
+    emoji = "👍"
+    emoji_from_form = request.form.get("emoji")
+    if emoji_from_form and emoji_from_form in favorite_emoji_list:
+        emoji = emoji_from_form
 
     if url:
         entry = favorites_dict.get(url)
