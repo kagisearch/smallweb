@@ -120,8 +120,11 @@
           <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lobsters</a>
           <a href="https://cohost.org" class="share-option" target="_blank">Cohost</a>
           <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank">Email</a>
+          <hr style="border: none; border-top: 1px solid #ccc; margin: 8px 0;">
           <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option"
-          target="_blank">Universal Summarizer</a>
+          target="_blank">Summarize</a>
+          <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option"
+          target="_blank">Translate</a>
           <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
              class="share-option" target="_blank">Link here</a>
 
