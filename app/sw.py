@@ -487,8 +487,11 @@ def flag_content():
     global flagged_content_dict, time_saved_flagged_content
     url = request.form.get("url")
 
-    if url:
-        # Increment favorites count
+    # Check if user has already flagged this URL (prevent multiple flags)
+    already_flagged = request.args.get("flagged") == url
+
+    if url and not already_flagged:
+        # Increment flagged content count
         flagged_content_dict[url] = flagged_content_dict.get(url, 0) + 1
 
         # Save to disk
@@ -501,10 +504,12 @@ def flag_content():
                 print("can not write flagged content file")
 
     # Preserve all query parameters except 'url'
-
     query_params = request.args.copy()
     if "url" in query_params:
         del query_params["url"]
+    
+    # Add flagged parameter to prevent multiple flags for the same URL
+    query_params["flagged"] = url if url else ""
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
     # we do not want to redirect to same url
