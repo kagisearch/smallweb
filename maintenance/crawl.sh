@@ -20,6 +20,9 @@ if [ ! -f "$OUTPUT" ]; then
   echo -e "$CSV_HEADER" >> "$OUTPUT"
 fi
 
-while read -r URL; do
-  curl --max-time 30 -Ls --head -o /dev/null --write-out "${CURL_COLUMNS}\n" "$URL" >> "$OUTPUT"
-done < $SMALLWEB
+# Use pv to show a progress bar and xargs to run curl in parallel
+NUM_URLS=$(wc -l < "$SMALLWEB")
+echo "Crawling $NUM_URLS URLs with 16 parallel connections..."
+
+cat "$SMALLWEB" | pv -l -s "$NUM_URLS" | xargs -P 16 -I{} \
+  curl --max-time 30 -Ls --head -o /dev/null --write-out "${CURL_COLUMNS}\n" "{}" >> "$OUTPUT"

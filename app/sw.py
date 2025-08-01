@@ -7,6 +7,7 @@ from flask import (
     render_template,
     Response,
 )
+from html import escape
 import feedparser
 import feedparser
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -19,8 +20,14 @@ import os
 import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed
+from collections import OrderedDict
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
+opml_cache = None          # will hold generated OPML xml
+
+# NOTE(z64): List of emotes that can be used for favoriting.
+# Used to build the list in the template, and perform validation on the server.
+favorite_emoji_list = ["👍","😍","😀","😘","😆","😜","🫶","😂","😱","🤔","👏","🚀","🥳","🔥"]
 
 def generate_appreciated_feed():
     """Generate Atom feed for appreciated posts"""
@@ -39,6 +46,29 @@ def generate_appreciated_feed():
             updated=updated,
             author=author,
         )
+
+def generate_opml_feed() -> str:
+    """Return OPML text that lists all cached Small-Web posts as RSS items."""
+    outlines, seen = [], set()
+    for feed in (urls_cache, urls_yt_cache, urls_app_cache,
+                 urls_gh_cache, urls_comic_cache):
+        for link, title, *_ in feed or []:
+            if link in seen:
+                continue
+            seen.add(link)
+            safe_title = escape(title or link, quote=True)
+            outlines.append(
+                f'    <outline text="{safe_title}" title="{safe_title}" '
+                f'type="rss" xmlUrl="{link}" htmlUrl="{link}"/>'
+            )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<opml version="1.0">\n'
+        '  <head>\n'
+        '    <title>Kagi Small Web OPML</title>\n'
+        '  </head>\n'
+        '  <body>\n' + "\n".join(outlines) + '\n  </body>\n</opml>'
+    )
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
@@ -94,7 +124,8 @@ def update_all():
         new_entries = update_entries(url + "?yt")  # youtube sites
 
         if not bool(urls_yt_cache) or bool(new_entries):
-            urls_yt_cache = new_entries
+            # Filter out YouTube Shorts links
+            urls_yt_cache = [entry for entry in new_entries if "/shorts/" not in entry[0]]
 
         new_entries = update_entries(url + "?gh")  # github sites
 
@@ -114,11 +145,16 @@ def update_all():
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
         favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
         
-        # Build urls_app_cache from appreciated entries in urls_cache
-        urls_app_cache = [entry for entry in urls_cache if entry[0] in favorites_dict]
+        # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
+        urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
+                          if e[0] in favorites_dict]
         
         # Generate the appreciated feed
         generate_appreciated_feed()
+
+        # ---- NEW: update cached OPML ----
+        global opml_cache
+        opml_cache = generate_opml_feed()
        
     except:
         print("something went wrong during update_all")
@@ -235,7 +271,14 @@ def index():
                 notes_list=[],
                 flag_content_count=0,
                 search_query=search_query,
-                no_results=True
+                no_results=True,
+                # --- NEW: satisfy template ---
+                reactions_dict=OrderedDict(),
+                reactions_list=[],
+                favorites_total=0,
+                next_link="",
+                next_doc_url="",
+                next_host="",
             )
 
     if url is not None:
@@ -290,7 +333,8 @@ def index():
         current_mode = 1
 
     # get favorites
-    favorites_count = favorites_dict.get(url, 0)
+    reactions_dict = favorites_dict.get(url, OrderedDict())
+    favorites_total = sum(reactions_dict.values())
 
     # Preserve all query parameters except 'url'
     query_params = request.args.copy()
@@ -318,6 +362,12 @@ def index():
     code_count = len(urls_gh_cache) if urls_gh_cache else 0
     comics_count = len(urls_comic_cache) if urls_comic_cache else 0
 
+    # NOTE(z64): Some invalid reactions may be left over in the pkl file; filter them out.
+    reactions_list = []
+    for emoji, count in reactions_dict.items():
+        if emoji in favorite_emoji_list:
+            reactions_list.append((emoji, count))
+
     return render_template(
         "index.html",
         url=url,
@@ -329,7 +379,6 @@ def index():
         prefix=prefix + "/",
         videoid=videoid,
         current_mode=current_mode,
-        favorites_count=favorites_count,
         notes_count=notes_count,
         notes_list=notes_list,
         flag_content_count=flag_content_count,
@@ -341,7 +390,11 @@ def index():
         comics_count=comics_count,
         next_link=next_link,
         next_doc_url=next_doc_url,      #  ← add
-        next_host=next_host             #  ← add
+        next_host=next_host,            #  ← add
+        reactions_list=reactions_list,
+        favorites_total=favorites_total,
+        favorite_emoji_list=favorite_emoji_list,
+        reactions_dict=reactions_dict,
     )
 
 
@@ -350,12 +403,24 @@ def favorite():
     global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
     url = request.form.get("url")
 
+    emoji = "👍"
+    emoji_from_form = request.form.get("emoji")
+    if emoji_from_form and emoji_from_form in favorite_emoji_list:
+        emoji = emoji_from_form
+
     if url:
-        # Increment favorites count
-        favorites_dict[url] = favorites_dict.get(url, 0) + 1
+        entry = favorites_dict.get(url)
+        if not isinstance(entry, OrderedDict):
+            entry = OrderedDict()                      # initialise
+        # enforce max 3 distinct emojis (drop oldest)
+        if emoji not in entry and len(entry) >= 3:
+            entry.popitem(last=False)
+        entry[emoji] = entry.get(emoji, 0) + 1
+        favorites_dict[url] = entry
 
         # Update urls_app_cache with the new favorite from both regular and YouTube feeds
-        urls_app_cache = [entry for entry in (urls_cache + urls_yt_cache) if entry[0] in favorites_dict]
+        urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
+                          if e[0] in favorites_dict]
         
         # Regenerate the appreciated feed
         generate_appreciated_feed()
@@ -369,17 +434,19 @@ def favorite():
             except:
                 print("can not write fav file")
 
-    # Preserve all query parameters except 'url'
+        # Preserve all query parameters except 'url'
+        query_params = request.args.copy()
+        if "url" in query_params:
+            del query_params["url"]
+        query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
-    query_params = request.args.copy()
-    if "url" in query_params:
-        del query_params["url"]
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
-
-    redirect_path = f"{prefix}/?url={url}"
-    if query_string:
-        redirect_path += f"&{query_string}"
-    return redirect(redirect_path)
+        redirect_path = f"{prefix}/?url={url}"
+        if query_string:
+            redirect_path += f"&{query_string}"
+        return redirect(redirect_path)
+    else:
+        # If no URL, just redirect to prefix
+        return redirect(prefix + "/")
 
 
 @app.post("/note")
@@ -420,8 +487,11 @@ def flag_content():
     global flagged_content_dict, time_saved_flagged_content
     url = request.form.get("url")
 
-    if url:
-        # Increment favorites count
+    # Check if user has already flagged this URL (prevent multiple flags)
+    already_flagged = request.args.get("flagged") == url
+
+    if url and not already_flagged:
+        # Increment flagged content count
         flagged_content_dict[url] = flagged_content_dict.get(url, 0) + 1
 
         # Save to disk
@@ -434,10 +504,12 @@ def flag_content():
                 print("can not write flagged content file")
 
     # Preserve all query parameters except 'url'
-
     query_params = request.args.copy()
     if "url" in query_params:
         del query_params["url"]
+    
+    # Add flagged parameter to prevent multiple flags for the same URL
+    query_params["flagged"] = url if url else ""
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
     # we do not want to redirect to same url
@@ -451,9 +523,12 @@ def appreciated():
     return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
 
 @app.route("/opml")
+@app.route(f"{prefix}/opml")
 def opml():
-    """OPML endpoint"""
-    return "Currently not supported", 404
+    global opml_cache
+    if opml_cache is None:          # first call before update_all ran?
+        opml_cache = generate_opml_feed()
+    return Response(opml_cache, mimetype="text/x-opml+xml")
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
@@ -473,6 +548,10 @@ try:
     with open(PATH_FAVORITES, "rb") as file:
         favorites_dict = pickle.load(file)
         print("Loaded favorites", len(favorites_dict))
+        # ---- migrate old int-only data to emoji dict -------------------
+        for u, v in list(favorites_dict.items()):
+            if isinstance(v, int):
+                favorites_dict[u] = OrderedDict({"👍": v})
 except:
     print("No favorites data found.")
 finally:
@@ -503,6 +582,7 @@ except:
 # get feeds
 update_all()
 
+opml_cache = generate_opml_feed()
 
 # Update feeds every 1 hour
 scheduler = BackgroundScheduler()

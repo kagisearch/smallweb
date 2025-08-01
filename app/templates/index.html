@@ -23,10 +23,51 @@
         <button class="next-button" title="Show next post">Next Post</button>
       </a>
       {% endif %}
-      <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post">
-        <input type="hidden" name="url" value="{{ url }}">
-        <button type="submit" title="Appreciate this post" class="favorite-link">Appreciate{% if favorites_count > 0 %} ({{ favorites_count }}){% endif %}</button>
-      </form>
+      <div id="reactions">
+
+{# --- always show the default 👍 button --- #}
+{% set thumb_cnt = reactions_dict.get('👍', 0) %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="👍">
+  <button type="submit" class="emoji-badge" title="Add one more 👍">
+      <span>👍</span>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
+  </button>
+</form>
+
+{# --- show the other (max-3) stored emojis, excluding 👍 --- #}
+{% for emoji, cnt in reactions_list if emoji != '👍' %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="{{ emoji }}">
+  <button type="submit" class="emoji-badge" title="Add one more {{ emoji }}">
+      <span>{{ emoji }}</span><span>{{ cnt }}</span>
+  </button>
+</form>
+{% endfor %}
+
+        <!-- add-emoji picker -->
+        <div class="popup-container">
+            <label for="emoji-popup" class="emoji-add-btn" title="More reactions">
+              <!-- smile-plus icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M15 5v4"/><path d="M17 7h-4"/></svg>
+            </label>
+            <input type="radio" id="emoji-popup" name="popup" class="popup-radio">
+            <div class="popup emoji-popup">
+              {% for e in favorite_emoji_list %}
+              <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post" style="display:inline;">
+                  <input type="hidden" name="url" value="{{ url }}">
+                  <input type="hidden" name="emoji" value="{{ e }}">
+                  <button type="submit" class="emoji-option">{{ e }}</button>
+              </form>
+              {% endfor %}
+              <label for="close-popup" class="sbutton cancel-button">Cancel</label>
+            </div>
+        </div>
+
+      </div>
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
         <span id="author" title="author">{{author}}</span> @ 
@@ -79,8 +120,11 @@
           <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lobsters</a>
           <a href="https://cohost.org" class="share-option" target="_blank">Cohost</a>
           <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank">Email</a>
+          <hr style="border: none; border-top: 1px solid #ccc; margin: 8px 0;">
           <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option"
-          target="_blank">Universal Summarizer</a>
+          target="_blank">Summarize</a>
+          <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option"
+          target="_blank">Translate</a>
           <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
              class="share-option" target="_blank">Link here</a>
 
@@ -95,7 +139,7 @@
                 type="submit"
                 class="flag-link"
                 onclick="return confirm('Are you sure you want to flag this post?');">
-                Flag{% if flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
+                Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
       </form>
 
       {% if current_mode==1 %} 
@@ -205,7 +249,7 @@ end.</p>
         video" frameborder="0" 
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
         allowfullscreen
-        {% if flag_content_count >= 5 %}
+        {% if flag_content_count and flag_content_count >= 5 %}
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
         {% endif %}
       ></iframe>
@@ -214,7 +258,7 @@ end.</p>
     <div id="content">
       <iframe 
         src="{{url}}"
-        {% if flag_content_count >= 5 %}
+        {% if flag_content_count and flag_content_count >= 5 %}
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target=_blank>View Flagged Content</a>'
         {% endif %}
       ></iframe>
