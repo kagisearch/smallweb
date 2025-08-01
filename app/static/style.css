@@ -4,13 +4,7 @@
 }
 
 body {
- margin:0;
- box-sizing: border-box;
- overflow-x: hidden;
-}
-
-*, *::before, *::after {
- box-sizing: border-box;
+ margin:0
 }
 
 
@@ -27,9 +21,7 @@ body {
   font-size: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  box-sizing: border-box;
-  overflow: hidden;
+  align-items: center; 
 }
 
 #controls {
@@ -56,7 +48,6 @@ body {
   width: 200px;
   height: 38px;
   box-sizing: border-box;
-  max-width: 150px;
 }
 
 .clear-search {
@@ -153,12 +144,11 @@ body {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 21vw;
+  max-width:21vw;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   padding: 5px 10px;
-  min-width: 150px;
-  flex-shrink: 1;
+  min-width:300px;
 }
 
 /* --- always show the compact “phone” url label --- */
@@ -219,17 +209,12 @@ body {
 #content {
   padding-top: 60px;
   height: calc(100vh - 60px);
-  overflow: hidden;
-  width: 100vw;
-  max-width: 100%;
 }
 
 #content iframe { 
   border: none;
-  width: 100%;
-  height: 100%;
-  max-width: 100vw;
-  overflow: hidden;
+  width:100%;
+  height:100%;
 }
 
 #content-yt {
@@ -404,7 +389,7 @@ svg {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 700px) {
   .middle {
     display: none;
   }
@@ -414,7 +399,7 @@ svg {
  }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 960px) {
   #switch {
     display: none;
   }
@@ -422,29 +407,7 @@ svg {
 
 @media (max-width: 500px) {
   .popup {
-    width: 360px;
-  }
-  
-  #search-input {
-    width: 120px;
-    max-width: 120px;
-  }
-  
-  #header #url-display-phone {
-    min-width: 80px;
-    max-width: 15vw;
-    font-size: 16px;
-  }
-  
-  #header {
-    font-size: 18px;
-    padding: 3px;
-  }
-  
-  .next-button, .ok-button {
-    font-size: 18px;
-    min-width: 80px;
-    padding: 6px !important;
+    width:360px;
   }
 }
 
