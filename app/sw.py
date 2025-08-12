@@ -329,8 +329,10 @@ def index():
 
     if "youtube.com" in short_url:
         parsed_url = urlparse(url)
-        videoid = parse_qs(parsed_url.query)["v"][0]
-        current_mode = 1
+        query_params = parse_qs(parsed_url.query)
+        if "v" in query_params:
+            videoid = query_params["v"][0]
+            current_mode = 1
 
     # get favorites
     reactions_dict = favorites_dict.get(url, OrderedDict())
@@ -487,8 +489,11 @@ def flag_content():
     global flagged_content_dict, time_saved_flagged_content
     url = request.form.get("url")
 
-    if url:
-        # Increment favorites count
+    # Check if user has already flagged this URL (prevent multiple flags)
+    already_flagged = request.args.get("flagged") == url
+
+    if url and not already_flagged:
+        # Increment flagged content count
         flagged_content_dict[url] = flagged_content_dict.get(url, 0) + 1
 
         # Save to disk
@@ -501,10 +506,12 @@ def flag_content():
                 print("can not write flagged content file")
 
     # Preserve all query parameters except 'url'
-
     query_params = request.args.copy()
     if "url" in query_params:
         del query_params["url"]
+    
+    # Add flagged parameter to prevent multiple flags for the same URL
+    query_params["flagged"] = url if url else ""
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
     # we do not want to redirect to same url
