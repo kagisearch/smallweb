@@ -119,7 +119,9 @@ def update_all():
         new_entries = update_entries(url + "?nso")  # no same origin sites feed
 
         if not bool(urls_cache) or bool(new_entries):
-            urls_cache = new_entries
+            # Filter out YouTube URLs from main feed
+            urls_cache = [entry for entry in new_entries 
+                         if "youtube.com" not in entry[0] and "youtu.be" not in entry[0]]
 
         new_entries = update_entries(url + "?yt")  # youtube sites
 
