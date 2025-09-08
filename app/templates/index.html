@@ -68,6 +68,11 @@
         </div>
 
       </div>
+      
+      <!-- Comments Toggle (after reactions) -->
+      <button id="comments-toggle" class="comments-toggle" onclick="toggleCommentsSidebar()" title="Toggle comments">
+        Comments{% if comments_count > 0 %} ({{ comments_count }}){% endif %}
+      </button>
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
         <span id="author" title="author">{{author}}</span> @ 
@@ -230,6 +235,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
     <a href="https://kagi.com"><img id="logo" src="{{ url_for('static', filename='doggo_px.png') }}" alt="Kagi Doggo
     mascot"/></a>
   </div>
+  
   {% if no_results %}
     <div id="content" class="no-results" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: calc(100vh - 60px);">
       <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No results found for "{{ search_query }}"</h2>
@@ -269,6 +275,130 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
       referrerpolicy="no-referrer"
       style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
   {% endif %}
+  
+  <!-- Comments Sidebar -->
+  <div id="comments-sidebar" class="comments-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-tabs">
+        <button id="tab-this-page" class="tab-button active" onclick="switchTab('this-page')">This Page</button>
+        <button id="tab-recent" class="tab-button" onclick="switchTab('recent')">Recent Comments</button>
+      </div>
+    </div>
+    
+    <div id="tab-content-this-page" class="tab-content active">
+      <div class="comments-list">
+        {% for comment in comments %}
+          {% if not comment.parent_id %}
+          <div class="comment" id="comment-{{ comment.id }}">
+            <div class="comment-header">
+              <strong>{{ comment.author }}</strong>
+              <span class="comment-time">{% if comment.timestamp|time_ago == 'now' %}now{% else %}{{ comment.timestamp|time_ago }} ago{% endif %}</span>
+              {% if comment.reports > 0 %}
+                <span class="report-count">[Reports: {{ comment.reports }}]</span>
+              {% endif %}
+            </div>
+            <div class="comment-content">{{ comment.content }}</div>
+            <div class="comment-actions">
+              <button class="reply-btn" onclick="showReplyForm('{{ comment.id }}')">Reply</button>
+              <form action="{{ prefix }}report_comment" method="post" style="display:inline;">
+                <input type="hidden" name="url" value="{{ url }}">
+                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                <button type="submit" class="report-btn">Report</button>
+              </form>
+              {% if is_moderator %}
+                <form action="{{ prefix }}moderate_comment" method="post" style="display:inline;">
+                  <input type="hidden" name="url" value="{{ url }}">
+                  <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                  <input type="hidden" name="mod" value="{{ request.args.get('mod') }}">
+                  <button type="submit" name="action" value="hide" class="mod-btn">Hide</button>
+                  <button type="submit" name="action" value="delete" class="mod-btn" onclick="return confirm('Delete this comment?')">Delete</button>
+                </form>
+              {% endif %}
+            </div>
+            <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none;">
+              <form action="{{ prefix }}comment" method="post">
+                <input type="hidden" name="url" value="{{ url }}">
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                <input type="text" name="author" placeholder="Name (optional)" class="comment-input">
+                <textarea name="content" placeholder="Your reply..." class="comment-textarea" required></textarea>
+                <input type="text" name="website" style="display:none" aria-hidden="true" tabindex="-1">
+                <button type="submit">Submit Reply</button>
+                <button type="button" onclick="hideReplyForm('{{ comment.id }}')">Cancel</button>
+              </form>
+            </div>
+            
+            <!-- Show nested replies -->
+            {% for reply in comments %}
+              {% if reply.parent_id == comment.id %}
+                <div class="comment nested">
+                  <div class="comment-header">
+                    <strong>{{ reply.author }}</strong>
+                    <span class="comment-time">{% if reply.timestamp|time_ago == 'now' %}now{% else %}{{ reply.timestamp|time_ago }} ago{% endif %}</span>
+                  </div>
+                  <div class="comment-content">{{ reply.content }}</div>
+                  <div class="comment-actions">
+                    <form action="{{ prefix }}report_comment" method="post" style="display:inline;">
+                      <input type="hidden" name="url" value="{{ url }}">
+                      <input type="hidden" name="comment_id" value="{{ reply.id }}">
+                      <button type="submit" class="report-btn">Report</button>
+                    </form>
+                    {% if is_moderator %}
+                      <form action="{{ prefix }}moderate_comment" method="post" style="display:inline;">
+                        <input type="hidden" name="url" value="{{ url }}">
+                        <input type="hidden" name="comment_id" value="{{ reply.id }}">
+                        <input type="hidden" name="mod" value="{{ request.args.get('mod') }}">
+                        <button type="submit" name="action" value="delete" class="mod-btn">Delete</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      
+      <!-- Comment Form -->
+      <div class="comment-form-container">
+        <h4>Add a Comment</h4>
+        <form action="{{ prefix }}comment" method="post">
+          <input type="hidden" name="url" value="{{ url }}">
+          <input type="text" name="author" placeholder="Name (optional)" class="comment-input">
+          <textarea name="content" placeholder="Share your thoughts..." class="comment-textarea" required minlength="3" maxlength="2000"></textarea>
+          <!-- Honeypot field -->
+          <input type="text" name="website" style="display:none" aria-hidden="true" tabindex="-1">
+          <button type="submit" class="submit-comment">Submit Comment</button>
+        </form>
+      </div>
+    </div>
+    
+    <div id="tab-content-recent" class="tab-content">
+      <div class="recent-comments-list">
+        {% for comment in recent_comments %}
+          <div class="recent-comment">
+            <div class="recent-comment-header">
+              <strong>{{ comment.author }}</strong> on 
+              <a href="{{ prefix }}?url={{ comment.url|urlencode }}#comment-{{ comment.id }}">{{ comment.page_title[:50] }}...</a>
+            </div>
+            <div class="recent-comment-time">{% if comment.timestamp|time_ago == 'now' %}now{% else %}{{ comment.timestamp|time_ago }} ago{% endif %}</div>
+            <div class="recent-comment-content">{{ comment.content[:100] }}{% if comment.content|length > 100 %}...{% endif %}</div>
+            {% if comment.reports > 0 %}
+              <span class="report-count">[Reports: {{ comment.reports }}]</span>
+            {% endif %}
+            {% if is_moderator %}
+              <form action="{{ prefix }}moderate_comment" method="post" style="display:inline;">
+                <input type="hidden" name="url" value="{{ comment.url }}">
+                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                <input type="hidden" name="mod" value="{{ request.args.get('mod') }}">
+                <button type="submit" name="action" value="delete" class="mod-btn">Delete</button>
+              </form>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 <script>
 (() => {                 // IIFE – keeps global scope clean
   const CSS_ID  = "global-dark-mode-style";
@@ -356,5 +486,84 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
   );
 })();
 </script>
+
+<script>
+// Comments sidebar functionality with localStorage
+function toggleCommentsSidebar() {
+  const sidebar = document.getElementById('comments-sidebar');
+  const content = document.getElementById('content') || document.getElementById('content-yt');
+  const isActive = sidebar.classList.contains('active');
+  
+  if (isActive) {
+    // Closing sidebar
+    sidebar.classList.remove('active');
+    if (content) {
+      content.style.width = '100%';
+    }
+    localStorage.setItem('commentsSidebarOpen', 'false');
+  } else {
+    // Opening sidebar
+    sidebar.classList.add('active');
+    if (content) {
+      content.style.width = 'calc(100% - 350px)';
+    }
+    localStorage.setItem('commentsSidebarOpen', 'true');
+  }
+}
+
+function switchTab(tabName) {
+  // Remove active class from all tabs and contents
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  
+  // Add active class to selected tab and content
+  if (tabName === 'this-page') {
+    document.getElementById('tab-this-page').classList.add('active');
+    document.getElementById('tab-content-this-page').classList.add('active');
+  } else {
+    document.getElementById('tab-recent').classList.add('active');
+    document.getElementById('tab-content-recent').classList.add('active');
+  }
+}
+
+function showReplyForm(commentId) {
+  document.getElementById('reply-form-' + commentId).style.display = 'block';
+}
+
+function hideReplyForm(commentId) {
+  document.getElementById('reply-form-' + commentId).style.display = 'none';
+}
+
+// Initialize sidebar state from localStorage WITHOUT animation
+(function() {
+  const sidebarOpen = localStorage.getItem('commentsSidebarOpen') === 'true';
+  
+  if (sidebarOpen) {
+    // Wait for DOM
+    setTimeout(function() {
+      const sidebar = document.getElementById('comments-sidebar');
+      const content = document.getElementById('content') || document.getElementById('content-yt');
+      
+      if (sidebar && content) {
+        // Temporarily disable transitions for instant load
+        sidebar.style.transition = 'none';
+        content.style.transition = 'none';
+        
+        // Set the open state
+        sidebar.classList.add('active');
+        content.style.width = 'calc(100% - 350px)';
+        
+        // Re-enable transitions after a brief delay
+        setTimeout(function() {
+          sidebar.style.transition = '';
+          content.style.transition = '';
+        }, 50);
+      }
+    }, 0);
+  }
+})();
+</script>
+
+
 </body>
 </html>
