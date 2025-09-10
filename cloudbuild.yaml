@@ -13,7 +13,7 @@ steps:
       '--region', 'us-central1',
       '--allow-unauthenticated',
       '--set-env-vars', 'URL_PREFIX=/smallweb',
-      '--set-env-vars', 'MOD_SECRET_KEY=smallweb-mod-secret-key:latest',
+      '--update-secrets', 'MOD_SECRET_KEY=smallweb-mod-secret-key:latest',
       '--service-account', 'smallweb@${PROJECT_ID}.iam.gserviceaccount.com',
       '--cpu=1',
       '--memory=1Gi',
