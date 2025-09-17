@@ -150,26 +150,43 @@ def get_all_recent_comments(limit=50):
     """Get recent comments across all URLs"""
     global comments_dict
     all_comments = []
-    
+
+    # Build a set of all current URLs in caches for quick lookup
+    current_urls = set()
+    for cache in [urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_comic_cache]:
+        if cache:
+            current_urls.update(entry[0] for entry in cache)
+            # Also add http versions if https exists and vice versa
+            for entry in cache:
+                url = entry[0]
+                if url.startswith("https://"):
+                    current_urls.add(url.replace("https://", "http://"))
+                elif url.startswith("http://"):
+                    current_urls.add(url.replace("http://", "https://"))
+
     for url, url_comments in comments_dict.items():
+        # Skip if URL is not in any cache
+        if url not in current_urls:
+            continue
+
         for comment in url_comments:
             if not comment.get('hidden', False) and not comment.get('mod_hidden', False):
                 # Get title from cache
                 title = "Unknown Page"
                 for cache in [urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_comic_cache]:
                     for entry in cache:
-                        if entry[0] == url:
+                        if entry[0] == url or (url.startswith("http://") and entry[0] == url.replace("http://", "https://")) or (url.startswith("https://") and entry[0] == url.replace("https://", "http://")):
                             title = entry[1]
                             break
                     if title != "Unknown Page":
                         break
-                
+
                 all_comments.append({
                     **comment,
                     'url': url,
                     'page_title': title
                 })
-    
+
     # Sort by timestamp descending
     all_comments.sort(key=lambda x: x['timestamp'], reverse=True)
     return all_comments[:limit]
@@ -185,8 +202,47 @@ app.jinja_env.filters["time_ago"] = time_ago
 master_feed = False
 
 
+def cleanup_orphaned_comments():
+    """Remove comments for URLs that are no longer in any cache"""
+    global comments_dict, time_saved_comments
+
+    # Build a set of all current URLs in caches
+    current_urls = set()
+    for cache in [urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_comic_cache]:
+        if cache:
+            for entry in cache:
+                url = entry[0]
+                current_urls.add(url)
+                # Also add http/https variants
+                if url.startswith("https://"):
+                    current_urls.add(url.replace("https://", "http://"))
+                elif url.startswith("http://"):
+                    current_urls.add(url.replace("http://", "https://"))
+
+    # Remove comments for URLs not in cache
+    orphaned_urls = []
+    for url in comments_dict.keys():
+        if url not in current_urls:
+            orphaned_urls.append(url)
+
+    if orphaned_urls:
+        print(f"Removing comments for {len(orphaned_urls)} URLs no longer in cache")
+        for url in orphaned_urls:
+            del comments_dict[url]
+
+        # Save updated comments to disk
+        try:
+            with open(PATH_COMMENTS, "wb") as file:
+                pickle.dump(comments_dict, file)
+                print(f"Saved comments after cleanup")
+        except Exception as e:
+            print(f"Cannot write comments file during cleanup: {e}")
+
+    return len(orphaned_urls)
+
+
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed, comments_dict
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -201,7 +257,7 @@ def update_all():
 
         if not bool(urls_cache) or bool(new_entries):
             # Filter out YouTube URLs from main feed
-            urls_cache = [entry for entry in new_entries 
+            urls_cache = [entry for entry in new_entries
                          if "youtube.com" not in entry[0] and "youtu.be" not in entry[0]]
 
         new_entries = update_entries(url + "?yt")  # youtube sites
@@ -216,29 +272,32 @@ def update_all():
             urls_gh_cache = new_entries
 
         new_entries = update_entries(url + "?comic")  # comic sites
-        
+
         if not bool(urls_comic_cache) or bool(new_entries):
             # Filter entries that have images in content
             urls_comic_cache = [
-                entry for entry in new_entries 
+                entry for entry in new_entries
                 if entry[3] and ('<img' in entry[3] or '.png' in entry[3] or '.jpg' in entry[3] or '.jpeg' in entry[3])
             ]
-        
+
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
         favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
-        
+
         # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
         urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
                           if e[0] in favorites_dict]
-        
+
         # Generate the appreciated feed
         generate_appreciated_feed()
 
         # ---- NEW: update cached OPML ----
         global opml_cache
         opml_cache = generate_opml_feed()
-       
+
+        # Clean up orphaned comments
+        cleanup_orphaned_comments()
+
     except:
         print("something went wrong during update_all")
     finally:
