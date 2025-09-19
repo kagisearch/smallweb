@@ -110,6 +110,87 @@ def get_client_ip(request):
         return request.environ.get('REMOTE_ADDR', '')
 
 
+def detect_xss_attempt(content):
+    """Detect potential XSS attempts in user content"""
+    if not content:
+        return False
+
+    content_lower = content.lower()
+
+    # Check for HTML tags commonly used in XSS
+    xss_patterns = [
+        '<script',
+        '</script',
+        '<iframe',
+        '<embed',
+        '<object',
+        '<applet',
+        '<meta',
+        '<link',
+        '<style',
+        'javascript:',
+        'data:text/html',
+        'vbscript:',
+        'onload=',
+        'onerror=',
+        'onclick=',
+        'onmouseover=',
+        'onfocus=',
+        'onblur=',
+        'onchange=',
+        'onsubmit=',
+        'onkeyup=',
+        'onkeydown=',
+        'onkeypress=',
+        '<img',
+        'src=',
+        '<svg',
+        '<body',
+        '<input',
+        '<form',
+        '<button',
+        'alert(',
+        'confirm(',
+        'prompt(',
+        'document.',
+        'window.',
+        'eval(',
+        '.cookie',
+        '.location',
+        'innerHTML',
+        'outerHTML',
+        'expression(',
+        'import(',
+        'fromcharcode',
+        'string.fromcharcode',
+        '&#x',  # Hex entities
+        '&#0',  # Decimal entities
+        '%3c',  # URL encoded <
+        '%3e',  # URL encoded >
+        '&lt;script',  # HTML entity encoded
+        '&gt;',
+        '&quot;',
+        '&#39;',
+        '&#x27;',
+    ]
+
+    # Check for suspicious patterns
+    for pattern in xss_patterns:
+        if pattern in content_lower:
+            return True
+
+    # Check for excessive HTML-like content (even if escaped)
+    html_tag_count = content_lower.count('&lt;') + content_lower.count('&gt;')
+    if html_tag_count > 10:  # Arbitrary threshold for excessive HTML
+        return True
+
+    # Check for base64 encoded content that might be malicious
+    if 'base64,' in content_lower:
+        return True
+
+    return False
+
+
 def check_rate_limit(ip):
     """Check if IP is rate limited"""
     global rate_limits_dict
@@ -737,7 +818,28 @@ def add_comment():
         return jsonify({'error': 'Comment too short'}), 400
     if len(content) > 2000:
         return jsonify({'error': 'Comment too long (max 2000 characters)'}), 400
-    
+
+    # Check for minimum word count (at least 2 words)
+    word_count = len(content.split())
+    if word_count < 2:
+        return jsonify({'error': 'Comment must contain at least 2 words'}), 400
+
+    # Check for XSS attempts
+    if detect_xss_attempt(content) or detect_xss_attempt(author):
+        # Log the attempt for monitoring
+        print(f"[SECURITY] XSS attempt blocked from IP: {client_ip}")
+        print(f"[SECURITY] Content: {content[:100]}...")  # Log first 100 chars
+
+        # Add IP to banned list for persistent XSS attempts
+        banned_ips_dict.add(client_ip)
+        try:
+            with open(PATH_BANNED_IPS, "wb") as file:
+                pickle.dump(banned_ips_dict, file)
+        except:
+            print("Cannot write banned IPs file")
+
+        return jsonify({'error': 'Invalid content detected. This incident has been logged.'}), 400
+
     # Default author name
     if not author:
         author = "Anonymous"
