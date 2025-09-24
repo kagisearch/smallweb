@@ -81,9 +81,6 @@ if not os.path.isdir(DIR_DATA):
 PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.pkl")
 PATH_NOTES = os.path.join(DIR_DATA, "notes.pkl")
 PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.pkl")
-PATH_COMMENTS = os.path.join(DIR_DATA, "comments.pkl")
-PATH_RATE_LIMITS = os.path.join(DIR_DATA, "rate_limits.pkl")
-PATH_BANNED_IPS = os.path.join(DIR_DATA, "banned_ips.pkl")
 
 
 def time_ago(timestamp):
@@ -100,177 +97,6 @@ def time_ago(timestamp):
         return f"{int(seconds // 86400)} days"
 
 
-def get_client_ip(request):
-    """Get client IP, considering proxy headers"""
-    if request.environ.get('HTTP_X_FORWARDED_FOR'):
-        return request.environ['HTTP_X_FORWARDED_FOR'].split(',')[0]
-    elif request.environ.get('HTTP_X_REAL_IP'):
-        return request.environ['HTTP_X_REAL_IP']
-    else:
-        return request.environ.get('REMOTE_ADDR', '')
-
-
-def detect_xss_attempt(content):
-    """Detect potential XSS attempts in user content"""
-    if not content:
-        return False
-
-    content_lower = content.lower()
-
-    # Check for HTML tags commonly used in XSS
-    xss_patterns = [
-        '<script',
-        '</script',
-        '<iframe',
-        '<embed',
-        '<object',
-        '<applet',
-        '<meta',
-        '<link',
-        '<style',
-        'javascript:',
-        'data:text/html',
-        'vbscript:',
-        'onload=',
-        'onerror=',
-        'onclick=',
-        'onmouseover=',
-        'onfocus=',
-        'onblur=',
-        'onchange=',
-        'onsubmit=',
-        'onkeyup=',
-        'onkeydown=',
-        'onkeypress=',
-        '<img',
-        'src=',
-        '<svg',
-        '<body',
-        '<input',
-        '<form',
-        '<button',
-        'alert(',
-        'confirm(',
-        'prompt(',
-        'document.',
-        'window.',
-        'eval(',
-        '.cookie',
-        '.location',
-        'innerHTML',
-        'outerHTML',
-        'expression(',
-        'import(',
-        'fromcharcode',
-        'string.fromcharcode',
-        '&#x',  # Hex entities
-        '&#0',  # Decimal entities
-        '%3c',  # URL encoded <
-        '%3e',  # URL encoded >
-        '&lt;script',  # HTML entity encoded
-        '&gt;',
-        '&quot;',
-        '&#39;',
-        '&#x27;',
-    ]
-
-    # Check for suspicious patterns
-    for pattern in xss_patterns:
-        if pattern in content_lower:
-            return True
-
-    # Check for excessive HTML-like content (even if escaped)
-    html_tag_count = content_lower.count('&lt;') + content_lower.count('&gt;')
-    if html_tag_count > 10:  # Arbitrary threshold for excessive HTML
-        return True
-
-    # Check for base64 encoded content that might be malicious
-    if 'base64,' in content_lower:
-        return True
-
-    return False
-
-
-def check_rate_limit(ip):
-    """Check if IP is rate limited"""
-    global rate_limits_dict
-    if ip in rate_limits_dict:
-        time_diff = (datetime.now() - rate_limits_dict[ip]).total_seconds()
-        if time_diff < 30:  # 30 second cooldown
-            return False
-    return True
-
-
-def update_rate_limit(ip):
-    """Update rate limit for IP and clean old entries"""
-    global rate_limits_dict, time_saved_rate_limits
-    rate_limits_dict[ip] = datetime.now()
-    
-    # Clean old entries (older than 1 hour)
-    cutoff = datetime.now() - timedelta(hours=1)
-    rate_limits_dict = {k: v for k, v in rate_limits_dict.items() if v > cutoff}
-    
-    # Save to disk periodically
-    if (datetime.now() - time_saved_rate_limits).total_seconds() > 300:  # Save every 5 mins
-        time_saved_rate_limits = datetime.now()
-        try:
-            with open(PATH_RATE_LIMITS, "wb") as file:
-                pickle.dump(rate_limits_dict, file)
-        except:
-            print("Cannot write rate limits file")
-
-
-def is_moderator(request):
-    """Check if current user is a moderator"""
-    mod_key = request.args.get('mod') or request.form.get('mod')
-    secret_key = os.environ.get('MOD_SECRET_KEY', 'default_secret_key_change_me')
-    return mod_key == secret_key
-
-
-def get_all_recent_comments(limit=50):
-    """Get recent comments across all URLs"""
-    global comments_dict
-    all_comments = []
-
-    # Build a set of all current URLs in caches for quick lookup
-    current_urls = set()
-    for cache in [urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_comic_cache]:
-        if cache:
-            current_urls.update(entry[0] for entry in cache)
-            # Also add http versions if https exists and vice versa
-            for entry in cache:
-                url = entry[0]
-                if url.startswith("https://"):
-                    current_urls.add(url.replace("https://", "http://"))
-                elif url.startswith("http://"):
-                    current_urls.add(url.replace("http://", "https://"))
-
-    for url, url_comments in comments_dict.items():
-        # Skip if URL is not in any cache
-        if url not in current_urls:
-            continue
-
-        for comment in url_comments:
-            if not comment.get('hidden', False) and not comment.get('mod_hidden', False):
-                # Get title from cache
-                title = "Unknown Page"
-                for cache in [urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_comic_cache]:
-                    for entry in cache:
-                        if entry[0] == url or (url.startswith("http://") and entry[0] == url.replace("http://", "https://")) or (url.startswith("https://") and entry[0] == url.replace("https://", "http://")):
-                            title = entry[1]
-                            break
-                    if title != "Unknown Page":
-                        break
-
-                all_comments.append({
-                    **comment,
-                    'url': url,
-                    'page_title': title
-                })
-
-    # Sort by timestamp descending
-    all_comments.sort(key=lambda x: x['timestamp'], reverse=True)
-    return all_comments[:limit]
 
 
 random.seed(time.time())
@@ -283,47 +109,8 @@ app.jinja_env.filters["time_ago"] = time_ago
 master_feed = False
 
 
-def cleanup_orphaned_comments():
-    """Remove comments for URLs that are no longer in any cache"""
-    global comments_dict, time_saved_comments
-
-    # Build a set of all current URLs in caches
-    current_urls = set()
-    for cache in [urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_comic_cache]:
-        if cache:
-            for entry in cache:
-                url = entry[0]
-                current_urls.add(url)
-                # Also add http/https variants
-                if url.startswith("https://"):
-                    current_urls.add(url.replace("https://", "http://"))
-                elif url.startswith("http://"):
-                    current_urls.add(url.replace("http://", "https://"))
-
-    # Remove comments for URLs not in cache
-    orphaned_urls = []
-    for url in comments_dict.keys():
-        if url not in current_urls:
-            orphaned_urls.append(url)
-
-    if orphaned_urls:
-        print(f"Removing comments for {len(orphaned_urls)} URLs no longer in cache")
-        for url in orphaned_urls:
-            del comments_dict[url]
-
-        # Save updated comments to disk
-        try:
-            with open(PATH_COMMENTS, "wb") as file:
-                pickle.dump(comments_dict, file)
-                print(f"Saved comments after cleanup")
-        except Exception as e:
-            print(f"Cannot write comments file during cleanup: {e}")
-
-    return len(orphaned_urls)
-
-
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed, comments_dict
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -376,8 +163,6 @@ def update_all():
         global opml_cache
         opml_cache = generate_opml_feed()
 
-        # Clean up orphaned comments
-        cleanup_orphaned_comments()
 
     except:
         print("something went wrong during update_all")
@@ -575,29 +360,6 @@ def index():
     # get flagged content
     flag_content_count = flagged_content_dict.get(url, 0)
     
-    # get comments for this URL - check both http and https versions
-    url_comments = comments_dict.get(url, [])
-    if not url_comments and url.startswith("https://"):
-        # Try http version
-        url_comments = comments_dict.get(url.replace("https://", "http://"), [])
-    elif not url_comments and url.startswith("http://"):
-        # Try https version
-        url_comments = comments_dict.get(url.replace("http://", "https://"), [])
-    
-    visible_comments = [c for c in url_comments if not c.get('hidden', False) and not c.get('mod_hidden', False)]
-    comments_count = len(visible_comments)
-    
-    # Debug logging
-    print(f"[DEBUG] Looking for comments for URL: {url}")
-    print(f"[DEBUG] Found {len(url_comments)} total comments, {len(visible_comments)} visible")
-    if comments_dict:
-        print(f"[DEBUG] URLs in comments_dict: {list(comments_dict.keys())[:5]}")
-    
-    # get recent comments
-    recent_comments = get_all_recent_comments(50)
-    
-    # check if user is moderator
-    is_mod = is_moderator(request)
 
     if url.startswith("http://"):
         url = url.replace(
@@ -644,10 +406,6 @@ def index():
         favorites_total=favorites_total,
         favorite_emoji_list=favorite_emoji_list,
         reactions_dict=reactions_dict,
-        comments=visible_comments,
-        comments_count=comments_count,
-        recent_comments=recent_comments,
-        is_moderator=is_mod,
     )
 
 
@@ -784,206 +542,11 @@ def opml():
     return Response(opml_cache, mimetype="text/x-opml+xml")
 
 
-@app.post("/comment")
-def add_comment():
-    """Add a new comment"""
-    global comments_dict, time_saved_comments
-    
-    # Check honeypot field (anti-spam)
-    if request.form.get('website'):  # Honeypot field - should be empty
-        return jsonify({'error': 'Invalid request'}), 400
-    
-    # Get client IP for rate limiting
-    client_ip = get_client_ip(request)
-    
-    # Check if IP is banned
-    if client_ip in banned_ips_dict:
-        return jsonify({'error': 'You are not allowed to comment'}), 403
-    
-    # Check rate limit
-    if not check_rate_limit(client_ip):
-        return jsonify({'error': 'Please wait 30 seconds between comments'}), 429
-    
-    # Get form data
-    url = request.form.get('url')
-    # Normalize URL to always use https for consistency
-    if url and url.startswith("http://"):
-        url = url.replace("http://", "https://")
-    author = request.form.get('author', '').strip()
-    content = request.form.get('content', '').strip()
-    parent_id = request.form.get('parent_id')
-    
-    # Validate content
-    if not content or len(content) < 3:
-        return jsonify({'error': 'Comment too short'}), 400
-    if len(content) > 2000:
-        return jsonify({'error': 'Comment too long (max 2000 characters)'}), 400
-
-    # Check for minimum word count (at least 2 words)
-    word_count = len(content.split())
-    if word_count < 2:
-        return jsonify({'error': 'Comment must contain at least 2 words'}), 400
-
-    # Check for XSS attempts
-    if detect_xss_attempt(content) or detect_xss_attempt(author):
-        # Log the attempt for monitoring
-        print(f"[SECURITY] XSS attempt blocked from IP: {client_ip}")
-        print(f"[SECURITY] Content: {content[:100]}...")  # Log first 100 chars
-
-        # Add IP to banned list for persistent XSS attempts
-        banned_ips_dict.add(client_ip)
-        try:
-            with open(PATH_BANNED_IPS, "wb") as file:
-                pickle.dump(banned_ips_dict, file)
-        except:
-            print("Cannot write banned IPs file")
-
-        return jsonify({'error': 'Invalid content detected. This incident has been logged.'}), 400
-
-    # Default author name
-    if not author:
-        author = "Anonymous"
-    
-    # Create comment
-    comment_id = str(uuid.uuid4())
-    comment = {
-        'id': comment_id,
-        'author': escape(author),
-        'content': escape(content),
-        'timestamp': datetime.now(),
-        'parent_id': parent_id,
-        'reports': 0,
-        'hidden': False,
-        'mod_hidden': False
-    }
-    
-    # Add to comments dict
-    if url not in comments_dict:
-        comments_dict[url] = []
-    comments_dict[url].append(comment)
-    
-    # Update rate limit
-    update_rate_limit(client_ip)
-    
-    # Save to disk immediately
-    time_saved_comments = datetime.now()
-    try:
-        with open(PATH_COMMENTS, "wb") as file:
-            pickle.dump(comments_dict, file)
-            print(f"[DEBUG] Saved {len(comments_dict[url])} comments for {url}")
-    except Exception as e:
-        print(f"Cannot write comments file: {e}")
-    
-    # Redirect back to the page
-    query_params = request.args.copy()
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
-    redirect_path = f"{prefix}/?url={url}"
-    if query_string:
-        redirect_path += f"&{query_string}"
-    redirect_path += f"#comment-{comment_id}"
-    return redirect(redirect_path)
-
-
-@app.post("/report_comment")
-def report_comment():
-    """Report a comment as spam/inappropriate"""
-    global comments_dict, time_saved_comments
-    
-    url = request.form.get('url')
-    # Normalize URL
-    if url and url.startswith("http://"):
-        url = url.replace("http://", "https://")
-    comment_id = request.form.get('comment_id')
-    
-    if url in comments_dict:
-        for comment in comments_dict[url]:
-            if comment['id'] == comment_id:
-                comment['reports'] = comment.get('reports', 0) + 1
-                # Auto-hide after 3 reports
-                if comment['reports'] >= 3:
-                    comment['hidden'] = True
-                
-                # Save to disk immediately
-                try:
-                    with open(PATH_COMMENTS, "wb") as file:
-                        pickle.dump(comments_dict, file)
-                        print(f"[DEBUG] Saved comments after report")
-                except Exception as e:
-                    print(f"Cannot write comments file: {e}")
-                break
-    
-    # Redirect back
-    query_params = request.args.copy()
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
-    redirect_path = f"{prefix}/?url={url}"
-    if query_string:
-        redirect_path += f"&{query_string}"
-    return redirect(redirect_path)
-
-
-@app.post("/moderate_comment")
-def moderate_comment():
-    """Moderate a comment (delete/hide) - requires mod access"""
-    global comments_dict, time_saved_comments
-    
-    if not is_moderator(request):
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    url = request.form.get('url')
-    # Normalize URL
-    if url and url.startswith("http://"):
-        url = url.replace("http://", "https://")
-    comment_id = request.form.get('comment_id')
-    action = request.form.get('action')  # 'delete', 'hide', 'unhide'
-    
-    if url in comments_dict:
-        if action == 'delete':
-            # Remove comment entirely
-            comments_dict[url] = [c for c in comments_dict[url] if c['id'] != comment_id]
-        else:
-            # Hide/unhide comment
-            for comment in comments_dict[url]:
-                if comment['id'] == comment_id:
-                    if action == 'hide':
-                        comment['mod_hidden'] = True
-                    elif action == 'unhide':
-                        comment['mod_hidden'] = False
-                        comment['hidden'] = False  # Also clear user reports
-                        comment['reports'] = 0
-                    break
-        
-        # Save to disk immediately
-        try:
-            with open(PATH_COMMENTS, "wb") as file:
-                pickle.dump(comments_dict, file)
-                print(f"[DEBUG] Saved comments after moderation")
-        except Exception as e:
-            print(f"Cannot write comments file: {e}")
-    
-    # Redirect back
-    query_params = request.args.copy()
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
-    redirect_path = f"{prefix}/?url={url}"
-    if query_string:
-        redirect_path += f"&{query_string}"
-    return redirect(redirect_path)
-
-
-@app.route("/recent_comments")
-def recent_comments_json():
-    """Get recent comments as JSON for dynamic loading"""
-    recent = get_all_recent_comments(50)
-    # Convert datetime objects to strings
-    for comment in recent:
-        comment['timestamp'] = comment['timestamp'].isoformat()
-    return jsonify(recent)
 
 
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
 time_saved_flagged_content = datetime.now()
-time_saved_comments = datetime.now()
-time_saved_rate_limits = datetime.now()
 
 urls_cache = []
 urls_yt_cache = []
@@ -1029,32 +592,6 @@ try:
 except:
     print("No flagged content data found.")
 
-comments_dict = {}  # Dictionary to store comments
-
-try:
-    with open(PATH_COMMENTS, "rb") as file:
-        comments_dict = pickle.load(file)
-        print("Loaded comments", sum(len(v) for v in comments_dict.values()))
-except:
-    print("No comments data found.")
-
-rate_limits_dict = {}  # Dictionary to store rate limits
-
-try:
-    with open(PATH_RATE_LIMITS, "rb") as file:
-        rate_limits_dict = pickle.load(file)
-        print("Loaded rate limits", len(rate_limits_dict))
-except:
-    print("No rate limits data found.")
-
-banned_ips_dict = set()  # Set to store banned IPs
-
-try:
-    with open(PATH_BANNED_IPS, "rb") as file:
-        banned_ips_dict = pickle.load(file)
-        print("Loaded banned IPs", len(banned_ips_dict))
-except:
-    print("No banned IPs data found.")
 
 
 # get feeds
@@ -1092,20 +629,6 @@ def save_all_data():
     except Exception as e:
         print(f"Error saving flagged content: {e}")
     
-    try:
-        with open(PATH_COMMENTS, "wb") as file:
-            pickle.dump(comments_dict, file)
-            total_comments = sum(len(v) for v in comments_dict.values())
-            print(f"[DEBUG] Saved {total_comments} comments across {len(comments_dict)} URLs")
-    except Exception as e:
-        print(f"Error saving comments: {e}")
-    
-    try:
-        with open(PATH_RATE_LIMITS, "wb") as file:
-            pickle.dump(rate_limits_dict, file)
-            print(f"[DEBUG] Saved {len(rate_limits_dict)} rate limits")
-    except Exception as e:
-        print(f"Error saving rate limits: {e}")
 
 atexit.register(save_all_data)
 atexit.register(lambda: scheduler.shutdown())
