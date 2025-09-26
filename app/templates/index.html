@@ -68,10 +68,10 @@
         </div>
 
       </div>
-      
+
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
-        <span id="author" title="author">{{author}}</span> @ 
+        <span id="author" title="author">{{author}}</span> @
       {% endif %}
 
       <a href="{{url}}">{{short_url}}</a>
@@ -81,33 +81,18 @@
         <a class="phone" href="{{url}}">{{domain}}</a>
 
       </div>
-      
-    </div>
-    <div class="middle">
-      <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
 
-      
-      <!-- Note Popup 
-      <div class="popup-container">
-        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
-        <input type="radio" id="note-popup" name="popup" class="popup-radio">
-        <div class="popup">
-          {% for note, timestamp in notes_list %}
-            <div class="note {% if loop.index % 2 == 0 %}alternate{% endif %}">
-              <span class="note-time">({{ timestamp|time_ago }})</span> {{ note }}
-            </div>
-          {% endfor %}
-          <form action="{{ prefix }}note" method="post">
-            <p style="text-align:left">Got thoughts on this post? Share them in a public note.</p>
-            <textarea name="note_content" class="note-textarea"></textarea>
-            <input type="hidden" name="url" value="{{ url }}" />
-            <button type="submit" class="button ok-button">Submit</button>
-            <label for="close-popup" class="button cancel-button">Cancel</label>
-          </form>
+      <form action="{{ prefix }}" method="get" id="search-form">
+        <div class="search-container">
+          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input">
+          {% if search_query %}
+          <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
+          {% endif %}
         </div>
-      </div>
-      -->
-     
+        <!-- Add a visually hidden submit button for accessibility and explicit submission -->
+        <button type="submit" style="display: none;" aria-hidden="true">Search</button>
+      </form>
+
       <!-- Share Popup -->
       <div class="popup-container">
         <label for="spread-love" class="popup-link" title="Share this post">Share</label>
@@ -133,7 +118,8 @@
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>
         </div>
       </div>
-       <!-- Flag Popup -->
+
+      <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
         <button title="Flag this post"
@@ -142,6 +128,32 @@
                 onclick="return confirm('Are you sure you want to flag this post?');">
                 Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
       </form>
+
+    </div>
+    <div class="middle">
+      <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
+
+      
+      <!-- Note Popup 
+      <div class="popup-container">
+        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
+        <input type="radio" id="note-popup" name="popup" class="popup-radio">
+        <div class="popup">
+          {% for note, timestamp in notes_list %}
+            <div class="note {% if loop.index % 2 == 0 %}alternate{% endif %}">
+              <span class="note-time">({{ timestamp|time_ago }})</span> {{ note }}
+            </div>
+          {% endfor %}
+          <form action="{{ prefix }}note" method="post">
+            <p style="text-align:left">Got thoughts on this post? Share them in a public note.</p>
+            <textarea name="note_content" class="note-textarea"></textarea>
+            <input type="hidden" name="url" value="{{ url }}" />
+            <button type="submit" class="button ok-button">Submit</button>
+            <label for="close-popup" class="button cancel-button">Cancel</label>
+          </form>
+        </div>
+      </div>
+      -->
 
       {% if current_mode==1 %} 
         <a id="switch"  href="{{ prefix }}">Web</a>
@@ -168,16 +180,6 @@
           <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0121 12.79z"/>
         </svg>
       </button>
-       <form action="{{ prefix }}" method="get" id="search-form">
-        <div class="search-container">
-          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
-          {% if search_query %}
-          <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
-          {% endif %}
-        </div>
-        <!-- Add a visually hidden submit button for accessibility and explicit submission -->
-        <button type="submit" style="display: none;" aria-hidden="true">Search</button>
-      </form>
        <a href="https://kagi.com" title="Visit Kagi"><img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif"></a>
        <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository">Contribute</a>
        <div class="popup-container">

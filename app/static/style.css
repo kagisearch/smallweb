@@ -28,6 +28,7 @@ body {
 #controls {
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 
 #search-form {
@@ -43,10 +44,10 @@ body {
 #search-input {
   font-family: pixel, Arial, sans-serif;
   font-size: 18px;
-  padding: 5px 25px 5px 5px;
+  padding: 5px 25px 5px 10px;
   border: none;
   border-radius: 5px;
-  width: 200px;
+  width: 280px;
   height: 38px;
   box-sizing: border-box;
 }
@@ -145,11 +146,12 @@ body {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width:21vw;
+  max-width:20vw;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   padding: 5px 10px;
-  min-width:300px;
+  min-width:180px;
+  margin: 0 10px;
 }
 
 /* --- always show the compact “phone” url label --- */
@@ -182,6 +184,10 @@ body {
   cursor: pointer;
 }
 
+#controls .flag-link {
+  margin: 0 8px;
+}
+
 #header .favorite-link:hover, #header .flag-link:hover {
   background-color: transparent;
 }
@@ -198,14 +204,12 @@ body {
 .right {
   flex: 1;
   text-align: right;
-  max-width: 410px;
+  max-width: 480px;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
 }
 
-#search-form {
-  margin-right: 10px;
-}
 
 #content {
   position: fixed;
@@ -241,7 +245,7 @@ body {
 .popup-container {
   display: inline-block;
   position: relative;
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 .popup {
