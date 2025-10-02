@@ -436,14 +436,13 @@ def favorite():
         # Regenerate the appreciated feed
         generate_appreciated_feed()
 
-        # Save to disk
-        if (datetime.now() - time_saved_favorites).total_seconds() > 60:
-            time_saved_favorites = datetime.now()
-            try:
-                with open(PATH_FAVORITES, "wb") as file:
-                    pickle.dump(favorites_dict, file)
-            except:
-                print("can not write fav file")
+        # Save to disk immediately (multi-instance deployment requires immediate persistence)
+        time_saved_favorites = datetime.now()
+        try:
+            with open(PATH_FAVORITES, "wb") as file:
+                pickle.dump(favorites_dict, file)
+        except:
+            print("can not write fav file")
 
         # Preserve all query parameters except 'url'
         query_params = request.args.copy()
