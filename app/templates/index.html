@@ -6,6 +6,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
+  <meta property="og:title" content="Kagi Small Web">
+  <meta property="og:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
+  <meta property="og:image" content="{{ url_for('static', filename='HumanWeb.png', _external=True) }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kagi Small Web">
+  <meta name="twitter:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='HumanWeb.png', _external=True) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
