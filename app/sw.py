@@ -201,6 +201,7 @@ def update_entries(url):
         cache = [
             (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"])
             for entry in formatted_entries
+            if entry["link"].startswith("https://")  # Only allow https:// URLs for iframe embedding
         ]
         print(len(cache), "entries")
         return cache
