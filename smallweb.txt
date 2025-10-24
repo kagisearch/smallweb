@@ -35,7 +35,6 @@ http://antonym.org/feed.xml
 http://arches.io/index.xml
 http://archimago.blogspot.com/feeds/posts/default
 http://arcturus-labs.com/feed_rss_created.xml
-http://arcturus-labs.com/feed_rss_updated.xml
 http://argumatronic.com/rss.xml
 http://armaina.com/rss.xml
 http://armueller.github.io/feed.xml
@@ -115,7 +114,6 @@ http://blog.rickumali.com/feeds/posts/default
 http://blog.rongarret.info/feeds/posts/default
 http://blog.sheasilverman.com/feed/
 http://blog.sigfpe.com/feeds/posts/default
-http://blog.sigfpe.com/feeds/posts/default?alt=rss
 http://blog.sqisland.com/feeds/posts/default
 http://blog.stabyourself.net/rss
 http://blog.svenbrauch.de/feed/
@@ -807,7 +805,6 @@ http://zyst.io/feed.xml
 https://マリウス.com/index.xml
 https://000fff.org/atom/
 https://00f.net/atom.xml
-https://00f.net/rss.xml
 https://00formicapunk00.wordpress.com/feed/
 https://00xbyte.com/feed.xml
 https://0100101110101101.org/atom/
@@ -843,7 +840,6 @@ https://1-minute-modem.branchable.com/index.atom
 https://100r.co/links/rss.xml
 https://10maurycy10.github.io/index.xml
 https://10zenmonkeys.com/atom/
-https://10zenmonkeys.com/feed/
 https://11011110.github.io/blog/feed.xml
 https://11foot8.com/feed/
 https://121gigawatts.org/rss/
@@ -984,7 +980,6 @@ https://abandoned.photos/rss
 https://abandonedasapup.com/atom.xml
 https://abandonedasapup.com/atom/
 https://abandonedonline.net/atom/
-https://abandonedonline.net/feed/
 https://abbbi.github.io/feed.xml
 https://abbesroad.blog/feed/
 https://abcl-dev.blogspot.com/feeds/posts/default
@@ -1158,7 +1153,6 @@ https://adl.io/index.xml
 https://adl1995.github.io/feeds/all.rss.xml
 https://admcpr.com/rss/
 https://adnano.co/atom.xml
-https://adnano.co/feed.xml
 https://adnanthekhan.com/index.xml
 https://adol.pw/index.xml
 https://adrian-philipp.com/rss.xml
@@ -1183,7 +1177,6 @@ https://adropincalm.com/index.xml
 https://aduros.com/index.xml
 https://advait.live/feed.xml
 https://advancedweb.hu/atom.xml
-https://advancedweb.hu/rss.xml
 https://adventurehermit.com/feed/
 https://adventureite.com/feed.xml
 https://adventures.michaelfbryan.com/index.xml
@@ -1208,8 +1201,6 @@ https://aeryn.me/atom/
 https://aerynos.com/blog/rss.xml
 https://aestheticsforbirds.com/feed/
 https://aestheticsofjoy.com/atom/
-https://aestheticsofjoy.com/feed/
-https://aestheticsofjoy.com/rss/
 https://aethermug.com/rss.xml
 https://aetherwizard.com/feed/
 https://aeturrell.com/atom.xml
@@ -1727,7 +1718,6 @@ https://andreasimonecosta.dev/posts/index.xml
 https://andreasjhkarlsson.github.io/feed.xml
 https://andreasthinks.me/index.xml
 https://andregarzia.com/feeds/all.atom.xml
-https://andregarzia.com/feeds/all.rss.xml
 https://andrei.xyz/index.xml
 https://andreicioara.com/feed
 https://andreiclinciu.net/index.xml
@@ -1965,8 +1955,6 @@ https://app.rodeo/index.xml
 https://appaddict.app/feed.atom
 https://appalachianground.com/feed/
 https://appalachianhistory.net/atom/
-https://appalachianhistory.net/feed/
-https://appalachianhistory.net/rss/
 https://appcodelabs.com/atom/
 https://appdecentral.com/feed/
 https://appellationbeer.com/blog/feed/
@@ -2033,7 +2021,6 @@ https://arhamjain.com/feed.xml
 https://arhan.sh/rss.xml
 https://ariadnavigo.xyz/index.xml
 https://ariadne.space/atom.xml
-https://ariadne.space/feed.xml
 https://ariadne.space/index.xml
 https://ariaieboy.ir/blog/feed.atom
 https://arialdomartini.github.io/feed.xml
@@ -2139,7 +2126,6 @@ https://asd.learnlearn.in/feed.atom
 https://aseemthakar.com/feed/
 https://asemic-horizon.com/atom.xml
 https://asemic-horizon.com/atom/
-https://asemic-horizon.com/feed/
 https://asemichorizon.wordpress.com/feed/
 https://ash.berlintaylor.com/feeds/up-and-at-them.xml
 https://ash.ms/atom.xml
@@ -2624,7 +2610,6 @@ https://benkaiser.dev/rss/
 https://benkettle.xyz/index.xml
 https://benlcollins.com/atom/
 https://benlcollins.com/blog/rss/
-https://benlcollins.com/feed/
 https://benlesh.com/feed/feed.xml
 https://benlog.com/feed/
 https://benlog.net/feed.rss
@@ -3058,7 +3043,6 @@ https://blog.bitgloss.ro/feed/
 https://blog.bithole.dev/rss.xml
 https://blog.bitsapien.dev/index.xml
 https://blog.bityard.net/feeds/all.atom.xml
-https://blog.bityard.net/feeds/all.rss.xml
 https://blog.bkryza.com/rss.xml
 https://blog.bl00cyb.org/feed/
 https://blog.blackhc.net/feed.xml
@@ -3211,7 +3195,6 @@ https://blog.darn.fish/feed.xml
 https://blog.darrennathanael.com/index.xml
 https://blog.darrien.dev/index.xml
 https://blog.darylsun.page/atom.xml
-https://blog.darylsun.page/rss.xml
 https://blog.dashmage.dev/feed/
 https://blog.datadive.net/atom/
 https://blog.datascienceheroes.com/rss/
@@ -3267,7 +3250,6 @@ https://blog.drewcutchins.com/feed.xml
 https://blog.drewolson.org/index.xml
 https://blog.drorgluska.com/feeds/posts/default
 https://blog.dshr.org/feeds/posts/default
-https://blog.dshr.org/feeds/posts/default?alt=rss
 https://blog.duangle.com/atom.xml
 https://blog.dubbelboer.com/atom.xml
 https://blog.duncandavidson.com/atom.xml
@@ -3331,7 +3313,6 @@ https://blog.feabhas.com/feed/
 https://blog.febo.com/?feed=atom
 https://blog.fedecarg.com/feed/
 https://blog.feld.me/feeds/all.atom.xml
-https://blog.feld.me/feeds/all.rss.xml
 https://blog.felixzieger.de/rss/
 https://blog.fercontreras.com/index.xml
 https://blog.ffwll.ch/feed.xml
@@ -3391,7 +3372,6 @@ https://blog.giladnaor.com/feed.xml
 https://blog.gingerbeardman.com/feed.xml
 https://blog.gingerlime.com/feed/
 https://blog.giovanh.com/feeds/atom.xml
-https://blog.giovanh.com/feeds/rss.xml
 https://blog.glyph.im/feeds/all.atom.xml
 https://blog.glyphdrawing.club/feed.xml
 https://blog.gngr.info/feed.xml
@@ -3521,7 +3501,6 @@ https://blog.jez.io/atom.xml
 https://blog.jfedor.org/feeds/posts/default
 https://blog.jfo.click/feed.xml
 https://blog.jgc.org/feeds/posts/default
-https://blog.jgc.org/feeds/posts/default?alt=rss
 https://blog.jgrossi.com/feed/
 https://blog.jhm.dev/index.xml
 https://blog.jiayuanzhang.com/index.xml
@@ -3856,7 +3835,6 @@ https://blog.noq2.net/feeds/all.atom.xml
 https://blog.noredink.com/rss
 https://blog.notmyhostna.me/atom.xml
 https://blog.notmyhostna.me/posts/feed.xml
-https://blog.notmyhostna.me/rss.xml
 https://blog.notryan.com/rss.xml
 https://blog.noupsi.de/rss
 https://blog.nuclearsecrecy.com/feed/
@@ -3944,7 +3922,6 @@ https://blog.pkh.me/rss.xml
 https://blog.planethawleywood.com/feed/
 https://blog.plenz.com/en/atom.xml
 https://blog.ploeh.dk/atom.xml
-https://blog.ploeh.dk/rss.xml
 https://blog.plover.com/index.atom
 https://blog.plover.com/index.rss
 https://blog.pluggedpotato.com/feed.xml
@@ -3965,7 +3942,6 @@ https://blog.preterit.me/feed.xml
 https://blog.preyneyv.dev/feed.xml
 https://blog.professorbeekums.com/index.xml
 https://blog.project-insanity.org/atom/
-https://blog.project-insanity.org/feed/
 https://blog.ptidej.net/rss/
 https://blog.puzzmo.com/index.xml
 https://blog.pwkf.org/feed.xml
@@ -4017,7 +3993,6 @@ https://blog.rodeo.io/feed.xml
 https://blog.roguetemple.com/feed/
 https://blog.rom1v.com/feed/
 https://blog.rongarret.info/feeds/posts/default
-https://blog.rongarret.info/feeds/posts/default?alt=rss
 https://blog.rootshell.be/feed/
 https://blog.ropnop.com/index.xml
 https://blog.rowan.website/index.xml
@@ -4710,7 +4685,6 @@ https://bronnieware.com/feed/
 https://brookeallen.com/feed/
 https://brookeharrington.com/atom/
 https://brooker.co.za/blog/atom.xml
-https://brooker.co.za/blog/rss.xml
 https://brooklynhacker.com/rss
 https://brooknerian.blogspot.com/feeds/posts/default
 https://brooksandbecks.blogspot.com/feeds/posts/default
@@ -5013,8 +4987,6 @@ https://carywalkin.ca/feed/
 https://cascadiainspired.com/feed/
 https://casdinteret.com/atom/
 https://casdinteret.com/feed
-https://casdinteret.com/feed/
-https://casdinteret.com/rss/
 https://caseyaccidental.com/feed/
 https://caseyhandmer.wordpress.com/feed/
 https://caseysoftware.com/feed
@@ -5037,8 +5009,6 @@ https://cat-bus.com/atom/
 https://catalin.red/feed
 https://catalins.tech/rss/
 https://catandgirl.com/atom/
-https://catandgirl.com/feed/
-https://catandgirl.com/rss/
 https://catch22.net/index.xml
 https://cate.blog/feed/
 https://caterina.net/feed/
@@ -5143,7 +5113,6 @@ https://charleseisenstein.org/atom/
 https://charlesharri.es/feed.xml
 https://charleshood.net/rss.xml
 https://charleshughsmith.blogspot.com/feeds/posts/default
-https://charleshughsmith.blogspot.com/feeds/posts/default?alt=rss
 https://charleslabs.fr/rss.xml
 https://charlesleifer.com/blog/rss/
 https://charlespetzold.com/rss.xml
@@ -5192,9 +5161,7 @@ https://chicagology.com/atom/
 https://chickcorea.com/feed/
 https://chikomukwenha.co/atom.xml
 https://chinachange.org/atom/
-https://chinachange.org/feed/
 https://chinaheritage.net/atom/
-https://chinaheritage.net/rss/
 https://chinstrap.community/atom/
 https://chipflip.wordpress.com/feed/
 https://chipnetics.com/index.xml
@@ -5242,7 +5209,6 @@ https://chrisfrew.in/rss.xml
 https://chrisgammell.com/feed/
 https://chrisgillett.org/rss.xml
 https://chrisglass.com/atom/
-https://chrisglass.com/feed/
 https://chrisglass.com/links/feed/
 https://chrisgliddon.com/feed
 https://chrishannah.me/feed
@@ -5438,7 +5404,6 @@ https://cmhb.de/feed
 https://cmichel.io/feed.xml
 https://cmtops.dev/feed.xml
 https://cnr.sh/atom.xml
-https://cnr.sh/rss.xml
 https://cnx.gdn/feed.xml
 https://coaching.chughes.uk/feed.xml
 https://coady.github.io/index.xml
@@ -5519,8 +5484,6 @@ https://coderoncode.com/feed.xml
 https://codersblock.com/rss.xml
 https://coderscat.com/atom.xml
 https://coderslexicon.com/atom/
-https://coderslexicon.com/feed/
-https://coderslexicon.com/rss/
 https://codertocto.com/feed.xml
 https://codesections.com/rss.xml
 https://codesimple.blog/feed/
@@ -5656,7 +5619,6 @@ https://consteval.ca/feed.xml
 https://constitution-unit.com/feed/
 https://constitutionallyspeaking.co.za/feed/
 https://constructortheory.org/atom/
-https://constructortheory.org/rss/
 https://consult.sauvik.me/feed.xml
 https://consultuning.blogspot.com/feeds/posts/default
 https://consultwithgriff.com/rss.xml
@@ -5863,7 +5825,6 @@ https://ctrlc.hu/~stef/blog/atom.xml
 https://ctrsec.io/feed.xml
 https://ctskennerton.github.io/index.xml
 https://cubehero.com/atom/
-https://cubehero.com/feed/
 https://cubicgarden.com/feed/
 https://cubiclenate.com/feed/
 https://cubiclenate.com/feed/podcast/
@@ -6001,7 +5962,6 @@ https://danhannigan.dev/rss/
 https://danhannigan.me/blog/feed/
 https://danhannigan.me/feed/
 https://daniel-azuma.com/atom.xml
-https://daniel-azuma.com/feed.xml
 https://daniel-cho.com/atom/
 https://daniel-lange.com/feeds/index.rss2
 https://daniel-m.github.io/index.xml
@@ -6060,7 +6020,6 @@ https://danielsolisblog.blogspot.com/feeds/posts/default
 https://danieltakeshi.github.io/feed.xml
 https://danieltan.weblog.lol/atom.xml
 https://danieltenner.com/atom/
-https://danieltenner.com/feed/
 https://danielwertheim.se/rss/
 https://danieru.com/atom/
 https://danigm.net/rss.xml
@@ -6200,7 +6159,6 @@ https://davelucia.com/feed.atom
 https://davemart.in/atom/
 https://davemullenjnr.co.uk/feed.xml
 https://daveon.design/atom.xml
-https://daveon.design/rss.xml
 https://davepeck.org/feed/master.xml
 https://daveredfern.com/feed.xml
 https://daverupert.com/atom.xml
@@ -6289,7 +6247,6 @@ https://davidsasaki.name/feed/
 https://davidschlachter.com/atom.xml
 https://davidseah.com/feed/
 https://davidsimon.com/atom/
-https://davidsimon.com/feed/
 https://davidsopas.com/atom/
 https://davidsterry.com/atom.xml
 https://davidstutz.de/atom/
@@ -6307,7 +6264,6 @@ https://daviewales.com/feed.xml
 https://davinder.net/feed.xml
 https://davintosh.com/index.php/feed/
 https://daviramos.com/atom/
-https://daviramos.com/feed/
 https://davmac.wordpress.com/feed/
 https://davquar.it/index.xml
 https://dawes.wordpress.com/feed/
@@ -6330,7 +6286,6 @@ https://dbhattarai.info.np/rss.xml
 https://dblog.laulkar.com/feeds/all.atom.xml
 https://dblohm7.ca/atom.xml
 https://dbmsmusings.blogspot.com/feeds/posts/default
-https://dbmsmusings.blogspot.com/feeds/posts/default?alt=rss
 https://dbohdan.com/atom.xml
 https://dbp.io/rss.xml
 https://dbushell.com/merge/rss.xml
@@ -6406,7 +6361,6 @@ https://deepseanews.com/atom/
 https://deerz.one/feed.xml
 https://deeshaa.org/feed/
 https://deevybee.blogspot.com/feeds/posts/default
-https://deevybee.blogspot.com/feeds/posts/default?alt=rss
 https://def.lakaban.net/index.xml
 https://defense.sh/feed.xml
 https://defiantsloth.com/feed.xml
@@ -6416,7 +6370,6 @@ https://deftly.net/atom.xml
 https://degenerateconic.com/feeds/all.atom.xml
 https://degoes.net/feed.xml
 https://degruchy.org/atom.xml
-https://degruchy.org/feed.xml
 https://dehora.net/journal?format=rss
 https://deirdre.net/feed.xml
 https://dejanglozic.com/feed/
@@ -6489,7 +6442,6 @@ https://designisrefactoring.com/feed.xml
 https://desmolysium.com/feed/
 https://desmondrivet.com/posts/feed_lifestream.xml
 https://desperate-living.com/atom/
-https://desperate-living.com/feed/
 https://destel.dev/rss.xml
 https://destevez.net/feed/
 https://destinationzerobars.com/feed/
@@ -6629,7 +6581,6 @@ https://digitalgarden.hypha.coop/feed.xml
 https://digitalinklingsblog.com/index.xml
 https://digitaljunky.io/feed/
 https://digitalmedusa.org/atom/
-https://digitalmedusa.org/feed/
 https://digitalnk.com/blog/rss/
 https://digitalnomadder.micro.blog/feed.xml
 https://digitalseams.com/blog?format=rss
@@ -6825,7 +6776,6 @@ https://dotya.ml/posts/index.xml
 https://doubleagent.net/rss/
 https://doubleclix.wordpress.com/feed/
 https://doublefree.dev/atom/
-https://doublefree.dev/feed/
 https://doubleloop.net/feed/
 https://doublepulsar.com/feed
 https://doubtmark.bearblog.dev/feed/
@@ -6949,13 +6899,11 @@ https://duncan.hull.name/feed/
 https://duncandavidson.com/atom.xml
 https://duncangh.com/feed/
 https://duncanlock.net/feeds/all.atom.xml
-https://duncanlock.net/feeds/all.rss.xml
 https://duncansteel.com/atom/
 https://duncanstephen.net/feed/
 https://dundalek.com/feed.xml
 https://dunglas.dev/feed/
 https://dunkirk.sh/atom.xml
-https://dunkirk.sh/rss.xml
 https://dunnhq.com/feed/feed.xml
 https://duriansoftware.com/joe/index.rss
 https://durmonski.com/feed/
@@ -6971,7 +6919,6 @@ https://dustinknopoff.dev/rss.xml
 https://dustintran.com/blog/rss/
 https://dustmop.io/blog/rss/
 https://dustri.org/b/atom.xml
-https://dustri.org/b/rss.xml
 https://dusty.phillips.codes/index.xml
 https://dustycloud.org/blog/index.xml
 https://dutzi.party/rss.xml
@@ -6993,7 +6940,6 @@ https://dylanbeattie.net/rss.xml
 https://dylanfitzgerald.net/index.xml
 https://dylanharris.org/feed-me.rss
 https://dylanhuang.com/blog/atom.xml
-https://dylanhuang.com/blog/rss.xml
 https://dylanj.xyz/index.xml
 https://dylanjpierce.com/feed.xml
 https://dylankatz.com/feed.xml
@@ -7098,7 +7044,6 @@ https://edwardshu.com/feed.xml
 https://eed3si9n.com/index.xml
 https://eerielinux.wordpress.com/feed/
 https://eev.ee/feeds/atom.xml
-https://eev.ee/feeds/rss.xml
 https://eevans.co/index.xml
 https://eevis.codes/feed.xml
 https://effectivesoftwaredesign.com/feed/
@@ -7152,7 +7097,6 @@ https://electricflapjack.com/blog/index.xml
 https://electro.pizza/feed.xml
 https://electroagenda.com/en/feed/
 https://electrobun.dev/blog/atom.xml
-https://electrobun.dev/blog/rss.xml
 https://electrondust.com/atom/
 https://electronupdate.blogspot.com/feeds/posts/default
 https://electronut.in/feed/
@@ -7160,7 +7104,6 @@ https://elegantcode.com/feed/
 https://elementsunearthed.com/feed/
 https://elephant.town/comic/rss
 https://elephly.net/atom.xml
-https://elephly.net/feed.xml
 https://elevanth.org/blog/feed/
 https://elevare.style/atom/
 https://elewis.dev/rss.xml
@@ -7243,14 +7186,12 @@ https://embracethered.com/blog/index.xml
 https://eme64.github.io/blog/feed.xml
 https://emeraldsip.cafe/atom/
 https://emersion.fr/blog/atom.xml
-https://emersion.fr/blog/rss.xml
 https://emily.news/rss/
 https://emilydamstra.com/feed
 https://emilyfuhrman.co/feed.xml
 https://emilyliu.me/rss
 https://emilymstark.com/feed.xml
 https://eminentdinosaur.blog/atom/
-https://eminentdinosaur.blog/feed/
 https://emiruz.com/index.xml
 https://emma.best/feed/
 https://emma.has-a.blog/feeds/_rss.xml
@@ -7366,8 +7307,6 @@ https://ericlbarnes.com/rss/
 https://ericlevi.com/feed/
 https://ericlippert.com/feed/
 https://ericmargolis.com/atom/
-https://ericmargolis.com/feed/
-https://ericmargolis.com/rss/
 https://ericmigi.com/rss.xml
 https://ericmurphy.xyz/index.xml
 https://ericneyman.wordpress.com/feed/
@@ -7395,8 +7334,6 @@ https://erikbern.com/atom.xml
 https://erikbern.com/index.xml
 https://erikengberg.com/feed/
 https://erikgahner.dk/atom/
-https://erikgahner.dk/feed/
-https://erikgahner.dk/rss/
 https://erikhedin.com/feed/
 https://erikkwakkel.tumblr.com/rss
 https://eriklentzphd.blogspot.com/feeds/posts/default
@@ -8137,7 +8074,6 @@ https://feross.org/atom.xml
 https://ferrad.as/feed.xml
 https://ferrucc.io/index.xml
 https://festercluck.wordpress.com/atom/
-https://festercluck.wordpress.com/feed/
 https://festivus.dev/index.xml
 https://fettblog.eu/feed.xml
 https://fev.al/feed.xml
@@ -8366,7 +8302,6 @@ https://fredericjacobs.com/blog/feed.xml
 https://frederickvanbrabant.com/index.xml
 https://frederik-braun.com/feeds/all.atom.xml
 https://frederikbraun.de/feeds/all.atom.xml
-https://frederikbraun.de/feeds/all.rss.xml
 https://frederikcreemers.be/index.xml
 https://fredhohman.com/feed.xml
 https://fredkozlowski.com/feed/
@@ -8451,7 +8386,6 @@ https://funloop.org/atom.xml
 https://funnelfiasco.com/blog/feed/
 https://funraniumlabs.com/atom/
 https://fupduckphoto.wordpress.com/atom/
-https://fupduckphoto.wordpress.com/feed/
 https://furayoshi.com/index.xml
 https://furbo.org/feed/
 https://furia.com/feed.cgi?source=log
@@ -8502,7 +8436,6 @@ https://gameidea.org/feed/
 https://gamemakerblog.com/atom/
 https://gamesbymason.com/feed.xml
 https://gamesfray.com/atom/
-https://gamesfray.com/rss/
 https://gamesfromwithin.com/atom/
 https://gametheory101.com/feed/
 https://gamozolabs.github.io/feed.xml
@@ -8589,13 +8522,9 @@ https://generatedcontent.org/rss
 https://generativeartistry.com/index.xml
 https://genesistemple.com/feed
 https://genna.win/atom.xml
-https://genna.win/rss.xml
-https://genodians.org/rss
 https://genodians.org/rss/
 https://gent.ilcore.com/atom.xml
 https://gentlesunday.com/atom/
-https://gentlesunday.com/feed/
-https://gentlesunday.com/rss/
 https://geo.rocks/index.xml
 https://geofcrowl.com/blog/feed/
 https://geoff.greer.fm/feed.atom
@@ -8605,7 +8534,6 @@ https://geoffgraham.me/feed/
 https://geoffoliver.me/feed.xml
 https://geoffrich.net/feed.xml
 https://geographicaljourneys.wordpress.com/feed/
-https://geohot.github.io//blog/feed.xml
 https://geohot.github.io/blog/feed.xml
 https://geopet85.github.io/feed.xml
 https://geopolicraticus.wordpress.com/feed/
@@ -8634,7 +8562,6 @@ https://gerritniezen.com/feed/
 https://geshan.com.np/atom.xml
 https://gessfred.xyz/rss.xml
 https://getcoleman.com/atom/
-https://getcoleman.com/feed/
 https://getonwithit.blog/feed/
 https://gettalong.org/posts.rss
 https://gfredericks.com/blog/atom.xml
@@ -8793,7 +8720,6 @@ https://gouline.net/feed.xml
 https://goulven-clech.dev/feed.xml
 https://gourav.io/atom.xml
 https://gowers.wordpress.com/atom/
-https://gowers.wordpress.com/feed/
 https://goyalankit.com/feed.xml
 https://goyavoyage.bearblog.dev/feed/
 https://gpacheco.org/feed/
@@ -8859,7 +8785,7 @@ https://greenbriarpictureshows.blogspot.com/feeds/posts/default
 https://greenido.wordpress.com/feed/
 https://greenmonk.net/atom/
 https://greenshadediary.blogspot.com/feeds/posts/default
-https://greenstarsproject.org/2025/06/15/signal-an-ethical-replacement-for-whatsapp/feed/
+https://greenstarsproject.org/feed/
 https://greenstarsproject.org/feed/
 https://greenthatlife.com/feed/
 https://greg.harmsboone.org/feed/
@@ -8926,7 +8852,6 @@ https://grison.me/index.xml
 https://gristleking.com/feed/
 https://griswoldcain.com/atom.xml
 https://griswoldcain.com/atom/
-https://griswoldcain.com/feed.xml
 https://grobmeier.de/rss.xml
 https://grobmeier.de/rss/
 https://grobmeier.solutions/rss.xml
@@ -8949,7 +8874,6 @@ https://grubz.net/feed.xml
 https://grumpy.systems/index.xml
 https://grumpy.website/feed.xml
 https://grumpygamer.com/rss
-https://grumpygamer.com/rss2.0
 https://grumpywelshman.com/atom/
 https://grumpywizard.home.blog/feed/
 https://grumpz.net/rss.xml
@@ -9242,7 +9166,6 @@ https://heitorpb.github.io/atom.xml
 https://heiwiper.com/index.xml
 https://helentronica.com/feed/
 https://helgeklein.com/atom/
-https://helgeklein.com/rss/
 https://helloanselm.com/feed/rss
 https://hellocode.co/feeds/latest/
 https://hellocplusplus.com/feed/
@@ -9266,7 +9189,6 @@ https://henriquebastos.net/rss.xml
 https://henriqueleite42.com/rss.xml
 https://henry.precheur.org/atom.xml
 https://henrytapper.com/atom/
-https://henrytapper.com/rss/
 https://henselforcongress.com/rss/
 https://henvic.dev/index.xml
 https://her.esy.fun/rss.xml
@@ -9392,7 +9314,6 @@ https://homehack.nl/feed/
 https://homethingspast.com/atom/
 https://hometownstohollywood.com/feed/
 https://homeworkinghenry.com/atom/
-https://homeworkinghenry.com/feed/
 https://homotopytypetheory.org/atom/
 https://hondu.co/feed.xml
 https://honest-food.net/atom/
@@ -9485,7 +9406,6 @@ https://human-as-media.com/feed/
 https://humanizingthevacuum.wordpress.com/atom/
 https://humans.md/index.xml
 https://humantransit.org/atom/
-https://humantransit.org/feed/
 https://humanwhocodes.com/feeds/all.xml
 https://humanwhocodes.com/feeds/blog.xml
 https://humberto.io/blog/index.xml
@@ -9502,7 +9422,6 @@ https://hunterwalk.com/feed/
 https://hunterwittenborn.com/index.xml
 https://huntingbears.nl/feed/
 https://huonw.github.io/blog/atom.xml
-https://huonw.github.io/blog/rss.xml
 https://huphtur.nl/feed.xml
 https://hurryabit.github.io/feed.xml
 https://huskyhacks.dev/feed/
@@ -10345,8 +10264,6 @@ https://jereze.com/feed.xml
 https://jerf.org/iri/rss.xml
 https://jergling.com/atom.xml
 https://jergling.com/atom/
-https://jergling.com/feed.xml
-https://jergling.com/rss/
 https://jericho.blog/feed/
 https://jerlance.com/feed/
 https://jero.zone/feed.xml
@@ -10452,7 +10369,6 @@ https://jjv.sh/index.xml
 https://jk-lee.com/rss.xml
 https://jkap.io/feed/
 https://jkbrickworks.com/atom/
-https://jkbrickworks.com/feed/
 https://jkirchartz.com/feed.xml
 https://jkjensen.me/index.xml
 https://jklinger.co/feed/?type=rss
@@ -10615,7 +10531,6 @@ https://johnmyleswhite.com/index.xml
 https://johnnydecimal.com/rss.xml
 https://johnnymetz.com/index.xml
 https://johnnyreilly.com/atom.xml
-https://johnnyreilly.com/rss.xml
 https://johnnyrodgers.is/rss
 https://johnnys.news/atom.xml
 https://johnnysswlab.com/feed/
@@ -10675,7 +10590,6 @@ https://jonathanhaslett.com/feed
 https://jonathankinlay.com/atom/
 https://jonathankinlay.com/feed/atom/
 https://jonathanmh.com/feed/atom.xml
-https://jonathanmh.com/feed/feed.xml
 https://jonathannen.com/rss.xml
 https://jonathanolson.net/feed.xml
 https://jonathanpagel.com/feed/
@@ -10827,7 +10741,6 @@ https://journal.rmccue.io/feed/
 https://journal.robbi.my/index.xml
 https://journal.spencerwnelson.com/feed.xml
 https://journal.stuffwithstuff.com/atom.xml
-https://journal.stuffwithstuff.com/rss.xml
 https://journal.valeriansaliou.name/rss/
 https://journeysthroughglass.net/rss/
 https://journeytolunar.com/index.xml
@@ -10910,14 +10823,12 @@ https://judithcurry.com/feed/
 https://judithvanstegeren.com/blog/atom.xml
 https://juergensmeyer.org/feed/
 https://juffalow.com/blog/atom.xml
-https://juffalow.com/blog/rss.xml
 https://juhaliikala.com/feed.xml
 https://jukkaniiranen.com/feed/
 https://julesh.com/feed/
 https://julespieri.com/atom/
 https://juliabausenhardt.com/feed/
 https://juliagalef.com/atom/
-https://juliagalef.com/feed/
 https://julian-hoffman.com/feed/
 https://julian-rose.com/atom/
 https://julian.bearblog.dev/feed/?type=rss
@@ -11293,14 +11204,12 @@ https://kieranhealy.org/blog/index.xml
 https://kieranhealy.org/index.xml
 https://kieranmcguire.uk/rss.xml
 https://kieranpotts.com/feeds/atom.xml
-https://kieranpotts.com/feeds/rss.xml
 https://kiko.io/rss.xml
 https://kiledjian.com/feed.xml
 https://kilianvalkhof.com/feed/
 https://kiljan.org/posts/index.xml
 https://killalldefects.com/feed/
 https://killsixbilliondemons.com/atom/
-https://killsixbilliondemons.com/feed/
 https://killtheradio.net/feed.xml
 https://kimberlyhirsh.com/feed.xml
 https://kimcastillo.com/feed/
@@ -11342,7 +11251,6 @@ https://kivikakk.ee/atom.xml
 https://kiwidog.me/feed/
 https://kiwihellenist.blogspot.com/feeds/posts/default
 https://kix.dev/atom/
-https://kix.dev/feed/
 https://kizu514.com/atom/
 https://kjaymiller.com/blog.rss
 https://kjellv.com/feed/
@@ -11398,7 +11306,6 @@ https://kokorobot.ca/links/rss.xml
 https://kokoscript.com/artAtom.xml
 https://kokoscript.com/artRss.xml
 https://kokoscript.com/atom.xml
-https://kokoscript.com/rss.xml
 https://kolesnikov.se/news.atom
 https://komelin.com/rss.xml
 https://konne.me/feed.xml
@@ -11569,7 +11476,6 @@ https://langsoul.com/feed/
 https://language-and-innovation.com/feed/
 https://languagehat.com/feed/
 https://languagelog.ldc.upenn.edu/nll/?feed=atom
-https://languagelog.ldc.upenn.edu/nll/?feed=rss2
 https://langui.sh/feed.xml
 https://lanie.dev/index.xml
 https://lanius.dev/feed.xml
@@ -11591,7 +11497,7 @@ https://larrycuban.wordpress.com/feed/
 https://larryjordan.com/atom/
 https://larrylittlefield.wordpress.com/feed/
 https://larryludwig.com/feed/
-https://larrysanger.org/2025/02/how-a-skeptical-philosopher-becomes-a-christian/feed/
+https://larrysanger.org/feed/
 https://larrysanger.org/feed/
 https://lars-christian.com/feed/
 https://lars.com/feed.xml
@@ -11637,7 +11543,6 @@ https://laurenoakdenrayner.com/feed/
 https://laurent.le-brun.eu/blog/.rss
 https://laurentkempe.com/atom.xml
 https://laurentrdc.xyz/atom.xml
-https://laurentrdc.xyz/feed.xml
 https://lav.io/index.xml
 https://law.gmnz.xyz/feed.xml
 https://lawandthemultiverse.com/feed/
@@ -11694,7 +11599,6 @@ https://learnyousomeerlang.com/rss
 https://leastprivilege.com/feed/
 https://leaverou.me/feed/
 https://leblancfg.com/feeds/all.atom.xml
-https://leblancfg.com/feeds/all.rss.xml
 https://lebo.io/atom.xml
 https://lecaro.me/feed.xml
 https://lecoqdewallst.fr/feed/
@@ -11730,7 +11634,6 @@ https://leigh-annegalloway.com/rss/
 https://leisureguy.ca/feed/
 https://leisurepurpose.wordpress.com/feed/
 https://leiterreports.com/atom/
-https://leiterreports.com/feed/
 https://leiterreports.typepad.com/blog/atom.xml
 https://lellep.xyz/blog/feeds/all.atom.xml
 https://lellep.xyz/blog/feeds/data.atom.xml
@@ -11774,7 +11677,6 @@ https://lethain.com/feeds.xml
 https://lethalguitar.wordpress.com/feed/
 https://letra.studio/feed.xml
 https://lets.re/blog/atom.xml
-https://lets.re/blog/rss.xml
 https://letsmeetin.space/index.xml
 https://letterformarchive.org/news/feed/
 https://letterpressworkers.org/feed/
@@ -12124,7 +12026,6 @@ https://lucybellwood.com/feed/
 https://ludd.life/atom/
 https://ludic.mataroa.blog/rss/
 https://ludovic.hirlimann.net/feeds/posts/default
-https://ludovic.hirlimann.net/feeds/posts/default?alt=rss
 https://ludusnovus.net/feed/
 https://luetkemj.github.io/feed.xml
 https://lugassy.net/feed
@@ -12235,7 +12136,6 @@ https://machiel.me/index.xml
 https://machinethoughts.wordpress.com/feed/
 https://macias.info/atom.xml
 https://maciejpedzi.ch/atom.xml
-https://maciejpedzi.ch/rss.xml
 https://mackle.io/index.xml
 https://mackow.ski/feed/
 https://maclabs.jazzace.ca/feed.xml
@@ -12448,7 +12348,6 @@ https://markcarrigan.net/feed/
 https://markcunningham91.blogspot.com/feeds/posts/default
 https://markdalessandro.com/feed/
 https://markentier.tech/feed.atom.xml
-https://markentier.tech/feed.rss.xml
 https://markessien.com/index.xml
 https://markgelbart.wordpress.com/feed/
 https://markgreville.ie/feed/
@@ -12748,7 +12647,6 @@ https://maxnagy.com/index.xml
 https://maxoffsky.com/feed/
 https://maxriffner.com/feed/
 https://maxrozen.com/atom.xml
-https://maxrozen.com/rss.xml
 https://maxschireson.com/atom/
 https://maxschmitt.me/feed.rss
 https://maxtayloraero.com/feed/
@@ -13069,7 +12967,6 @@ https://mikebifulco.com/rss.xml
 https://mikebutcher.me/feed/
 https://mikecoats.com/atom.xml
 https://mikecoats.com/feed/
-https://mikecoats.com/rss.xml
 https://mikedashhistory.com/feed/
 https://mikedebo.com/feed.xml
 https://mikedempsey.typepad.com/graphic_journey_blog/atom.xml
@@ -13171,7 +13068,6 @@ https://miqu.me/atom.xml
 https://mir.aculo.us/atom/
 https://miralis-firmware.github.io/blog/atom.xml
 https://mirawelner.com/atom.xml
-https://mirawelner.com/rss.xml
 https://mireklzicar.com/rss.xml
 https://mirio.dev/index.xml
 https://mirocupak.com/feed.xml
@@ -13287,7 +13183,6 @@ https://momo5502.com/index.xml
 https://momo5502.com/posts/index.xml
 https://momorell.com/feed/
 https://momsunhinged.com/atom/
-https://momsunhinged.com/feed/
 https://mon.im/feed.xml
 https://mondaybits.com/feed/
 https://mondaynote.com/feed
@@ -13321,7 +13216,6 @@ https://moonside.games/index.xml
 https://moonspeaker.ca/recentrss.xml
 https://moq.dev/rss.xml
 https://moral.net.au/feeds/all.atom.xml
-https://moral.net.au/feeds/all.rss.xml
 https://mordenstar.com/rss.xml
 https://morepablo.com/feeds/all.atom.xml
 https://morestina.net/atom/
@@ -13372,7 +13266,6 @@ https://movingpackets.net/feed/
 https://movingparts.net/atom/
 https://moxie.org/feed.xml
 https://moyix.blogspot.com/feeds/posts/default
-https://moyix.blogspot.com/feeds/posts/default?alt=rss
 https://mozanunal.com/index.xml
 https://mozzius.dev/rss
 https://mpetroff.net/feed/
@@ -13475,7 +13368,6 @@ https://multoghost.wordpress.com/feed/
 https://municipaldreams.wordpress.com/feed/
 https://mupuf.org/atom.xml
 https://muratbuffalo.blogspot.com/feeds/posts/default
-https://muratbuffalo.blogspot.com/feeds/posts/default?alt=rss
 https://muratkasimov.art/index.xml
 https://muratov.space/index.xml
 https://murphyslab.ca/notes/index.xml
@@ -13553,7 +13445,6 @@ https://mystical-trash-heap.blogspot.com/feeds/posts/default
 https://mysticmind.dev/rss.xml
 https://mystie.bearblog.dev/feed/?type=rss
 https://mythicaltype.com/atom.xml
-https://mythicaltype.com/feed.xml
 https://mythicaltype.com/feed/
 https://mzrn.sh/feed.xml
 https://mzucker.github.io/feed.xml
@@ -13809,7 +13700,6 @@ https://nextlevelchess.blog/atom/
 https://nextthing.org/atom/
 https://nexy.blog/feed.xml
 https://nezhar.com/feeds/all.atom.xml
-https://nezhar.com/feeds/all.rss.xml
 https://nfil.dev/feed.xml
 https://nfrechette.github.io/atom.xml
 https://ngauthier.com/feeds/posts/default
@@ -13905,7 +13795,6 @@ https://nigeness.blogspot.com/feeds/posts/default
 https://nightoftheknight.com/feed/
 https://nights.bearblog.dev/feed/?type=rss
 https://nighttime-imaging.eu/atom/
-https://nighttime-imaging.eu/feed/
 https://nih.ar/rss.xml
 https://nik.art/feed/
 https://nikd.posthaven.com/posts.atom
@@ -13944,7 +13833,6 @@ https://niniane.blogspot.com/feeds/posts/default
 https://ninjarockstar.dev/feed.xml
 https://ninjasandrobots.com/feed/
 https://ninkovic.dev/atom.xml
-https://ninkovic.dev/rss.xml
 https://ninodorsi.wordpress.com/feed/
 https://nintil.com/rss.xml
 https://nipafx.dev/feed.xml
@@ -14004,7 +13892,6 @@ https://nochlin.com/rss.xml
 https://nocodefunctions.com/blog/feed.xml
 https://nocoffei.com/?feed=rss2
 https://nocomplexity.com/atom/
-https://nocomplexity.com/feed/
 https://noctslackv2.wordpress.com/feed/
 https://node.school/feed/feed.xml
 https://nodighome.com/feed/
@@ -14072,7 +13959,6 @@ https://notebook.wesleyac.com/atom.xml
 https://noted.lol/rss/
 https://noteflakes.com/feeds/rss
 https://notenik.app/atom.xml
-https://notenik.app/rss.xml
 https://notenoughtech.com/feed/
 https://notes.alinpanaitiu.com/index.xml
 https://notes.ansonbiggs.com/rss/
@@ -14094,10 +13980,8 @@ https://notes.husk.org/rss
 https://notes.jeddacp.com/feed/
 https://notes.jordanscales.com/feed.atom
 https://notes.kateva.org/feeds/posts/default
-https://notes.kateva.org/feeds/posts/default?alt=rss
 https://notes.keithjgrant.com/index.xml
 https://notes.neatnik.net/atom.xml
-https://notes.neatnik.net/rss.xml
 https://notes.neeasade.net/rss.xml
 https://notes.npilk.com/feed.xml
 https://notes.prealpinux.com/feed
@@ -14115,7 +13999,6 @@ https://noteship.com/feeds/all.xml
 https://notesof.com/feed.rss
 https://notesoncinematograph.blogspot.com/feeds/posts/default
 https://notesonliberty.com/atom/
-https://notesonliberty.com/feed/
 https://notesonmydesk.top/atom/
 https://notgull.net/feed.xml
 https://nothe.purplellamas.net/feed.xml
@@ -14123,8 +14006,6 @@ https://nothingismere.com/feed/
 https://nothingoriginalhere.com/posts_feed
 https://notiz.blog/feed/
 https://notla.com/atom/
-https://notla.com/feed/
-https://notla.com/rss/
 https://notlaura.com/feed/
 https://notoneoffbritishisms.com/feed/
 https://notoriousbfg.com/rss.xml
@@ -14228,7 +14109,6 @@ https://octocat.dev/feed.xml
 https://oddathenaeum.com/feed/
 https://oddevan.com/atom.xml
 https://oddlama.org/atom.xml
-https://oddlama.org/rss.xml
 https://oddvar.moe/feed/
 https://odeliachan.com/feed/
 https://odersky.github.io/feed.xml
@@ -14470,7 +14350,6 @@ https://overengineer.dev/blog/feeds/all.xml
 https://overkill.wtf/rss/
 https://overlookinfratech.com/feed.xml
 https://overreacted.io/atom.xml
-https://overreacted.io/rss.xml
 https://overthehills.in/feed.xml
 https://ovid.github.io/article.rss
 https://ovl.design/text/feed.xml
@@ -14577,7 +14456,6 @@ https://parislemon.com/rss
 https://parisvega.com/feed/
 https://parkerhiggins.net/feed.xml
 https://parkerortolani.blog/atom.xml
-https://parkerortolani.blog/feed.xml
 https://parsiya.net/index.xml
 https://partee.io/feed.xml
 https://parth.ninja/feed.xml
@@ -14652,7 +14530,6 @@ https://paulefou.com/blog/rss
 https://paulenglish.com/atom.xml
 https://pauley.me/index.xml
 https://pauleychrome.com/atom/
-https://pauleychrome.com/feed/
 https://paulhalme.com/feed/
 https://paulhammant.com/atom.xml
 https://paulholmes.ca/atom/
@@ -14767,9 +14644,7 @@ https://perfectretort.blogspot.com/feeds/posts/default
 https://performanceengineeringin.wordpress.com/feed/
 https://perfumeprofessor.net/feed/
 https://perishablepress.com/atom/
-https://perishablepress.com/feed/
 https://perishablepress.com/feed/atom/
-https://perishablepress.com/rss/
 https://perlancar.wordpress.com/feed/
 https://perlhacks.com/feed/
 https://perpetualbeta.com/feed.xml
@@ -14779,7 +14654,6 @@ https://person-al.github.io/feed.xml
 https://personal.garrettfuller.org/blog/rss/
 https://personal.jatan.space/feed.xml
 https://perspective-collective.com/atom.xml
-https://perspective-collective.com/rss.xml
 https://perspectives.mvdirona.com/feed/
 https://persumi.com/u/fredwu/feed/atom
 https://pert.dev/atom.xml
@@ -14924,7 +14798,6 @@ https://pierce.dev/rss.xml
 https://pierre-couy.dev/feed.xml
 https://pierre.equoy.fr/blog/feeds/all.atom.xml
 https://pierrezemb.fr/atom.xml
-https://pierrezemb.fr/rss.xml
 https://pietersz.co.uk/feed
 https://pietrasiak.com/rss.xml
 https://pietroalbini.org/blog/atom.xml
@@ -14935,7 +14808,6 @@ https://pig-monkey.com/feed.atom
 https://pigsty.io/index.xml
 https://pikdum.dev/index.xml
 https://pikku.dev/blog/atom.xml
-https://pikku.dev/blog/rss.xml
 https://pikseladam.com/rss.xml
 https://pikuma.com/feed
 https://pilabor.com/index.xml
@@ -15113,10 +14985,8 @@ https://powermoves.blog/rss/
 https://pqina.nl/feed.xml
 https://pqvst.com/feed.xml
 https://pr-if.org/atom/
-https://pr-if.org/feed/
 https://prabinpoudel.com.np/atom.xml
 https://pracap.com/atom/
-https://pracap.com/feed/
 https://practical.engineering/blog?format=rss
 https://practicalai.io/atom/
 https://practicalbetterments.com/feed.xml
@@ -15132,7 +15002,6 @@ https://pragmateek.com/atom/
 https://pragmaticpineapple.com/rss.xml
 https://prahladyeri.github.io/atom.xml
 https://praisecurseandrecurse.blogspot.com/feeds/posts/default
-https://praisecurseandrecurse.blogspot.com/feeds/posts/default?alt=rss
 https://prakashsellathurai.github.io/feed.xml
 https://prakhar.me/index.xml
 https://prakhargurunani.com/index.xml
@@ -15166,8 +15035,6 @@ https://preining.info/blog/feed/
 https://preining.info/blog/rss/
 https://premp.in/index.xml
 https://preparednessmama.com/atom/
-https://preparednessmama.com/feed/
-https://preparednessmama.com/rss/
 https://prepend.com/feed.xml
 https://prepitaph.org/index.atom
 https://prescheme.org/rss.xml
@@ -15271,11 +15138,9 @@ https://pseudorandom.resistant.tech/feed.xml
 https://psgraphics.blogspot.com/feeds/posts/default
 https://pshapira.net/feed/
 https://psiace.me/atom.xml
-https://psiace.me/rss.xml
 https://pski.net/feed/
 https://psuter.net/feed.xml
 https://psy-lob-saw.blogspot.com/feeds/posts/default
-https://psy-lob-saw.blogspot.com/feeds/posts/default?alt=rss
 https://psychip.net/ext/rss.xml
 https://psychocod3r.wordpress.com/feed/
 https://psychogeographicreview.com/feed/
@@ -15713,8 +15578,6 @@ https://reidbarber.com/feed.xml
 https://reidburke.com/feed/
 https://reiddraper.com/atom.xml
 https://reidhoffman.org/atom/
-https://reidhoffman.org/feed/
-https://reidhoffman.org/rss/
 https://reiinakano.com/feed.xml
 https://reillybrennan.com/feed.rss
 https://reillyspitzfaden.com/notes/feed.xml
@@ -15763,8 +15626,6 @@ https://rescue1130.blogspot.com/feeds/posts/default
 https://research.meekolab.com/rss.xml
 https://research.swtch.com/feed.atom
 https://researchbuzz.me/atom/
-https://researchbuzz.me/feed/
-https://researchbuzz.me/rss/
 https://researchingfoodhistory.blogspot.com/feeds/posts/default
 https://researchwhisperer.org/feed/
 https://resevoir.net/rss.xml
@@ -15822,8 +15683,6 @@ https://rhymeswithdiploma.com/feed/
 https://rianrietveld.com/atom/
 https://rianrietveld.com/blog/feed/
 https://rianrietveld.com/blog/rss/
-https://rianrietveld.com/feed/
-https://rianrietveld.com/rss/
 https://ribo.zone/feed.xml
 https://ricardoanderegg.com/index.xml
 https://ricardoanderegg.com/posts/index.xml
@@ -15918,7 +15777,6 @@ https://rkiselenko.dev/feed/feed.xml
 https://rknight.me/feed.xml
 https://rknight.me/subscribe/everything/rss.xml
 https://rknight.me/subscribe/posts/atom.xml
-https://rknight.me/subscribe/posts/rss.xml
 https://rkoutnik.com/feed.xml
 https://rkp.science/feed/
 https://rkrishnan.org/atom.xml
@@ -15988,7 +15846,6 @@ https://roberto.selbach.ca/index.xml
 https://robertovg.com/feed.xml
 https://robertoviola.cloud/atom/
 https://robertoviola.cloud/feed
-https://robertoviola.cloud/rss/
 https://robertovitillo.com/rss.xml
 https://roberts.pm/index.php/feed/
 https://robertsdesign.biz/feed
@@ -16020,7 +15877,6 @@ https://robmcentarffer.net/feed/
 https://robmensching.com/blog/posts/feed
 https://robnapier.net/atom.xml
 https://robonine.com/atom/
-https://robonine.com/rss/
 https://roborooter.com/feed/
 https://robotameri.ca/atom/
 https://robotchinwag.com/feed.xml
@@ -16031,7 +15887,6 @@ https://robotskirts.com/feed/
 https://robr.dev/index.xml
 https://robrace.dev/blog/rss.xml
 https://robservatory.com/atom/
-https://robservatory.com/feed/
 https://rocket9labs.com/index.xml
 https://rocketee.rs/feed.xml
 https://rocketeer.be/index.xml
@@ -16323,7 +16178,6 @@ https://sage.thesharps.us/feed/
 https://saghm.com/rss/
 https://sagi.io/rss.xml
 https://sagivo.com/blog/atom.xml
-https://sagivo.com/blog/rss.xml
 https://sahajsarup.com/feed/
 https://sahandsaba.com/feeds/all.atom.xml
 https://sahansera.dev/rss.xml
@@ -16497,7 +16351,6 @@ https://scattered-thoughts.net/atom.xml
 https://scattershot.blog/feed.xml
 https://sccarlos.com/index.xml
 https://scenelift.com/atom/
-https://scenelift.com/rss/
 https://scentsandsensibilities.co/feed/
 https://scepturempire.com/feed/
 https://schadokar.dev/index.xml
@@ -16587,10 +16440,8 @@ https://scriptingosx.com/feed/
 https://scrivenerserror.blogspot.com/feeds/posts/default
 https://scrollart.org/feeds/all.atom.xml
 https://scrollinondubs.com/atom/
-https://scrollinondubs.com/feed/
 https://scruss.com/blog/feed/
 https://scummywatertower.com/atom/
-https://scummywatertower.com/rss/
 https://scvalex.net/atom.xml
 https://scyy.fi/index.xml
 https://sdarchitect.blog/feed/
@@ -16651,14 +16502,12 @@ https://sector035.nl/articles.atom
 https://secure.grepular.com/atom
 https://securehoney.net/feeds/all.atom.xml
 https://securitycafe.ro/atom/
-https://securitycafe.ro/rss/
 https://securitycryptographywhatever.com/feed.xml
 https://securityinaction.wordpress.com/feed/
 https://securityuncorked.com/feed/
 https://securitywithsam.com/atom/
 https://securosophy.com/feed/
 https://sedimental.org/atom.xml
-https://sedimental.org/rss.xml
 https://seebitcoin.com/atom/
 https://seeinglogic.com/index.xml
 https://seekingstars.tumblr.com/rss
@@ -16667,7 +16516,6 @@ https://seenaburns.com/feed.xml
 https://seescott.dev/feed/
 https://sef.kloninger.com/rss.xml
 https://sefiks.com/atom/
-https://sefiks.com/rss/
 https://segphault.io/index.xml
 https://seh.dev/index.xml
 https://seirdy.one/atom.xml
@@ -16718,12 +16566,10 @@ https://sergeytihon.com/atom/
 https://sergheicebotari.com/index.xml
 https://sergimansilla.com/atom.xml
 https://sergiolema.dev/atom/
-https://sergiolema.dev/feed/
 https://sergioprado.blog/index.xml
 https://sergiswriting.com/atom.xml
 https://serhack.me/index.xml
 https://seri.tools/atom.xml
-https://seri.tools/rss.xml
 https://serialized.net/index.xml
 https://series.live/atom/
 https://serocell.com/feeds/serocell.xml
@@ -17013,7 +16859,6 @@ https://simplyexplained.com/atom.xml
 https://sin-ack.github.io/index.xml
 https://sina.is/atom.xml
 https://sinapticas.com/atom/
-https://sinapticas.com/rss/
 https://sinclairtarget.com/feed.xml
 https://sinclairtarget.com/index.xml
 https://sinclairtrails.com/feed/
@@ -17075,7 +16920,6 @@ https://skullsinthestars.com/feed/
 https://skuth.us/feed/
 https://skyfall.dev/rss.xml
 https://skymania.com/atom/
-https://skymania.com/rss/
 https://skynetandebert.com/feed/
 https://skypjack.github.io/feed.xml
 https://skyriddles.wordpress.com/feed/
@@ -17101,7 +16945,6 @@ https://slightknack.dev/atom.xml
 https://slimemoldtimemold.com/feed/
 https://slingingbits.com/rss/
 https://slinkp.com/feeds/all.atom.xml
-https://slinkp.com/feeds/all.rss.xml
 https://slinkydeveloper.com/slinkydeveloper.github.io/feed/feed.xml
 https://slipway.co/blog/rss.xml
 https://slobodan.me/index.xml
@@ -17120,7 +16963,6 @@ https://smagin.fyi/index.xml
 https://smallcultfollowing.com/babysteps/atom.xml
 https://smallcypress.bearblog.dev/feed/
 https://smalldatum.blogspot.com/feeds/posts/default
-https://smalldatum.blogspot.com/feeds/posts/default?alt=rss
 https://smaller.blog/feed/
 https://smaller.fish/index.xml
 https://smallfarmersjournal.com/feed/
@@ -17142,7 +16984,6 @@ https://smaslennikov.com/rss.xml
 https://smcalilly.github.io/feed.xml
 https://smcleod.net/index.xml
 https://smetj.net/feeds/blog-atom.xml
-https://smetj.net/feeds/blog-rss.xml
 https://smist08.wordpress.com/feed/
 https://smithamilli.com/feed.xml
 https://smithery.com/feed/
@@ -17247,8 +17088,6 @@ https://sometechblog.com/index.xml
 https://somethingaboutmaps.wordpress.com/feed/
 https://somethingdecent.co.uk/feed/
 https://somethingnerdy.com/atom/
-https://somethingnerdy.com/feed/
-https://somethingnerdy.com/rss/
 https://somethingorotherwhatever.com/rss.xml
 https://sometimes.digital/feed.xml
 https://somewherein.jp/feed/
@@ -17263,7 +17102,6 @@ https://sonspring.com/feed/
 https://sookocheff.com/index.xml
 https://sooraj.io/feed/
 https://sophiabits.com/feed.atom.xml
-https://sophiabits.com/feed.rss.xml
 https://sophiaenglmaier.com/atom/
 https://sophiebits.com/atom.xml
 https://sophiechou.com/rss/
@@ -17348,7 +17186,6 @@ https://spyced.blogspot.com/feeds/posts/default
 https://spyculture.com/feed/
 https://spyder.wordpress.com/feed/
 https://spydergrrl.com/atom/
-https://spydergrrl.com/feed/
 https://spyglass.org/rss/
 https://spywrite.com/feed/podcast/
 https://sqlserverradio.com/rss
@@ -17412,7 +17249,6 @@ https://standardcrypto.wordpress.com/feed/
 https://standardebooks.org/feeds/atom/new-releases
 https://standardsandfreedom.net/index.php/feed/
 https://stanislas.blog/atom.xml
-https://stanislas.blog/feed.xml
 https://stanislavkozlovski.com/rss.xml
 https://stanko.io/articles/atom
 https://stanlemon.com/feed.xml
@@ -17423,7 +17259,6 @@ https://starbreaker.org/feed.xml
 https://starchamber.com/feed/
 https://stardiviner.github.io/Blog/index.xml
 https://stardustxr.org/blog/atom.xml
-https://stardustxr.org/blog/rss.xml
 https://stareffect.xyz/atom/
 https://starinastar.com/feed/
 https://starkeycomics.com/feed/
@@ -17442,8 +17277,6 @@ https://startupnextdoor.com/rss/
 https://startupsunplugged.com/feed/
 https://startwithawhy.com/feed.xml
 https://stashofcode.com/atom/
-https://stashofcode.com/feed/
-https://stashofcode.com/rss/
 https://state-of-algeria.dev/blog/rss.xml
 https://stateofprogress.blog/rss.xml
 https://staticmade.com/feed.xml
@@ -17555,8 +17388,6 @@ https://steveperkins.com/atom/
 https://stevepulec.com/index.xml
 https://steveridout.com/atom.xml
 https://steverrobbins.com/atom/
-https://steverrobbins.com/feed/
-https://steverrobbins.com/rss/
 https://stevesalaita.com/atom/
 https://stevesammartino.com/feed/
 https://stevescargall.com/index.xml
@@ -17588,7 +17419,6 @@ https://stopironingshirts.com/feed/
 https://stoppels.ch/rss.xml
 https://storagemojo.com/atom/
 https://storeboughtisfineblog.wpcomstaging.com/atom/
-https://storeboughtisfineblog.wpcomstaging.com/feed/
 https://stories.wegnerdesign.com/feed.xml
 https://storiesbehindthefog.com/feed
 https://storiesfromthestateofexception.wordpress.com/feed/
@@ -17644,10 +17474,8 @@ https://studywolf.wordpress.com/feed/
 https://stuebinm.eu/rss.xml
 https://stuff.tamius.net/sacred-texts/feed/
 https://stuffnobodycaresabout.com/atom/
-https://stuffnobodycaresabout.com/feed/
 https://stuker.com/atom/
 https://stuker.com/blog/rss/
-https://stuker.com/feed/
 https://stum.de/rss.xml
 https://stumbl.ing/index.xml
 https://stumblingandmumbling.typepad.com/stumbling_and_mumbling/atom.xml
@@ -17723,7 +17551,6 @@ https://susancain.net/feed/
 https://susannahbreslin.com/blog?format=rss
 https://suspendedreason.com/feed/
 https://suszter.com/atom/
-https://suszter.com/rss/
 https://suze.dev/feed.xml
 https://svana.name/feed/
 https://svay.com/blog/rss/
@@ -17748,8 +17575,6 @@ https://swe-blog.amanbolat.com/rss.xml
 https://sweepingthenation.blogspot.com/feeds/posts/default
 https://sweetness.hmmz.org/feeds/all.rss.xml
 https://swelltype.com/atom/
-https://swelltype.com/feed/
-https://swelltype.com/rss/
 https://swethatanamala.github.io/feed.xml
 https://swiftandmemes.com/feed/
 https://swiftbysundell.com/feed.rss
@@ -17845,7 +17670,6 @@ https://talesfromtheencrypt.home.blog/feed/
 https://talesoftimesforgotten.com/feed/
 https://talkin10days.com/feed/
 https://talkingrobot.com/atom/
-https://talkingrobot.com/feed/
 https://talkingshelfspace.com/feed/
 https://talktech.info/feed/
 https://talkweb.eu/feed/
@@ -18015,7 +17839,6 @@ https://teleogistic.net/atom/
 https://telephoneworld.org/feed/
 https://teleread.com/atom.xml
 https://telescoper.blog/atom/
-https://telescoper.blog/feed/
 https://teletext.zaibatsutel.net/rss
 https://telkins.dev/feed.xml
 https://temikus.net/feed
@@ -18324,8 +18147,6 @@ https://thepoetsky.com/feed.xml
 https://thepoetsky.com/feed/
 https://theprincipledagent.com/atom/
 https://theprintshop.club/atom/
-https://theprintshop.club/feed/
-https://theprintshop.club/rss/
 https://theprivacydad.com/feed/
 https://theprivateequiteer.com/blog/feed/
 https://theprivateequiteer.com/blog/rss/
@@ -18388,13 +18209,10 @@ https://thethreepennyguignol.com/feed/
 https://thetolkienist.com/feed/
 https://thetoolsweneed.com/rss/
 https://thetransfemininereview.com/atom/
-https://thetransfemininereview.com/feed/
-https://thetransfemininereview.com/rss/
 https://thetreeographer.com/atom/
 https://thetrevorharmon.com/rss.xml
 https://thetrichordist.com/atom.xml
 https://thetrichordist.com/atom/
-https://thetrichordist.com/feed/
 https://thetrolleydodger.com/feed/
 https://thettablog.blogspot.com/feeds/posts/default
 https://theturnsignalblog.com/rss.xml
@@ -18680,7 +18498,6 @@ https://tmfarrell.github.io/atom.xml
 https://tmichellemoore.com/feed/
 https://tmoabom.blog/atom.xml
 https://tmoabom.blog/atom/
-https://tmoabom.blog/rss/
 https://tmorris.net/rss.xml
 https://tmrwedition.com/feed/
 https://tmsvr.com/rss/
@@ -18831,8 +18648,6 @@ https://tp69.blog/feed/
 https://tpaschalis.me/feed.xml
 https://tqwewe.com/atom.xml
 https://trackinghappiness.com/atom/
-https://trackinghappiness.com/feed/
-https://trackinghappiness.com/rss/
 https://tracks.ranea.org/rss
 https://tracy.posthaven.com/posts.atom
 https://tracydurnell.com/feed/
@@ -18964,7 +18779,6 @@ https://twitch.nervestaple.com/atom.xml
 https://twitchard.github.io/atom.xml
 https://twkrr.com/atom.xml
 https://two-worlds.com/atom/
-https://two-worlds.com/feed/
 https://two-wrongs.com/atom
 https://two-wrongs.com/feed
 https://twobithistory.org/feed.xml
@@ -19049,7 +18863,6 @@ https://uncrunched.com/rss/
 https://undefined.pyfy.ch/rss.xml
 https://undercoverlocal.wordpress.com/feed/
 https://underhill-lounge.flannestad.com/atom/
-https://underhill-lounge.flannestad.com/feed/
 https://underjord.io/feed.xml
 https://underlap.org/feed/
 https://underreacted.leaflet.pub/atom
@@ -19071,7 +18884,6 @@ https://uniqueatpenn.wordpress.com/feed/
 https://unit520.net/index.xml
 https://univalence.me/api/feed
 https://universealacarte.blogspot.com/feeds/posts/default
-https://universealacarte.blogspot.com/feeds/posts/default?alt=rss
 https://unix.dog/announcements.rss
 https://unix.foo/index.xml
 https://unixdigest.com/feed.rss
@@ -19474,7 +19286,6 @@ https://warrenellis.ltd/feed/
 https://wasabigeek.com/rss.xml
 https://wasi0013.com/feed/
 https://wasmgroundup.com/blog/atom.xml
-https://wasmgroundup.com/blog/rss.xml
 https://wasmoke.blogspot.com/atom.xml
 https://wasmoke.blogspot.com/feeds/posts/default
 https://waspdev.com/rss
@@ -19631,7 +19442,6 @@ https://wingfelder.ca/feed/
 https://wingolog.org/feed/atom
 https://winklerweb.net/blog/rss/
 https://winnielim.org/atom/
-https://winnielim.org/feed/
 https://winsnes.io/index.xml
 https://winterbloed.be/feed/
 https://winther.sysctl.dk/atom/
@@ -19642,7 +19452,6 @@ https://wiredream.com/atom.xml
 https://wiredspace.de/index.xml
 https://wirelesspi.com/feed/
 https://wiremodal.net/atom.xml
-https://wiremodal.net/rss.xml
 https://wiresareobsolete.com/feed.atom
 https://wirfs-brock.com/rebecca/feed/feed.xml
 https://witestlab.poly.edu/blog/rss/
@@ -19759,7 +19568,6 @@ https://www.10000birds.com/feed
 https://www.1014.org/rss.php
 https://www.10endibujo.com/feed/
 https://www.10zenmonkeys.com/atom/
-https://www.10zenmonkeys.com/feed/
 https://www.15billiondollarcase.com/feed/
 https://www.16elt.com/atom.xml
 https://www.1a-insec.net/all.atom.xml
@@ -19818,7 +19626,6 @@ https://www.adiem.com/blog-feed.xml
 https://www.adipatil.in/feed/
 https://www.adithyabalaji.com/atom.xml
 https://www.adithyan.io/atom.xml
-https://www.adithyan.io/rss.xml
 https://www.adityathebe.com/rss.xml
 https://www.adminbyaccident.com/feed/
 https://www.adrian.idv.hk/feed.xml
@@ -19841,8 +19648,6 @@ https://www.aidancooper.co.uk/rss/
 https://www.aidanwoods.com/latest.atom
 https://www.airs.com/blog/feed
 https://www.aisleone.net/atom/
-https://www.aisleone.net/feed/
-https://www.aisleone.net/rss/
 https://www.aisnakeoil.com/feed
 https://www.aiweirdness.com/rss/
 https://www.ajeetraina.com/rss/
@@ -20159,7 +19964,6 @@ https://www.bitsnbites.eu/feed/
 https://www.bitsondisk.com/feeds/all.atom.xml
 https://www.bjonnh.net/index.xml
 https://www.bjornjeffery.com/atom/
-https://www.bjornjeffery.com/feed/
 https://www.bjornjohansen.com/feed.xml
 https://www.blackplastic.co.uk/alternative-electronic-music-b?format=rss
 https://www.blakeboles.com/feed/
@@ -20228,7 +20032,6 @@ https://www.boronine.com/atom.xml
 https://www.both.org/?feed=rss2
 https://www.boucek.me/index.xml
 https://www.bozemanpass.com/atom/
-https://www.bozemanpass.com/feed/
 https://www.bradcypert.com/index.xml
 https://www.bradhussey.ca/feed/
 https://www.bradrevell.com/rss/
@@ -20400,7 +20203,6 @@ https://www.cianclarke.com/index.xml
 https://www.ciccarello.me/feed.xml
 https://www.cipv6.de/worp/index.php/feed/
 https://www.circuitvalley.com/feeds/posts/default
-https://www.circuitvalley.com/feeds/posts/default?alt=rss
 https://www.circusscientist.com/feed/
 https://www.ciroduran.com/atom.xml
 https://www.citationneeded.news/rss/
@@ -20414,7 +20216,6 @@ https://www.claudiokuenzler.com/rss.xml
 https://www.claudiu-ivan.com/rss.xml
 https://www.cleverthinkingsoftware.com/feed/
 https://www.clickworlddaily.com/feeds/posts/default
-https://www.clickworlddaily.com/feeds/posts/default?alt=rss
 https://www.clintmcmahon.com/rss/
 https://www.cloudwisp.com/rss
 https://www.cmason.com/feed.xml
@@ -20446,7 +20247,6 @@ https://www.coffeeonthekeyboard.com/rss/
 https://www.colby.so/atom.xml
 https://www.cold-takes.com/rss/
 https://www.colincornaby.me/atom/
-https://www.colincornaby.me/feed/
 https://www.colino.net/wordpress/en/feed/
 https://www.colino.net/wordpress/en/glider-for-apple-ii/feed/
 https://www.colino.net/wordpress/feed/
@@ -20555,7 +20355,6 @@ https://www.dannydutch.com/blog-feed.xml
 https://www.dannyguo.com/blog/feed.xml
 https://www.dannysalzman.com/feed.xml
 https://www.dannyvankooten.com/atom.xml
-https://www.dannyvankooten.com/feed.xml
 https://www.danritz.com/feed.xml
 https://www.danshapiro.com/blog/feed
 https://www.danstroot.com/feed.xml
@@ -20591,7 +20390,6 @@ https://www.davidbcalhoun.com/posts/index.xml
 https://www.davidbelbin.com/atom/
 https://www.davidbordwell.net/blog/feed/atom/
 https://www.daviddaly.me/feeds/posts/default
-https://www.daviddaly.me/feeds/posts/default?alt=rss
 https://www.davideaversa.it/index.xml
 https://www.davidglarson.com/feed/
 https://www.davidgodman.org/feed/
@@ -20676,7 +20474,6 @@ https://www.dmitry.ie/atom/
 https://www.dmuth.org/atom/
 https://www.doctormonk.com/feeds/posts/default
 https://www.dodgycoder.net/feeds/posts/default
-https://www.dodgycoder.net/feeds/posts/default?alt=rss
 https://www.dogan-ucar.de/feed/
 https://www.dogesec.com/feed.xml
 https://www.domainnoob.com/blog/feed/
@@ -20684,7 +20481,6 @@ https://www.domenechmilan.com/feed/
 https://www.dominikmayer.com/index.xml
 https://www.dompajak.com/atom.xml
 https://www.donnfelker.com/atom/
-https://www.donnfelker.com/rss/
 https://www.doobybrain.com/blog?format=rss
 https://www.doodlersanonymous.com/feed/
 https://www.door.link/rss.xml
@@ -20760,7 +20556,6 @@ https://www.electrospaces.net/feeds/posts/default
 https://www.elegantframework.com/feeds/feed.xml
 https://www.elephant.town/comic/rss/
 https://www.elidedbranches.com/feeds/posts/default
-https://www.elidedbranches.com/feeds/posts/default?alt=rss
 https://www.elinace.com/journal?format=rss
 https://www.eliostruyf.com/feed.xml
 https://www.elisadoucette.com/feed/
@@ -20932,7 +20727,6 @@ https://www.funkysi1701.com/index.xml
 https://www.funraniumlabs.com/feed/
 https://www.furia.com/feed.cgi?source=log
 https://www.furidamu.org/feeds/all.atom.xml
-https://www.furidamu.org/feeds/all.rss.xml
 https://www.futilitycloset.com/atom/
 https://www.futurefabric.co/blog/feed.xml
 https://www.futurile.net/feeds/all.atom.xml
@@ -21101,7 +20895,6 @@ https://www.hexkey.co.uk/lee/feed/
 https://www.heyfirst.co/rss.xml
 https://www.heyhomepage.com/feed.rss
 https://www.hezmatt.org/~mpalmer/blog/atom.xml
-https://www.hezmatt.org/~mpalmer/blog/rss.xml
 https://www.hhyu.org/index.xml
 https://www.hibberts.co.uk/feed/
 https://www.hillelwayne.com/index.xml
@@ -21114,7 +20907,6 @@ https://www.hoanthropos.com/blog?format=rss
 https://www.hoelzel.it/feed.xml
 https://www.holdfastprojects.com/feed.rss
 https://www.holm.dog/feeds/posts/default
-https://www.holm.dog/feeds/posts/default?alt=rss
 https://www.holovaty.com/rss/
 https://www.homesicktexan.com/feed/
 https://www.hootreview.com/feed/
@@ -21858,7 +21650,6 @@ https://www.mrdbourke.com/rss/
 https://www.mripard.dev/feed.xml
 https://www.mrjamiebowman.com/feed/
 https://www.mrlacey.com/feeds/posts/default
-https://www.mrlacey.com/feeds/posts/default?alt=rss
 https://www.mrmoneymustache.com/feed/
 https://www.mrripleysenchantedbooks.com/feeds/posts/default
 https://www.mrspeaker.net/feed/
@@ -22184,7 +21975,6 @@ https://www.politicalorphans.com/feed/
 https://www.ponelat.com/feed.xml
 https://www.poppastring.com/blog/feed/rss
 https://www.portlandoccupier.org/atom/
-https://www.portlandoccupier.org/rss/
 https://www.positech.co.uk/cliffsblog/feed/
 https://www.potaroo.net/rss.xml
 https://www.potato.horse/rss.xml
@@ -22579,11 +22369,9 @@ https://www.skrasser.com/feed.xml
 https://www.skullsecurity.org/feed
 https://www.skushagra.com/feeds/posts/default
 https://www.skymania.com/atom/
-https://www.skymania.com/rss/
 https://www.slashgeek.net/feed/
 https://www.slavoglinsky.com/atom/
 https://www.sledgeworx.io/atom/
-https://www.sledgeworx.io/feed/
 https://www.sleuthsayers.org/feeds/posts/default
 https://www.sligocki.com/feed.xml
 https://www.sloww.co/feed/
@@ -22909,7 +22697,6 @@ https://www.tinytransistors.net/feed/
 https://www.tjmaher.com/feeds/posts/default
 https://www.tjvantoll.com/feed.xml
 https://www.tkkader.com/atom/
-https://www.tkkader.com/feed/
 https://www.tmwhere.com/posts/index.xml
 https://www.tnhh.net/feed.xml
 https://www.tobias-franke.eu/rss/index.xml
@@ -23102,7 +22889,6 @@ https://www.willsroot.io/atom.xml
 https://www.willwhang.dev/feed.xml
 https://www.windsortowncrier.com/feed/
 https://www.windytan.com/feeds/posts/default
-https://www.windytan.com/feeds/posts/default?alt=rss
 https://www.wingolog.org/feed/atom
 https://www.winstoncooke.com/blog/atom.xml
 https://www.wintermute.org/rss.xml
@@ -23134,7 +22920,6 @@ https://www.yachtmollymawk.com/feed/
 https://www.yaoyuyang.com/feed.xml
 https://www.yared.com/atom.xml
 https://www.yared.com/feeds/posts/default
-https://www.yared.com/feeds/posts/default?alt=rss
 https://www.yartykim.com/feed/
 https://www.yashsingh.us/feed.xml
 https://www.yauh.de/feed.xml
@@ -23185,7 +22970,6 @@ https://www.zpub.com/feed/
 https://www.zsolt.blog/feeds/posts/default
 https://www.zubach.com/rss.xml
 https://www.zufallsheld.de/feeds/all.atom.xml
-https://www.zufallsheld.de/feeds/all.rss.xml
 https://www.zumsteg.net/feed/
 https://www.zuzana-k.com/feed
 https://www.zylstra.org/blog/feed/
@@ -23223,7 +23007,6 @@ https://xeon.me/index.xml
 https://xer0x.in/feed/
 https://xeres.io/atom/
 https://xeroxnostalgia.com/atom/
-https://xeroxnostalgia.com/feed/
 https://xiam.dev/rss/
 https://xianblog.wordpress.com/feed/
 https://xieyonglin.com/blog/atom.xml
