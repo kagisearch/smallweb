@@ -6,6 +6,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
+  <meta property="og:title" content="Kagi Small Web">
+  <meta property="og:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
+  <meta property="og:image" content="{{ url_for('static', filename='HumanWeb.png', _external=True) }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kagi Small Web">
+  <meta name="twitter:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='HumanWeb.png', _external=True) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
@@ -68,9 +77,10 @@
         </div>
 
       </div>
+
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
-        <span id="author" title="author">{{author}}</span> @ 
+        <span id="author" title="author">{{author}}</span> @
       {% endif %}
 
       <a href="{{url}}">{{short_url}}</a>
@@ -80,33 +90,18 @@
         <a class="phone" href="{{url}}">{{domain}}</a>
 
       </div>
-      
-    </div>
-    <div class="middle">
-      <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
 
-      
-      <!-- Note Popup 
-      <div class="popup-container">
-        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
-        <input type="radio" id="note-popup" name="popup" class="popup-radio">
-        <div class="popup">
-          {% for note, timestamp in notes_list %}
-            <div class="note {% if loop.index % 2 == 0 %}alternate{% endif %}">
-              <span class="note-time">({{ timestamp|time_ago }})</span> {{ note }}
-            </div>
-          {% endfor %}
-          <form action="{{ prefix }}note" method="post">
-            <p style="text-align:left">Got thoughts on this post? Share them in a public note.</p>
-            <textarea name="note_content" class="note-textarea"></textarea>
-            <input type="hidden" name="url" value="{{ url }}" />
-            <button type="submit" class="button ok-button">Submit</button>
-            <label for="close-popup" class="button cancel-button">Cancel</label>
-          </form>
+      <form action="{{ prefix }}" method="get" id="search-form">
+        <div class="search-container">
+          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input">
+          {% if search_query %}
+          <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
+          {% endif %}
         </div>
-      </div>
-      -->
-     
+        <!-- Add a visually hidden submit button for accessibility and explicit submission -->
+        <button type="submit" style="display: none;" aria-hidden="true">Search</button>
+      </form>
+
       <!-- Share Popup -->
       <div class="popup-container">
         <label for="spread-love" class="popup-link" title="Share this post">Share</label>
@@ -132,7 +127,8 @@
           <label for="close-popup" class="sbutton cancel-button">Cancel</label>
         </div>
       </div>
-       <!-- Flag Popup -->
+
+      <!-- Flag Popup -->
       <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
         <input type="hidden" name="url" value="{{ url }}">
         <button title="Flag this post"
@@ -141,6 +137,32 @@
                 onclick="return confirm('Are you sure you want to flag this post?');">
                 Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
       </form>
+
+    </div>
+    <div class="middle">
+      <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
+
+      
+      <!-- Note Popup 
+      <div class="popup-container">
+        <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
+        <input type="radio" id="note-popup" name="popup" class="popup-radio">
+        <div class="popup">
+          {% for note, timestamp in notes_list %}
+            <div class="note {% if loop.index % 2 == 0 %}alternate{% endif %}">
+              <span class="note-time">({{ timestamp|time_ago }})</span> {{ note }}
+            </div>
+          {% endfor %}
+          <form action="{{ prefix }}note" method="post">
+            <p style="text-align:left">Got thoughts on this post? Share them in a public note.</p>
+            <textarea name="note_content" class="note-textarea"></textarea>
+            <input type="hidden" name="url" value="{{ url }}" />
+            <button type="submit" class="button ok-button">Submit</button>
+            <label for="close-popup" class="button cancel-button">Cancel</label>
+          </form>
+        </div>
+      </div>
+      -->
 
       {% if current_mode==1 %} 
         <a id="switch"  href="{{ prefix }}">Web</a>
@@ -167,16 +189,6 @@
           <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0121 12.79z"/>
         </svg>
       </button>
-       <form action="{{ prefix }}" method="get" id="search-form">
-        <div class="search-container">
-          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" style="width: 100px;">
-          {% if search_query %}
-          <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
-          {% endif %}
-        </div>
-        <!-- Add a visually hidden submit button for accessibility and explicit submission -->
-        <button type="submit" style="display: none;" aria-hidden="true">Search</button>
-      </form>
        <a href="https://kagi.com" title="Visit Kagi"><img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif"></a>
        <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository">Contribute</a>
        <div class="popup-container">
@@ -214,15 +226,11 @@ href="https://github.com/kagisearch/smallweb#small-web">our sources</a>
 or check if your blog is in the <a class="container-link" href="https://github.com/kagisearch/smallweb/blob/main/smallweb.txt">list</a>. You'll also
 encounter these pages now in <a class="container-link" href="https://kagi.com">Kagi search</a> when you're looking for something relevant.</p>
 <p>Hit 'Next Post' to read something new. We only show posts from the last
-seven days to keep it fresh. Feel like saying thanks or jotting down a thought? Use 'Appreciation' and 'Notes'. They'll be around for about a week, but hey, it's a way to say "hi" to someone else out here.
-</p>
-<p>Find a cool site or spot something sketchy? Use 'Report/Add Site' to help
-curate the feed. 
+seven days or so to keep it fresh. 
 </p>
 <p>
 And yep, this whole thing is <a class="container-link"
-href="https://github.com/kagisearch/smallweb">open-source</a>. Oh, and no JavaScript on our
-end.</p>
+href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
 <p>---</p>
 <p>So, what do you say? Ready to meet some neighbors? 
 <br/><br/></p>
@@ -234,6 +242,7 @@ end.</p>
     <a href="https://kagi.com"><img id="logo" src="{{ url_for('static', filename='doggo_px.png') }}" alt="Kagi Doggo
     mascot"/></a>
   </div>
+  
   {% if no_results %}
     <div id="content" class="no-results" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: calc(100vh - 60px);">
       <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No results found for "{{ search_query }}"</h2>
@@ -273,6 +282,7 @@ end.</p>
       referrerpolicy="no-referrer"
       style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
   {% endif %}
+  
 <script>
 (() => {                 // IIFE – keeps global scope clean
   const CSS_ID  = "global-dark-mode-style";
@@ -360,5 +370,8 @@ end.</p>
   );
 })();
 </script>
+
+
+
 </body>
 </html>

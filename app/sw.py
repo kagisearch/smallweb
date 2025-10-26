@@ -6,13 +6,14 @@ from flask import (
     redirect,
     render_template,
     Response,
+    jsonify,
 )
 from html import escape
 import feedparser
 import feedparser
 from apscheduler.schedulers.background import BackgroundScheduler
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 from urllib.parse import urlencode
 import atexit
@@ -21,6 +22,8 @@ import time
 from urllib.parse import urlparse
 from feedwerk.atom import AtomFeed
 from collections import OrderedDict
+import uuid
+import json
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None          # will hold generated OPML xml
@@ -94,6 +97,8 @@ def time_ago(timestamp):
         return f"{int(seconds // 86400)} days"
 
 
+
+
 random.seed(time.time())
 
 
@@ -119,7 +124,9 @@ def update_all():
         new_entries = update_entries(url + "?nso")  # no same origin sites feed
 
         if not bool(urls_cache) or bool(new_entries):
-            urls_cache = new_entries
+            # Filter out YouTube URLs from main feed
+            urls_cache = [entry for entry in new_entries
+                         if "youtube.com" not in entry[0] and "youtu.be" not in entry[0]]
 
         new_entries = update_entries(url + "?yt")  # youtube sites
 
@@ -133,29 +140,30 @@ def update_all():
             urls_gh_cache = new_entries
 
         new_entries = update_entries(url + "?comic")  # comic sites
-        
+
         if not bool(urls_comic_cache) or bool(new_entries):
             # Filter entries that have images in content
             urls_comic_cache = [
-                entry for entry in new_entries 
+                entry for entry in new_entries
                 if entry[3] and ('<img' in entry[3] or '.png' in entry[3] or '.jpg' in entry[3] or '.jpeg' in entry[3])
             ]
-        
+
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
         favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
-        
+
         # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
         urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
                           if e[0] in favorites_dict]
-        
+
         # Generate the appreciated feed
         generate_appreciated_feed()
 
         # ---- NEW: update cached OPML ----
         global opml_cache
         opml_cache = generate_opml_feed()
-       
+
+
     except:
         print("something went wrong during update_all")
     finally:
@@ -193,6 +201,7 @@ def update_entries(url):
         cache = [
             (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"])
             for entry in formatted_entries
+            if entry["link"].startswith("https://")  # Only allow https:// URLs for iframe embedding
         ]
         print(len(cache), "entries")
         return cache
@@ -329,8 +338,10 @@ def index():
 
     if "youtube.com" in short_url:
         parsed_url = urlparse(url)
-        videoid = parse_qs(parsed_url.query)["v"][0]
-        current_mode = 1
+        query_params = parse_qs(parsed_url.query)
+        if "v" in query_params:
+            videoid = query_params["v"][0]
+            current_mode = 1
 
     # get favorites
     reactions_dict = favorites_dict.get(url, OrderedDict())
@@ -349,6 +360,7 @@ def index():
 
     # get flagged content
     flag_content_count = flagged_content_dict.get(url, 0)
+    
 
     if url.startswith("http://"):
         url = url.replace(
@@ -425,14 +437,13 @@ def favorite():
         # Regenerate the appreciated feed
         generate_appreciated_feed()
 
-        # Save to disk
-        if (datetime.now() - time_saved_favorites).total_seconds() > 60:
-            time_saved_favorites = datetime.now()
-            try:
-                with open(PATH_FAVORITES, "wb") as file:
-                    pickle.dump(favorites_dict, file)
-            except:
-                print("can not write fav file")
+        # Save to disk immediately (multi-instance deployment requires immediate persistence)
+        time_saved_favorites = datetime.now()
+        try:
+            with open(PATH_FAVORITES, "wb") as file:
+                pickle.dump(favorites_dict, file)
+        except:
+            print("can not write fav file")
 
         # Preserve all query parameters except 'url'
         query_params = request.args.copy()
@@ -530,6 +541,9 @@ def opml():
         opml_cache = generate_opml_feed()
     return Response(opml_cache, mimetype="text/x-opml+xml")
 
+
+
+
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
 time_saved_flagged_content = datetime.now()
@@ -579,6 +593,7 @@ except:
     print("No flagged content data found.")
 
 
+
 # get feeds
 update_all()
 
@@ -590,4 +605,30 @@ scheduler.start()
 scheduler.add_job(update_all, "interval", minutes=5)
 
 
+def save_all_data():
+    """Save all data before shutdown"""
+    print("[DEBUG] Saving all data before shutdown...")
+    try:
+        with open(PATH_FAVORITES, "wb") as file:
+            pickle.dump(favorites_dict, file)
+            print(f"[DEBUG] Saved {len(favorites_dict)} favorites")
+    except Exception as e:
+        print(f"Error saving favorites: {e}")
+    
+    try:
+        with open(PATH_NOTES, "wb") as file:
+            pickle.dump(notes_dict, file)
+            print(f"[DEBUG] Saved {len(notes_dict)} notes")
+    except Exception as e:
+        print(f"Error saving notes: {e}")
+    
+    try:
+        with open(PATH_FLAGGED, "wb") as file:
+            pickle.dump(flagged_content_dict, file)
+            print(f"[DEBUG] Saved {len(flagged_content_dict)} flagged items")
+    except Exception as e:
+        print(f"Error saving flagged content: {e}")
+    
+
+atexit.register(save_all_data)
 atexit.register(lambda: scheduler.shutdown())
