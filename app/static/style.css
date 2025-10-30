@@ -15,20 +15,24 @@ body {
   left: 0;
   width: 100%;
   background-color: #2c3e50;
-  padding: 5px;
+  padding: 8px 10px;
   z-index: 100;
   color: #ecf0f1;
   font-family: pixel, Arial, sans-serif;
   font-size: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center; 
+  align-items: center;
+  box-sizing: border-box;
 }
 
 #controls {
   display: flex;
   align-items: center;
   gap: 5px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 
 #search-form {
@@ -213,10 +217,10 @@ body {
 
 #content {
   position: fixed;
-  top: 60px;
+  top: 70px;
   left: 0;
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 70px);
   box-sizing: border-box;
 }
 
@@ -228,13 +232,13 @@ body {
 
 #content-yt {
   position: fixed;
-  top: 60px;
+  top: 70px;
   left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 70px);
   box-sizing: border-box;
 }
 
@@ -397,9 +401,47 @@ svg {
 
 
 
+@media (max-width: 1450px) {
+  #search-input {
+    width: 200px;
+  }
+
+  #header {
+    font-size: 18px;
+  }
+
+  .next-button, .ok-button {
+    font-size: 20px;
+    min-width: 90px;
+  }
+
+  #header .middle a, #header .right a, .favorite-link, .flag-link {
+    padding: 0 8px;
+  }
+}
+
 @media (max-width: 1330px) {
   .right {
     display: none;
+  }
+
+  #search-input {
+    width: 180px;
+  }
+}
+
+@media (max-width: 900px) {
+  #search-input {
+    width: 150px;
+  }
+
+  #header {
+    font-size: 16px;
+  }
+
+  .next-button {
+    min-width: 80px;
+    font-size: 18px;
   }
 }
 
@@ -407,10 +449,16 @@ svg {
   .middle {
     display: none;
   }
- .right-popup {
-   right: 0; /* Align the popup to the right side */
-   left: -220px;
- }
+
+  .right-popup {
+    right: 0;
+    left: -220px;
+  }
+
+  #search-input {
+    width: 140px;
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 960px) {
