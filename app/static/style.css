@@ -15,7 +15,7 @@ body {
   left: 0;
   width: 100%;
   background-color: #2c3e50;
-  padding: 8px 10px;
+  padding: 5px 10px;
   z-index: 100;
   color: #ecf0f1;
   font-family: pixel, Arial, sans-serif;
@@ -24,14 +24,14 @@ body {
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
+  min-height: 50px;
 }
 
 #controls {
   display: flex;
   align-items: center;
   gap: 5px;
-  flex-wrap: wrap;
-  flex: 1;
+  flex-shrink: 1;
   min-width: 0;
 }
 
@@ -217,10 +217,10 @@ body {
 
 #content {
   position: fixed;
-  top: 70px;
+  top: 60px;
   left: 0;
   width: 100%;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 60px);
   box-sizing: border-box;
 }
 
@@ -232,13 +232,13 @@ body {
 
 #content-yt {
   position: fixed;
-  top: 70px;
+  top: 60px;
   left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 60px);
   box-sizing: border-box;
 }
 
@@ -408,15 +408,27 @@ svg {
 
   #header {
     font-size: 18px;
+    padding: 6px 8px;
+  }
+
+  #controls {
+    gap: 4px;
   }
 
   .next-button, .ok-button {
-    font-size: 20px;
+    font-size: 18px;
     min-width: 90px;
+    padding: 6px !important;
   }
 
   #header .middle a, #header .right a, .favorite-link, .flag-link {
-    padding: 0 8px;
+    padding: 0 6px;
+  }
+
+  #logo {
+    width: 45px;
+    height: 38px;
+    padding-right: 20px;
   }
 }
 
@@ -426,22 +438,73 @@ svg {
   }
 
   #search-input {
-    width: 180px;
+    width: 160px;
+  }
+
+  #header {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 1100px) {
+  #search-input {
+    width: 140px;
+  }
+
+  #header {
+    font-size: 16px;
+    padding: 5px 6px;
+  }
+
+  #controls {
+    gap: 3px;
+  }
+
+  .next-button, .ok-button {
+    font-size: 17px;
+    min-width: 80px;
+    padding: 5px !important;
+  }
+
+  #logo {
+    width: 40px;
+    height: 34px;
+    padding-right: 15px;
   }
 }
 
 @media (max-width: 900px) {
   #search-input {
-    width: 150px;
+    width: 120px;
   }
 
   #header {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .next-button {
-    min-width: 80px;
-    font-size: 18px;
+    min-width: 70px;
+    font-size: 16px;
+  }
+
+  #url-display, #url-display-phone {
+    min-width: 100px !important;
+    font-size: 15px;
+  }
+
+  .emoji-badge {
+    font-size: 16px;
+    padding: 2px 6px;
+  }
+
+  #reactions {
+    gap: 4px;
+  }
+}
+
+@media (max-width: 800px) {
+  #url-display, #url-display-phone {
+    display: none !important;
   }
 }
 
@@ -481,7 +544,7 @@ svg {
 }
 
 /* Emoji reactions */
-#reactions { display:flex; align-items:center; gap:6px; }
+#reactions { display:flex; align-items:center; gap:6px; flex-shrink: 1; }
 
 .emoji-form   { display:inline-block; }
 .emoji-badge  {
@@ -490,6 +553,7 @@ svg {
   color:#ecf0f1;                        /* near-white text */
   border:none; border-radius:9999px;
   padding:2px 8px; font-size:18px; cursor:pointer;
+  white-space: nowrap;
 }
 body.dark .emoji-badge,
 .dark-mode .emoji-badge { background:transparent; color:#ecf0f1; }
