@@ -110,7 +110,7 @@ master_feed = False
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, master_feed, favorites_dict, appreciated_feed
+    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, urls_flagged_cache, master_feed, favorites_dict, appreciated_feed
 
     #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
@@ -155,6 +155,10 @@ def update_all():
         # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
         urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
                           if e[0] in favorites_dict]
+
+        # Build urls_flagged_cache from flagged entries in all caches
+        urls_flagged_cache = [e for e in (urls_cache + urls_yt_cache + urls_gh_cache + urls_comic_cache)
+                              if e[0] in flagged_content_dict]
 
         # Generate the appreciated feed
         generate_appreciated_feed()
@@ -234,7 +238,7 @@ def get_registered_domain(url):
 
 @app.route("/")
 def index():
-    global urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache
+    global urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_flagged_cache
 
     url = request.args.get("url")
     search_query = request.args.get("search", "").lower()
@@ -252,6 +256,9 @@ def index():
     elif "comic" in request.args:
         cache = urls_comic_cache
         current_mode = 4
+    elif "flagged" in request.args:
+        cache = urls_flagged_cache
+        current_mode = 5
     else:
         cache = urls_cache
 
@@ -553,6 +560,7 @@ urls_yt_cache = []
 urls_app_cache = []
 urls_gh_cache = []
 urls_comic_cache = []
+urls_flagged_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 
