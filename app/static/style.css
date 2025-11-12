@@ -58,13 +58,23 @@ body {
 
 .clear-search {
   position: absolute;
-  right: 5px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #999;
-  font-size: 18px;
-  display: none;
+  color: #666;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.clear-search:hover {
+  color: #fff;
+  background-color: #e74c3c;
 }
 
 .clear-search-button {
@@ -90,10 +100,6 @@ body {
 .no-results #url-display,
 .no-results #url-display-phone {
   display: none !important;
-}
-
-#search-input:not(:placeholder-shown) + .clear-search {
-  display: block;
 }
 
 .search-button {

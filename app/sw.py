@@ -7,6 +7,7 @@ from flask import (
     render_template,
     Response,
     jsonify,
+    make_response,
 )
 from html import escape
 import feedparser
@@ -256,7 +257,7 @@ def index():
     elif "comic" in request.args:
         cache = urls_comic_cache
         current_mode = 4
-    elif "flagged" in request.args:
+    elif "viewflagged" in request.args:
         cache = urls_flagged_cache
         current_mode = 5
     else:
@@ -505,12 +506,17 @@ def flag_content():
     global flagged_content_dict, time_saved_flagged_content
     url = request.form.get("url")
 
-    # Check if user has already flagged this URL (prevent multiple flags)
-    already_flagged = request.args.get("flagged") == url
+    # Check if user has already flagged this URL using cookie
+    flagged_urls_cookie = request.cookies.get("flagged_urls", "")
+    flagged_urls = set(flagged_urls_cookie.split("|")) if flagged_urls_cookie else set()
+    already_flagged = url in flagged_urls
 
     if url and not already_flagged:
         # Increment flagged content count
         flagged_content_dict[url] = flagged_content_dict.get(url, 0) + 1
+
+        # Add URL to user's flagged set
+        flagged_urls.add(url)
 
         # Save to disk
         if (datetime.now() - time_saved_flagged_content).total_seconds() > 60:
@@ -525,14 +531,17 @@ def flag_content():
     query_params = request.args.copy()
     if "url" in query_params:
         del query_params["url"]
-    
-    # Add flagged parameter to prevent multiple flags for the same URL
-    query_params["flagged"] = url if url else ""
+
     query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
 
-    # we do not want to redirect to same url
-    # as that allows them to flag again
-    return redirect(f"{prefix}/?{query_string}")
+    # Create response with updated cookie
+    response = make_response(redirect(f"{prefix}/?{query_string}"))
+
+    # Store flagged URLs in cookie (max 100 URLs to prevent cookie size issues)
+    flagged_urls_list = list(flagged_urls)[-100:]
+    response.set_cookie("flagged_urls", "|".join(flagged_urls_list), max_age=31536000)  # 1 year
+
+    return response
 
 
 @app.route("/appreciated")
@@ -591,7 +600,7 @@ try:
 except:
     print("No notes data found.")
 
-flagged_content_dict = {}  # Dictionary to store favorites count
+flagged_content_dict = {}  # Dictionary to store flagged content count
 
 try:
     with open(PATH_FLAGGED, "rb") as file:
@@ -599,7 +608,6 @@ try:
         print("Loaded flagged content", len(flagged_content_dict))
 except:
     print("No flagged content data found.")
-
 
 
 # get feeds
