@@ -524,9 +524,32 @@ svg {
     left: -220px;
   }
 
+  .popup-container:has(label[for="spread-love"]),
+  .flag-link {
+    display: none !important;
+  }
+
   #search-input {
-    width: 105px;
+    width: 100%;
     font-size: 16px;
+  }
+
+  .right-popup-container.about {
+    padding: 0 2px !important;
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  .next-button {
+    min-width: 60px;
+    font-size: 14px;
+    margin-right: 5px;
+  }
+}
+
+@media (max-width: 400px) {
+  #search-form {
+    display: none !important;
   }
 }
 
