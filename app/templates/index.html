@@ -8,13 +8,13 @@
   <title>Kagi Small Web</title>
   <meta property="og:title" content="Kagi Small Web">
   <meta property="og:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
-  <meta property="og:image" content="{{ url_for('static', filename='HumanWeb.png', _external=True) }}">
+  <meta property="og:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ request.url }}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Kagi Small Web">
   <meta name="twitter:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
-  <meta name="twitter:image" content="{{ url_for('static', filename='HumanWeb.png', _external=True) }}">
+  <meta name="twitter:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
@@ -142,8 +142,8 @@
     <div class="middle">
       <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
 
-      
-      <!-- Note Popup 
+
+      <!-- Note Popup
       <div class="popup-container">
         <label for="note-popup" class="popup-link">{{ 'Notes' if notes_count else 'Note' }}{{ ' (' ~ notes_count ~ ')' if notes_count else '' }}</label>
         <input type="radio" id="note-popup" name="popup" class="popup-radio">
@@ -164,7 +164,7 @@
       </div>
       -->
 
-      {% if current_mode==1 %} 
+      {% if current_mode==1 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
         <a id="switch"  href="{{ prefix }}?comic">Comics</a>
@@ -177,10 +177,10 @@
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
       {% else %}
-        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>  
+        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
         <a id="switch"  href="{{ prefix }}?yt">Videos</a>
         <a id="switch"  href="{{ prefix }}?comic">Comics</a>
-      {% endif %}      
+      {% endif %}
     </div>
     <div class="right">
       <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
@@ -208,7 +208,7 @@
         </div>
       </div>
 
-    
+
 
     </div>
       <div style="padding-right:40px" class="popup-container right-popup-container about">
@@ -227,19 +227,19 @@ href="https://github.com/kagisearch/smallweb#small-web">our sources</a>
 or check if your blog is in the <a class="container-link" href="https://github.com/kagisearch/smallweb/blob/main/smallweb.txt">list</a>. You'll also
 encounter these pages now in <a class="container-link" href="https://kagi.com">Kagi search</a> when you're looking for something relevant.</p>
 <p>Hit 'Next Post' to read something new. We only show posts from the last
-seven days or so to keep it fresh. 
+seven days or so to keep it fresh.
 </p>
 <p>
 And yep, this whole thing is <a class="container-link"
 href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
 <p>---</p>
-<p>So, what do you say? Ready to meet some neighbors? 
+<p>So, what do you say? Ready to meet some neighbors?
 <br/><br/></p>
 
           </div>
         </div>
   </div>
-  
+
   {% if no_results %}
     <div id="content" class="no-results" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: calc(100vh - 60px);">
       <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No results found for "{{ search_query }}"</h2>
@@ -247,13 +247,13 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
     </div>
   {% elif current_mode == 1 %}
     <div id="content-yt">
-      <iframe 
-        width="840" 
-        height="472" 
-        src="https://www.youtube.com/embed/{{videoid}}?rel=0" 
-        title="{{title}} 
-        video" frameborder="0" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      <iframe
+        width="840"
+        height="472"
+        src="https://www.youtube.com/embed/{{videoid}}?rel=0"
+        title="{{title}}
+        video" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
         {% if flag_content_count and flag_content_count >= 5 %}
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
@@ -262,7 +262,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
     </div>
   {% else %}
     <div id="content">
-      <iframe 
+      <iframe
         src="{{url}}"
         {% if flag_content_count and flag_content_count >= 5 %}
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target=_blank>View Flagged Content</a>'
@@ -279,7 +279,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
       referrerpolicy="no-referrer"
       style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
   {% endif %}
-  
+
 <script>
 (() => {                 // IIFE – keeps global scope clean
   const CSS_ID  = "global-dark-mode-style";
