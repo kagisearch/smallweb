@@ -5,7 +5,6 @@
 (function(global) {
   'use strict';
 
-  // Default configuration (override via init())
   const DEFAULT_CONFIG = {
     metaUrl: '/smallweb/appreciated/meta',
     fullListUrl: '/smallweb/appreciated.json',
@@ -16,9 +15,7 @@
     persistKey: 'kagi_smallweb_queue_v2',
     lockKey: 'kagi_smallweb_queue_lock',
     lockTimeoutMs: 2000,
-    selectionMode: 'random',  // 'random' or 'shuffle'
     resetOnVersionChange: false,
-    allowBackgroundFetch: true,
     enableDebug: false,
   };
 
@@ -28,11 +25,8 @@
   let initialized = false;
   let onNextCallbacks = [];
 
-  // Logging
   function log(...args) {
-    if (config.enableDebug) {
-      console.log('[SmallWebQueue]', ...args);
-    }
+    if (config.enableDebug) console.log('[SmallWebQueue]', ...args);
   }
 
   function warn(...args) {
@@ -70,8 +64,6 @@
     return {
       version: null,
       items: {},
-      shuffled: [],
-      shuffleIndex: 0,
       visited_fifo: [],
       roundRobinCounter: 0,
       lastUpdated: 0,
@@ -174,7 +166,6 @@
         state.version = data.version;
         state.lastUpdated = Date.now();
         for (const item of data.urls) state.items[item.id] = item;
-        state.shuffled = shuffleArray(Object.keys(state.items));
       } else {
         mergeNewItems(data.urls, data.version);
       }
@@ -186,7 +177,6 @@
 
   function mergeNewItems(newUrls, newVersion) {
     const shownSet = new Set(state.visited_fifo);
-    for (let i = 0; i < state.shuffleIndex; i++) shownSet.add(state.shuffled[i]);
     
     const newItems = {};
     for (const item of newUrls) newItems[item.id] = item;
@@ -196,16 +186,6 @@
     state.version = newVersion;
     state.items = newItems;
     state.lastUpdated = Date.now();
-    
-    // Rebuild shuffled
-    const remainingOld = [];
-    for (let i = state.shuffleIndex; i < state.shuffled.length; i++) {
-      const id = state.shuffled[i];
-      if (newItems[id] && !shownSet.has(id)) remainingOld.push(id);
-    }
-    const shuffledNew = shuffleArray(newIds.filter(id => !remainingOld.includes(id)));
-    state.shuffled = [...remainingOld, ...shuffledNew];
-    state.shuffleIndex = 0;
     
     // Remove deleted items from FIFO
     const oldFifoLen = state.visited_fifo.length;
@@ -237,9 +217,7 @@
     
     let item = null;
     try {
-      item = config.selectionMode === 'shuffle' 
-        ? await selectNextShuffle() 
-        : await selectNextRandom();
+      item = await selectNextRandom();
       
       if (item && !state.visited_fifo.includes(item.id)) {
         addToVisited(item.id);
@@ -265,19 +243,6 @@
     
     const idx = Math.floor(Math.random() * candidates.length);
     return state.items[candidates[idx]];
-  }
-
-  async function selectNextShuffle() {
-    const visitedSet = new Set(state.visited_fifo);
-    const skipped = [];
-    
-    while (state.shuffleIndex < state.shuffled.length) {
-      const id = state.shuffled[state.shuffleIndex++];
-      if (visitedSet.has(id)) { skipped.push(id); continue; }
-      if (skipped.length > 0) state.shuffled.push(...skipped);
-      return state.items[id];
-    }
-    return await handleExhaustion();
   }
 
   async function handleExhaustion() {
@@ -344,15 +309,6 @@
     }
   }
 
-  function shuffleArray(array) {
-    const arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
-
   // Public API
   async function init(userConfig = {}) {
     if (initialized) { warn('Already initialized'); return; }
@@ -415,9 +371,7 @@
   function clearVisited() {
     if (!state) return;
     state.visited_fifo = [];
-    state.shuffleIndex = 0;
     state.roundRobinCounter = 0;
-    state.shuffled = shuffleArray(Object.keys(state.items));
     saveState();
     log('Cleared visited');
   }
