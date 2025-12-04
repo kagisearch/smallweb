@@ -16,21 +16,34 @@
   <meta name="twitter:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
   <meta name="twitter:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% if current_mode != 2 %}
+  {# Prefetch next link for non-appreciated modes (appreciated uses client-side queue) #}
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
   {% if next_doc_url %}
   <link rel="preconnect" href="{{ next_host }}"  crossorigin>
   <link rel="prefetch"  href="{{ next_doc_url }}" as="document" crossorigin>
   {% endif %}
+  {% endif %}
+  {# SmallWeb Queue module for client-side random selection (appreciated mode) #}
+  <script src="{{ url_for('static', filename='smallweb-queue.js') }}"></script>
 </head>
 
 <body>
   <div id="header">
     <div id="controls">
-      {% if not no_results and next_link %}
+      {% if not no_results %}
+      {% if current_mode == 2 %}
+      {# Appreciated mode: use client-side random selection #}
+      <a href="{{ next_link }}" class="stumble-link" id="appreciated-next-link" rel="prefetch">
+        <button class="next-button" id="appreciated-next-btn" title="Show next appreciated post">Next Post</button>
+      </a>
+      {% elif next_link %}
+      {# Other modes: use server-side random selection #}
       <a href="{{ next_link }}" class="stumble-link" rel="prefetch">
         <button class="next-button" title="Show next post">Next Post</button>
       </a>
+      {% endif %}
       {% endif %}
       <div id="reactions">
 
@@ -368,7 +381,88 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
 })();
 </script>
 
-
+{% if current_mode == 2 %}
+{# SmallWeb Queue - client-side random selection for appreciated mode #}
+<script>
+(() => {
+  'use strict';
+  
+  // Configuration (overrides defaults in smallweb-queue.js)
+  const SMALLWEB_QUEUE_CONFIG = {
+    metaUrl: '{{ prefix }}smallweb/appreciated/meta',
+    fullListUrl: '{{ prefix }}smallweb/appreciated.json',
+    checkOnNext: false,           // check version on every Next click
+    periodicCheckEnabled: false,  // periodic background checks
+    periodicCheckMinutes: 300,     // check interval (minutes)
+    checkOnExhaustion: true,      // check when all items visited
+    persistKey: 'kagi_smallweb_queue_v2',
+    selectionMode: 'random',      // 'random' or 'shuffle'
+    enableDebug: false,           // console logging
+  };
+  
+  const nextLink = document.getElementById('appreciated-next-link');
+  const nextBtn = document.getElementById('appreciated-next-btn');
+  
+  if (!nextLink || !nextBtn || typeof SmallWebQueue === 'undefined') return;
+  
+  SmallWebQueue.init(SMALLWEB_QUEUE_CONFIG).then(() => {
+    const currentUrl = '{{ url }}';
+    if (currentUrl) SmallWebQueue.markVisited(currentUrl);
+    preloadNextItem();
+  }).catch(err => console.error('[SmallWebQueue] Init failed:', err));
+  
+  let isNavigating = false;
+  
+  nextLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (isNavigating) return;
+    isNavigating = true;
+    
+    nextBtn.textContent = 'Loading...';
+    nextBtn.disabled = true;
+    
+    try {
+      const item = await SmallWebQueue.getNext();
+      if (item && item.url) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('url', item.url);
+        window.location.href = url.toString();
+      } else {
+        window.location.href = nextLink.getAttribute('href') || '{{ prefix }}?app';
+      }
+    } catch (err) {
+      console.error('[SmallWebQueue] Error:', err);
+      window.location.href = nextLink.getAttribute('href') || '{{ prefix }}?app';
+    }
+  });
+  
+  async function preloadNextItem() {
+    try {
+      const debugInfo = SmallWebQueue.getDebugInfo();
+      if (!debugInfo.initialized || debugInfo.totalItems === 0) return;
+      
+      const allItems = SmallWebQueue.getAllItems();
+      const visitedSet = new Set(debugInfo.visitedFifo);
+      
+      for (const item of allItems) {
+        if (!visitedSet.has(item.id)) {
+          const prefetchLink = document.createElement('link');
+          prefetchLink.rel = 'prefetch';
+          prefetchLink.href = item.url;
+          prefetchLink.as = 'document';
+          document.head.appendChild(prefetchLink);
+          
+          const url = new URL(window.location.href);
+          url.searchParams.set('url', item.url);
+          nextLink.setAttribute('href', url.toString());
+          break;
+        }
+      }
+    } catch (err) {}
+  }
+})();
+</script>
+{% endif %}
 
 </body>
 </html>

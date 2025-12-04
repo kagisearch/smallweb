@@ -1,5 +1,7 @@
 import pickle
 import re
+import hashlib
+import gzip
 from flask import (
     Flask,
     request,
@@ -29,9 +31,68 @@ import json
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None          # will hold generated OPML xml
 
+# Version tracking for appreciated feed (client-side random selection support)
+appreciated_version = None  # sha1 hash of sorted URLs
+appreciated_json_cache = None  # cached JSON response for /appreciated.json
+appreciated_json_gzip = None  # gzipped version of JSON response
+
 # NOTE(z64): List of emotes that can be used for favoriting.
 # Used to build the list in the template, and perform validation on the server.
 favorite_emoji_list = ["👍","😍","😀","😘","😆","😜","🫶","😂","😱","🤔","👏","🚀","🥳","🔥"]
+
+def compute_appreciated_version(urls_list):
+    """Compute sha1 hash of sorted URLs for version tracking.
+    
+    The version changes whenever the appreciated feed contents change
+    (add/remove URLs, or if the canonical ordering changes).
+    """
+    sorted_urls = sorted(entry[0] for entry in urls_list)
+    content = "\n".join(sorted_urls).encode("utf-8")
+    return hashlib.sha1(content).hexdigest()[:16]
+
+
+def generate_appreciated_json():
+    """Generate and cache JSON representation of appreciated feed.
+    
+    Response format:
+    {
+        "version": "abc123...",  # sha1 hash of sorted URLs
+        "urls": [
+            {"id": "u1", "url": "https://...", "title": "...", "author": "..."},
+            ...
+        ]
+    }
+    """
+    global appreciated_version, appreciated_json_cache, appreciated_json_gzip
+    
+    # Compute version from current appreciated list
+    appreciated_version = compute_appreciated_version(urls_app_cache)
+    
+    # Build the urls array with minimal data per item
+    urls_array = []
+    for idx, entry in enumerate(urls_app_cache):
+        url_item, title, author, description, updated = entry
+        # Generate stable ID from URL hash (consistent across restarts)
+        item_id = hashlib.sha1(url_item.encode("utf-8")).hexdigest()[:12]
+        urls_array.append({
+            "id": item_id,
+            "url": url_item,
+            "title": title or "",
+            "author": author or "",
+        })
+    
+    # Build response object
+    response_data = {
+        "version": appreciated_version,
+        "urls": urls_array,
+    }
+    
+    # Cache JSON and gzipped version
+    appreciated_json_cache = json.dumps(response_data, separators=(",", ":"))
+    appreciated_json_gzip = gzip.compress(appreciated_json_cache.encode("utf-8"))
+    
+    return appreciated_json_cache
+
 
 def generate_appreciated_feed():
     """Generate Atom feed for appreciated posts"""
@@ -50,6 +111,9 @@ def generate_appreciated_feed():
             updated=updated,
             author=author,
         )
+    
+    # Also regenerate JSON cache when feed changes
+    generate_appreciated_json()
 
 def generate_opml_feed() -> str:
     """Return OPML text that lists all cached Small-Web posts as RSS items."""
@@ -548,6 +612,86 @@ def flag_content():
 def appreciated():
     global appreciated_feed
     return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
+
+
+@app.route("/smallweb/appreciated/meta")
+def appreciated_meta():
+    """Lightweight metadata endpoint for appreciated feed.
+    
+    Returns a small JSON with version info for client-side polling.
+    Clients use this to detect when the feed has changed.
+    
+    Response:
+    {
+        "version": "abc123...",      # sha1 of sorted URLs (changes when feed changes)
+        "total_count": 123,          # number of appreciated items
+        "estimated_gzip_bytes": 1234 # approximate size of full JSON response (gzipped)
+    }
+    """
+    global appreciated_version, appreciated_json_gzip, urls_app_cache
+    
+    # Ensure cache exists
+    if appreciated_version is None:
+        generate_appreciated_json()
+    
+    meta_data = {
+        "version": appreciated_version,
+        "total_count": len(urls_app_cache),
+        "estimated_gzip_bytes": len(appreciated_json_gzip) if appreciated_json_gzip else 0,
+    }
+    
+    response = make_response(jsonify(meta_data))
+    response.headers["Cache-Control"] = "public, max-age=60"  # cache for 1 min
+    response.headers["Access-Control-Allow-Origin"] = "*"  # CORS
+    return response
+
+
+@app.route("/smallweb/appreciated.json")
+def appreciated_json():
+    """Full appreciated feed as JSON for client-side random selection.
+    
+    Returns the complete list of appreciated URLs with version info.
+    Supports ETag for conditional requests (304 Not Modified).
+    
+    Response:
+    {
+        "version": "abc123...",
+        "urls": [
+            {"id": "u1", "url": "https://...", "title": "...", "author": "..."},
+            ...
+        ]
+    }
+    """
+    global appreciated_version, appreciated_json_cache, appreciated_json_gzip
+    
+    # Ensure cache exists
+    if appreciated_json_cache is None:
+        generate_appreciated_json()
+    
+    # Check for conditional request (ETag)
+    etag = f'"{appreciated_version}"'
+    if_none_match = request.headers.get("If-None-Match")
+    if if_none_match and if_none_match == etag:
+        response = make_response("", 304)
+        response.headers["ETag"] = etag
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+    
+    # Check if client accepts gzip
+    accept_encoding = request.headers.get("Accept-Encoding", "")
+    if "gzip" in accept_encoding and appreciated_json_gzip:
+        response = make_response(appreciated_json_gzip)
+        response.headers["Content-Encoding"] = "gzip"
+    else:
+        response = make_response(appreciated_json_cache)
+    
+    response.headers["Content-Type"] = "application/json"
+    response.headers["ETag"] = etag
+    response.headers["Cache-Control"] = "public, max-age=300"  # cache for 5 min
+    response.headers["Access-Control-Allow-Origin"] = "*"  # CORS
+    response.headers["Access-Control-Expose-Headers"] = "ETag"
+    return response
+
 
 @app.route("/opml")
 @app.route(f"{prefix}/opml")
