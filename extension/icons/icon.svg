@@ -1,0 +1,17 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#1a1917"/>
+  <circle cx="64" cy="64" r="56" fill="#242220"/>
+
+  <!-- Globe/web lines -->
+  <ellipse cx="64" cy="64" rx="40" ry="40" stroke="#3a3734" stroke-width="2" fill="none"/>
+  <ellipse cx="64" cy="64" rx="40" ry="20" stroke="#3a3734" stroke-width="2" fill="none"/>
+  <ellipse cx="64" cy="64" rx="20" ry="40" stroke="#3a3734" stroke-width="2" fill="none"/>
+  <line x1="24" y1="64" x2="104" y2="64" stroke="#3a3734" stroke-width="2"/>
+  <line x1="64" y1="24" x2="64" y2="104" stroke="#3a3734" stroke-width="2"/>
+
+  <!-- Accent dot - the "small" in small web -->
+  <circle cx="64" cy="64" r="12" fill="#f0b429"/>
+  <circle cx="64" cy="64" r="8" fill="#1a1917"/>
+  <circle cx="64" cy="64" r="4" fill="#f0b429"/>
+</svg>
