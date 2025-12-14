@@ -369,9 +369,11 @@ body {
 }
 
 .right-popup {
-  right: 0; /* Align the popup to the right side */
-  left: -270px;
-  top: 41px;
+  position: fixed;
+  left: auto;
+  right: 16px;
+  top: 50px;
+  max-width: calc(100vw - 32px);
 }
 
 #header .container-link {
@@ -520,8 +522,7 @@ svg {
   }
 
   .right-popup {
-    right: 0;
-    left: -220px;
+    right: 8px;
   }
 
   .popup-container:has(label[for="spread-love"]),
@@ -561,7 +562,15 @@ svg {
 
 @media (max-width: 500px) {
   .popup {
-    width:360px;
+    width: calc(100vw - 16px);
+    max-width: 360px;
+  }
+
+  .right-popup {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: none;
   }
 }
 
