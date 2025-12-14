@@ -1,50 +1,64 @@
 # Kagi Small Web Browser Extension
 
-A browser extension that brings the Small Web discovery experience directly to your browser, without iframes.
+Discover the indie web directly in your browser. Random posts from personal blogs, YouTube creators, GitHub projects, and webcomics.
 
 ## Features
 
-- **Direct Navigation**: Sites load directly in your browser tab - no iframe restrictions
-- **Side Panel UI**: Compact, always-accessible panel for discovery
-- **Session History**: Track visited sites during your browsing session
-- **Multiple Modes**: Switch between Blogs, Videos, GitHub, and Comics
-- **Keyboard Support**: Press Space or Enter to load the next post
+- **Discover**: Random posts from curated indie content
+- **Multiple Modes**: Blogs, Appreciated, Videos, Code, Comics, Saved
+- **Reader Mode**: Clean reading experience with optional dyslexia-friendly font
+- **Text-to-Speech**: Listen to articles hands-free
+- **Save for Later**: Bookmark posts to your local collection
+- **Appreciate**: Send appreciation to content creators
+- **History**: Per-mode browsing history
+- **Keyboard Shortcuts**:
+  - `Space` - Discover next post
+  - `R` - Toggle reader mode
+  - `S` - Save/unsave post
+  - `T` - Toggle text-to-speech
+  - `D` - Toggle dyslexia font
 
 ## Installation
 
 ### Chrome
 
-1. Open `chrome://extensions/`
-2. Enable "Developer mode" (toggle in top right)
-3. Click "Load unpacked"
-4. Select the `extension` folder
+1. Download `smallweb-chrome.zip` from dist/
+2. Unzip the file
+3. Open `chrome://extensions/`
+4. Enable "Developer mode" (toggle in top right)
+5. Click "Load unpacked"
+6. Select the unzipped folder
 
 ### Firefox
 
-Firefox requires manifest v2 with `sidebar_action`. A Firefox-compatible version would need:
-- Change `manifest_version` to `2`
-- Replace `side_panel` with `sidebar_action`
-- Replace `chrome.*` APIs with `browser.*` APIs
+1. Download `smallweb-firefox.zip` from dist/
+2. Open `about:debugging#/runtime/this-firefox`
+3. Click "Load Temporary Add-on"
+4. Select the zip file or manifest.json inside
+
+## Building from Source
+
+```bash
+cd extension
+./build.sh
+```
+
+Outputs:
+- `dist/chrome/` - Chrome extension
+- `dist/firefox/` - Firefox extension
+- `dist/smallweb-chrome.zip` - Chrome distribution
+- `dist/smallweb-firefox.zip` - Firefox distribution
 
 ## Usage
 
 1. Click the extension icon to open the side panel
-2. Click "NEXT POST" to navigate to a random blog/video/project
-3. Use the mode buttons to switch content types
-4. Your session history is saved locally for easy backtracking
-
-## Why an Extension?
-
-As Chris Coyier noted, the iframe approach has limitations:
-- Some sites block iframing (X-Frame-Options/CSP)
-- URLs aren't in the address bar (can't bookmark/share easily)
-- Browser back/forward don't work as expected
-- Sites can't be added to browsing history
-
-This extension solves all of these by navigating directly to sites while providing a persistent UI panel.
+2. Click "Discover" to navigate to a random post
+3. Use mode tabs to switch content types (hover for item counts)
+4. Enable Reader Mode for distraction-free reading
+5. Save posts you want to revisit later
 
 ## Privacy
 
-- No user data is sent to any server
-- Session history is stored locally in browser storage
-- Reactions are currently local-only (future: sync with Kagi)
+- All data stored locally in browser storage
+- No tracking or analytics
+- Referrer set to kagi.com/smallweb for proper attribution

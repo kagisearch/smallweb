@@ -2,12 +2,13 @@
   "manifest_version": 3,
   "name": "Kagi Small Web",
   "version": "1.0.0",
-  "description": "Discover the indie web - random posts from personal blogs, YouTube creators, and webcomics",
+  "description": "Discover the indie web - random posts from personal blogs, YouTube creators, and webcomics. https://kagi.com/smallweb",
   "permissions": [
     "sidePanel",
     "storage",
     "tabs",
-    "scripting"
+    "scripting",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "<all_urls>"

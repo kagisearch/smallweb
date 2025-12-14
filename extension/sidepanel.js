@@ -8,9 +8,13 @@ let currentMode = 'blogs';
 let currentPost = null;
 let history = {}; // Per-mode history
 let readerModeEnabled = false;
+let dyslexiaModeEnabled = false;
+let ttsEnabled = false;
+let isSpeaking = false;
 
 // DOM Elements
 const discoverBtn = document.getElementById('nextPost');
+const postLoading = document.getElementById('postLoading');
 const postEmpty = document.getElementById('postEmpty');
 const postContent = document.getElementById('postContent');
 const postTitle = document.getElementById('postTitle');
@@ -23,30 +27,105 @@ const listLabel = document.getElementById('listLabel');
 const listItems = document.getElementById('listItems');
 const clearListBtn = document.getElementById('clearList');
 const modeTabs = document.querySelectorAll('.mode-tab');
-const openInKagiLink = document.getElementById('openInKagi');
+const openInSmallWebLink = document.getElementById('openInSmallWeb');
+const contributeBtn = document.getElementById('contributeBtn');
+const contributeModal = document.getElementById('contributeModal');
+const closeModalBtn = document.getElementById('closeModal');
+const ttsBtn = document.getElementById('ttsBtn');
+const dyslexiaBtn = document.getElementById('dyslexiaBtn');
+const shortcutsBtn = document.getElementById('shortcutsBtn');
+const shortcutsTooltip = document.getElementById('shortcutsTooltip');
 
 // Initialize - load feeds in background
 async function init() {
+  // Disable discover button while loading
+  discoverBtn.disabled = true;
+
   // Load saved state
-  const stored = await api.storage.local.get(['history', 'currentMode']);
+  const stored = await api.storage.local.get(['history', 'currentMode', 'readerModeEnabled', 'dyslexiaModeEnabled', 'ttsEnabled']);
   if (stored.history) {
     history = stored.history;
   }
   if (stored.currentMode) {
     currentMode = stored.currentMode;
   }
+  if (stored.readerModeEnabled) {
+    readerModeEnabled = true;
+    readerBtn.classList.add('active');
+    dyslexiaBtn.classList.add('visible');
+  }
+  if (stored.dyslexiaModeEnabled) {
+    dyslexiaModeEnabled = true;
+    dyslexiaBtn.classList.add('active');
+  }
+  if (stored.ttsEnabled) {
+    ttsEnabled = true;
+    ttsBtn.classList.add('active');
+  }
 
   updateModeUI();
   renderList();
 
-  // Initialize feeds and get first preload URL
-  const response = await api.runtime.sendMessage({
-    type: 'init',
-    mode: currentMode
-  });
+  // Initialize feeds (this fetches all feeds and waits)
+  try {
+    const response = await api.runtime.sendMessage({
+      type: 'init',
+      mode: currentMode
+    });
 
-  if (response?.preloadUrl) {
-    setPreload(response.preloadUrl);
+    // Hide loading state, enable button
+    postLoading.style.display = 'none';
+    discoverBtn.disabled = false;
+
+    if (response?.error) {
+      console.error('Init failed:', response.error);
+      postEmpty.style.display = 'flex';
+      showToast('Failed to load feeds', true);
+      return;
+    }
+
+    if (response?.preloadUrl) {
+      setPreload(response.preloadUrl);
+    }
+
+    // Auto-discover first post for a great first experience
+    if (response?.ready) {
+      discover();
+    } else {
+      // Feeds didn't load, show empty state - user can click Discover to retry
+      postEmpty.style.display = 'flex';
+      console.log('Init completed but no entries loaded');
+    }
+
+    // Update tooltips with counts
+    updateTabCounts();
+  } catch (error) {
+    console.error('Init error:', error);
+    postLoading.style.display = 'none';
+    discoverBtn.disabled = false;
+    postEmpty.style.display = 'flex';
+  }
+}
+
+// Update mode tab tooltips with item counts
+async function updateTabCounts() {
+  try {
+    const counts = await api.runtime.sendMessage({ type: 'getCounts' });
+    const labels = {
+      blogs: 'Blogs',
+      appreciated: 'Appreciated',
+      youtube: 'Videos',
+      github: 'Code',
+      comics: 'Comics',
+      saved: 'Saved'
+    };
+    modeTabs.forEach(tab => {
+      const mode = tab.dataset.mode;
+      const count = counts[mode] || 0;
+      tab.title = `${labels[mode]} (${count})`;
+    });
+  } catch (e) {
+    console.error('Failed to get counts:', e);
   }
 }
 
@@ -60,21 +139,12 @@ function setPreload(url) {
   });
 }
 
-// Apply reader mode with retry for slow-loading pages
-function applyReaderModeWithRetry() {
-  const delays = [800, 1500, 3000]; // Retry at 800ms, 1.5s, 3s
-  delays.forEach(delay => {
-    setTimeout(() => {
-      if (readerModeEnabled) {
-        api.runtime.sendMessage({ type: 'applyReaderMode' });
-      }
-    }, delay);
-  });
-}
-
 // Discover next post - INSTANT because post is pre-selected
 async function discover() {
   discoverBtn.classList.add('loading');
+
+  // Stop any ongoing TTS
+  stopReading();
 
   try {
     const response = await api.runtime.sendMessage({
@@ -87,15 +157,17 @@ async function discover() {
       addToHistory(currentPost);
       updatePostUI();
 
-      // Navigate immediately
+      // Navigate immediately (pass reader mode and TTS state)
       api.runtime.sendMessage({
         type: 'navigate',
-        url: currentPost.link
+        url: currentPost.link,
+        readerMode: readerModeEnabled,
+        dyslexia: dyslexiaModeEnabled
       });
 
-      // Re-apply reader mode if enabled (with retry for slow pages)
-      if (readerModeEnabled) {
-        applyReaderModeWithRetry();
+      // Start TTS after page loads (with retry)
+      if (ttsEnabled) {
+        startReadingWithRetry();
       }
 
       // Set up preload for the NEXT post
@@ -120,11 +192,13 @@ async function discover() {
 // Update post card UI
 async function updatePostUI() {
   if (!currentPost) {
+    postLoading.style.display = 'none';
     postEmpty.style.display = 'flex';
     postContent.style.display = 'none';
     return;
   }
 
+  postLoading.style.display = 'none';
   postEmpty.style.display = 'none';
   postContent.style.display = 'flex';
 
@@ -132,8 +206,8 @@ async function updatePostUI() {
   postTitle.textContent = currentPost.title || 'Untitled';
   postAuthor.textContent = currentPost.author ? `by ${currentPost.author}` : '';
 
-  // Update "Open in Kagi" link
-  openInKagiLink.href = `https://kagi.com/smallweb/?url=${encodeURIComponent(currentPost.link)}`;
+  // Update "Open in Small Web" link
+  openInSmallWebLink.href = `https://kagi.com/smallweb/?url=${encodeURIComponent(currentPost.link)}`;
 
   // Check if post is saved
   const { saved } = await api.runtime.sendMessage({
@@ -179,23 +253,35 @@ async function toggleSave() {
 
 // Toggle reader mode
 async function toggleReaderMode() {
-  const response = await api.runtime.sendMessage({
-    type: 'toggleReaderMode'
-  });
-
-  readerModeEnabled = response?.enabled || false;
+  // Toggle state immediately (optimistic update)
+  readerModeEnabled = !readerModeEnabled;
   readerBtn.classList.toggle('active', readerModeEnabled);
+  dyslexiaBtn.classList.toggle('visible', readerModeEnabled);
+  api.storage.local.set({ readerModeEnabled });
 
-  if (response?.error) {
-    showToast('Cannot enable reader mode here', true);
-  } else {
-    showToast(readerModeEnabled ? 'Reader mode on' : 'Reader mode off');
+  // Try to apply/remove - may fail if page still loading, that's okay
+  // State is saved and will apply on next navigation
+  try {
+    const response = await api.runtime.sendMessage({
+      type: 'toggleReaderMode',
+      enable: readerModeEnabled,
+      dyslexia: dyslexiaModeEnabled
+    });
+
+    if (response?.notReadable && readerModeEnabled) {
+      showToast('Page not readable', true);
+    }
+  } catch (e) {
+    // Page not ready, state will apply on next navigation
   }
 }
 
 // Appreciate current post
 async function appreciatePost() {
-  if (!currentPost) return;
+  if (!currentPost) {
+    showToast('Discover a post first', true);
+    return;
+  }
 
   appreciateBtn.classList.add('active');
 
@@ -204,9 +290,98 @@ async function appreciatePost() {
       type: 'appreciate',
       url: currentPost.link
     });
-    showToast('Appreciated!');
   } catch (error) {
     appreciateBtn.classList.remove('active');
+  }
+}
+
+// Text-to-speech - toggle persistent TTS mode
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  api.storage.local.set({ ttsEnabled });
+  ttsBtn.classList.toggle('active', ttsEnabled);
+
+  if (ttsEnabled) {
+    // Start reading current page if we have a post
+    if (currentPost) {
+      startReading();
+    }
+  } else {
+    stopReading();
+  }
+}
+
+// Stop any ongoing speech
+function stopReading() {
+  if (isSpeaking) {
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    ttsBtn.classList.remove('speaking');
+  }
+}
+
+// Start reading the current page
+async function startReading() {
+  if (!ttsEnabled || isSpeaking) return false;
+
+  // Get page content from the active tab
+  const response = await api.runtime.sendMessage({ type: 'getPageText' });
+
+  if (!response?.text || response.text.length < 50) {
+    return false; // Page may still be loading
+  }
+
+  // Truncate to reasonable length for TTS
+  const text = response.text.slice(0, 10000);
+
+  // Start speaking
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 1.0;
+  utterance.pitch = 1.0;
+
+  utterance.onstart = () => {
+    isSpeaking = true;
+    ttsBtn.classList.add('speaking');
+  };
+
+  utterance.onend = () => {
+    isSpeaking = false;
+    ttsBtn.classList.remove('speaking');
+  };
+
+  utterance.onerror = () => {
+    isSpeaking = false;
+    ttsBtn.classList.remove('speaking');
+  };
+
+  speechSynthesis.speak(utterance);
+  return true;
+}
+
+// Start reading with retry for slow-loading pages
+function startReadingWithRetry() {
+  const delays = [1500, 3000, 5000]; // Wait for page to load
+  let started = false;
+
+  delays.forEach(delay => {
+    setTimeout(async () => {
+      if (!started && ttsEnabled && !isSpeaking) {
+        const success = await startReading();
+        if (success) started = true;
+      }
+    }, delay);
+  });
+}
+
+// Toggle dyslexia-friendly font
+function toggleDyslexia() {
+  dyslexiaModeEnabled = !dyslexiaModeEnabled;
+  dyslexiaBtn.classList.toggle('active', dyslexiaModeEnabled);
+  api.storage.local.set({ dyslexiaModeEnabled });
+
+  // If reader mode is active, re-apply with new font setting
+  if (readerModeEnabled) {
+    api.runtime.sendMessage({ type: 'toggleReaderMode', enable: true, dyslexia: dyslexiaModeEnabled });
   }
 }
 
@@ -263,8 +438,9 @@ async function renderList() {
     // Show recent history for this mode
     const modeLabels = {
       blogs: 'Recent Blogs',
-      appreciated: 'Recent Liked',
+      appreciated: 'Recent Appreciated',
       youtube: 'Recent Videos',
+      github: 'Recent Code',
       comics: 'Recent Comics'
     };
     listLabel.textContent = modeLabels[currentMode] || 'Recent';
@@ -300,13 +476,19 @@ async function renderList() {
       }
 
       if (item) {
+        stopReading();
         currentPost = item;
         updatePostUI();
-        api.runtime.sendMessage({ type: 'navigate', url: item.link });
+        api.runtime.sendMessage({
+          type: 'navigate',
+          url: item.link,
+          readerMode: readerModeEnabled,
+          dyslexia: dyslexiaModeEnabled
+        });
 
-        // Re-apply reader mode if enabled
-        if (readerModeEnabled) {
-          applyReaderModeWithRetry();
+        // Start TTS after page loads
+        if (ttsEnabled) {
+          startReadingWithRetry();
         }
       }
     });
@@ -358,9 +540,7 @@ function showToast(message, isError = false) {
 
 // Escape HTML
 function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text || '';
-  return div.innerHTML;
+  return (text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // Event Listeners
@@ -369,12 +549,41 @@ clearListBtn.addEventListener('click', clearList);
 saveBtn.addEventListener('click', toggleSave);
 readerBtn.addEventListener('click', toggleReaderMode);
 appreciateBtn.addEventListener('click', appreciatePost);
+ttsBtn.addEventListener('click', toggleTTS);
+dyslexiaBtn.addEventListener('click', toggleDyslexia);
 
 modeTabs.forEach(tab => {
   tab.addEventListener('click', () => switchMode(tab.dataset.mode));
 });
 
-// Keyboard: Space to discover, R for reader mode, S to save
+// Modal handlers
+contributeBtn.addEventListener('click', () => {
+  contributeModal.classList.add('show');
+});
+
+closeModalBtn.addEventListener('click', () => {
+  contributeModal.classList.remove('show');
+});
+
+contributeModal.addEventListener('click', (e) => {
+  if (e.target === contributeModal) {
+    contributeModal.classList.remove('show');
+  }
+});
+
+// Shortcuts tooltip
+shortcutsBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  shortcutsTooltip.classList.toggle('show');
+});
+
+document.addEventListener('click', (e) => {
+  if (!shortcutsTooltip.contains(e.target) && e.target !== shortcutsBtn) {
+    shortcutsTooltip.classList.remove('show');
+  }
+});
+
+// Keyboard: Space to discover, R for reader mode, S to save, T for TTS, D for dyslexia
 document.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea')) return;
 
@@ -387,6 +596,12 @@ document.addEventListener('keydown', (e) => {
   } else if (e.code === 'KeyS') {
     e.preventDefault();
     toggleSave();
+  } else if (e.code === 'KeyT') {
+    e.preventDefault();
+    toggleTTS();
+  } else if (e.code === 'KeyD') {
+    e.preventDefault();
+    toggleDyslexia();
   }
 });
 

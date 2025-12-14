@@ -2,16 +2,18 @@
   "manifest_version": 2,
   "name": "Kagi Small Web",
   "version": "1.0.0",
-  "description": "Discover the indie web - random posts from personal blogs, YouTube creators, and webcomics",
+  "description": "Discover the indie web - random posts from personal blogs, YouTube creators, and webcomics. https://kagi.com/smallweb",
   "permissions": [
     "storage",
     "tabs",
     "activeTab",
+    "webRequest",
+    "webRequestBlocking",
     "<all_urls>"
   ],
   "background": {
     "scripts": ["browser-polyfill.js", "background.js"],
-    "persistent": false
+    "persistent": true
   },
   "sidebar_action": {
     "default_panel": "sidepanel.html",
