@@ -107,27 +107,43 @@ async function init() {
   }
 }
 
-// Update mode tab tooltips with item counts
+// Update mode tabs with item counts (shown on hover)
+const tabLabels = {
+  blogs: 'Blogs',
+  appreciated: 'Appreciated',
+  youtube: 'Videos',
+  github: 'Code',
+  comics: 'Comics',
+  saved: 'Saved'
+};
+
 async function updateTabCounts() {
   try {
     const counts = await api.runtime.sendMessage({ type: 'getCounts' });
-    const labels = {
-      blogs: 'Blogs',
-      appreciated: 'Appreciated',
-      youtube: 'Videos',
-      github: 'Code',
-      comics: 'Comics',
-      saved: 'Saved'
-    };
     modeTabs.forEach(tab => {
       const mode = tab.dataset.mode;
-      const count = counts[mode] || 0;
-      tab.title = `${labels[mode]} (${count})`;
+      tab.dataset.count = counts[mode] || 0;
+      tab.textContent = tabLabels[mode];
     });
   } catch (e) {
     console.error('Failed to get counts:', e);
   }
 }
+
+// Show count on hover
+modeTabs.forEach(tab => {
+  tab.addEventListener('mouseenter', () => {
+    const mode = tab.dataset.mode;
+    const count = tab.dataset.count;
+    if (count !== undefined) {
+      tab.textContent = `${tabLabels[mode]} (${count})`;
+    }
+  });
+  tab.addEventListener('mouseleave', () => {
+    const mode = tab.dataset.mode;
+    tab.textContent = tabLabels[mode];
+  });
+});
 
 // Prefetch next URL in the actual browser tab
 function setPreload(url) {

@@ -302,28 +302,17 @@ const readerModeScript = (dyslexia, hideFirst, removeOnly) => {
 
   // Check readability
   const isReadable = () => {
-    const results = {};
     for (const sel of ['article', 'main', '.post', '.content', '.entry', '[role="main"]']) {
       const el = document.querySelector(sel);
-      if (el) {
-        const len = el.innerText.trim().length;
-        results[sel] = len;
-        if (len > 200) return { readable: true, selector: sel, length: len };
-      }
+      if (el && el.innerText.trim().length > 200) return true;
     }
-    const bodyLen = (document.body.innerText || '').trim().length;
-    results.body = bodyLen;
-    if (bodyLen > 500) return { readable: true, selector: 'body', length: bodyLen };
-    return { readable: false, results };
+    return (document.body.innerText || '').trim().length > 500;
   };
 
-  const readableCheck = isReadable();
-  console.log('[SmallWeb] isReadable check:', readableCheck);
-
-  if (!readableCheck.readable) {
+  if (!isReadable()) {
     const h = document.getElementById(HIDE_ID);
     if (h) h.remove();
-    return { enabled: false, notReadable: true, debug: readableCheck };
+    return { enabled: false, notReadable: true };
   }
 
   // Generate CSS
@@ -421,12 +410,9 @@ async function handleMessage(message) {
       const useReader = message.readerMode === true;
       const useDyslexia = message.dyslexia === true;
 
-      console.log('[SmallWeb] navigate:', { url: message.url, useReader, useDyslexia, tabId });
-
       // Queue reader mode to apply after page loads
       if (useReader) {
         pendingReaderMode.set(tabId, { dyslexia: useDyslexia, attempts: 0 });
-        console.log('[SmallWeb] queued reader mode for tab', tabId);
       } else {
         pendingReaderMode.delete(tabId);
       }
@@ -463,9 +449,7 @@ async function handleMessage(message) {
     if (tabs[0]?.id) {
       // Frontend tells us whether to enable or disable
       const shouldEnable = message.enable;
-      console.log('[SmallWeb] manual toggle:', { shouldEnable, dyslexia: message.dyslexia });
       const result = await runInTab(tabs[0].id, readerModeScript, [message.dyslexia || false, false, !shouldEnable]);
-      console.log('[SmallWeb] manual toggle result:', result);
       return result || { enabled: false };
     }
     return { enabled: false };
@@ -513,23 +497,19 @@ async function tryApplyReaderMode(tabId) {
   if (!config) return;
 
   config.attempts++;
-  console.log('[SmallWeb] applying reader mode, attempt', config.attempts);
 
   try {
     const result = await runInTab(tabId, readerModeScript, [config.dyslexia, false, false]);
-    console.log('[SmallWeb] reader mode result:', result);
     if (result?.enabled) {
       pendingReaderMode.delete(tabId);
-      console.log('[SmallWeb] reader mode applied successfully');
       return true;
     }
   } catch (e) {
-    console.log('[SmallWeb] reader mode error:', e.message);
+    // Tab not ready yet
   }
 
   if (config.attempts >= 6) {
     pendingReaderMode.delete(tabId);
-    console.log('[SmallWeb] giving up after max attempts');
   }
   return false;
 }
@@ -538,8 +518,6 @@ async function tryApplyReaderMode(tabId) {
 api.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (!pendingReaderMode.has(tabId)) return;
   if (changeInfo.status !== 'complete') return;
-
-  console.log('[SmallWeb] onUpdated complete:', { tabId });
 
   // Try immediately, then with delays for JS-rendered content
   const success = await tryApplyReaderMode(tabId);
