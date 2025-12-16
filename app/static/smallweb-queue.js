@@ -13,8 +13,6 @@
     periodicCheckMinutes: 60,
     checkOnExhaustion: true,
     persistKey: 'kagi_smallweb_queue_v2',
-    lockKey: 'kagi_smallweb_queue_lock',
-    lockTimeoutMs: 2000,
     resetOnVersionChange: false,
     enableDebug: false,
   };
@@ -68,35 +66,6 @@
       roundRobinCounter: 0,
       lastUpdated: 0,
     };
-  }
-
-  // Multi-tab lock
-  function acquireLock() {
-    const now = Date.now();
-    const lockData = localStorage.getItem(config.lockKey);
-    
-    if (lockData) {
-      try {
-        const lock = JSON.parse(lockData);
-        if (lock.expiry > now) return false;
-      } catch (e) {}
-    }
-    
-    localStorage.setItem(config.lockKey, JSON.stringify({
-      tabId: getTabId(),
-      expiry: now + config.lockTimeoutMs,
-    }));
-    return true;
-  }
-
-  function releaseLock() {
-    localStorage.removeItem(config.lockKey);
-  }
-
-  let tabId = null;
-  function getTabId() {
-    if (!tabId) tabId = Math.random().toString(36).substring(2, 10);
-    return tabId;
   }
 
   function setupStorageListener() {
@@ -213,19 +182,15 @@
       }
     }
     
-    if (!acquireLock()) loadState();
+    // Reload state in case another tab updated it
+    loadState();
     
-    let item = null;
-    try {
-      item = await selectNextRandom();
-      
-      if (item && !state.visited_fifo.includes(item.id)) {
-        addToVisited(item.id);
-      }
-      if (item) saveState();
-    } finally {
-      releaseLock();
+    const item = await selectNextRandom();
+    
+    if (item && !state.visited_fifo.includes(item.id)) {
+      addToVisited(item.id);
     }
+    if (item) saveState();
     
     for (const cb of onNextCallbacks) {
       try { cb(item); } catch (e) { error('Callback error:', e); }
