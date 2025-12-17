@@ -265,6 +265,9 @@ async function toggleSave() {
     saveBtn.classList.add('active');
     showToast(result.alreadySaved ? 'Already saved' : 'Saved for later');
   }
+
+  // Update tab counts to reflect the change
+  updateTabCounts();
 }
 
 // Toggle reader mode
