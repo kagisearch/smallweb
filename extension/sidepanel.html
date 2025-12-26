@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Small Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="panel">
+    <!-- Hero Actions: Discover + Appreciate -->
+    <div class="hero-actions">
+      <button id="nextPost" class="discover-btn">
+        <span class="discover-text">Discover</span>
+        <svg class="discover-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+      <button id="appreciateBtn" class="appreciate-btn" title="Appreciate this post">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Current Post Card -->
+    <div class="post-card" id="postCard">
+      <!-- Loading State (shown during init) -->
+      <div class="post-loading" id="postLoading">
+        <div class="loading-spinner"></div>
+        <div class="post-loading-text">Loading feeds...</div>
+      </div>
+      <!-- Empty State (shown after init, before first discover) -->
+      <div class="post-empty" id="postEmpty" style="display: none;">
+        <div class="post-empty-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </div>
+        <div class="post-empty-text">Click Discover to find<br>a random blog post</div>
+      </div>
+      <div class="post-content" id="postContent" style="display: none;">
+        <div class="post-header">
+          <div class="post-info">
+            <div class="post-domain" id="postDomain"></div>
+            <div class="post-title" id="postTitle"></div>
+            <div class="post-author" id="postAuthor"></div>
+          </div>
+          <div class="post-actions">
+            <button class="action-btn save-btn" id="saveBtn" title="Save for later">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode Tabs -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="blogs">Blogs</button>
+      <button class="mode-tab" data-mode="appreciated">Appreciated</button>
+      <button class="mode-tab" data-mode="youtube">Videos</button>
+      <button class="mode-tab" data-mode="github">Code</button>
+      <button class="mode-tab" data-mode="comics">Comics</button>
+      <button class="mode-tab" data-mode="saved">Saved</button>
+    </div>
+
+    <!-- List Section (context-sensitive) -->
+    <div class="list-section">
+      <div class="list-header">
+        <span id="listLabel">Recent</span>
+        <button class="list-clear" id="clearList">Clear</button>
+      </div>
+      <div class="list-items" id="listItems">
+        <!-- Items added dynamically -->
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-section">
+      <div class="footer-row">
+        <div class="footer-tools">
+          <button id="ttsBtn" class="tool-btn" title="Listen (Text-to-Speech)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </button>
+          <button id="readerBtn" class="tool-btn" title="Reader Mode">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </button>
+          <button id="dyslexiaBtn" class="tool-btn dyslexia-toggle" title="Dyslexia Font">
+            <span class="dyslexia-icon">Aa</span>
+          </button>
+        </div>
+        <div class="footer-links">
+          <a href="https://kagi.com" target="_blank" class="footer-link">Kagi</a>
+          <span class="footer-divider">·</span>
+          <a id="openInSmallWeb" href="https://kagi.com/smallweb" target="_blank" class="footer-link">Small Web</a>
+          <span class="footer-divider">·</span>
+          <button id="contributeBtn" class="footer-link footer-btn">Contribute</button>
+          <span class="footer-divider">·</span>
+          <button id="shortcutsBtn" class="footer-link footer-btn" title="Keyboard shortcuts">?</button>
+        </div>
+      </div>
+
+      <!-- Shortcuts Tooltip -->
+      <div id="shortcutsTooltip" class="shortcuts-tooltip">
+        <div class="shortcuts-title">Keyboard Shortcuts</div>
+        <div class="shortcut-row"><kbd>Space</kbd> <span>Discover next post</span></div>
+        <div class="shortcut-row"><kbd>R</kbd> <span>Toggle reader mode</span></div>
+        <div class="shortcut-row"><kbd>S</kbd> <span>Save/unsave post</span></div>
+        <div class="shortcut-row"><kbd>T</kbd> <span>Listen (TTS)</span></div>
+        <div class="shortcut-row"><kbd>D</kbd> <span>Dyslexia font</span></div>
+      </div>
+    </div>
+
+    <!-- Contribute Modal -->
+    <div id="contributeModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Contribute to Small Web</h3>
+          <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Guidelines:</strong></p>
+          <ul>
+            <li>Submit RSS feeds of personal blogs only</li>
+            <li>Content must be in English</li>
+            <li>No ads, popups, or affiliate links</li>
+            <li>Must have a post within last 12 months</li>
+            <li>No AI/LLM generated content</li>
+            <li>Submit 2 other sites if adding your own</li>
+          </ul>
+          <p class="modal-note">For YouTube: max 400k subs, max 2 posts/week</p>
+        </div>
+        <div class="modal-actions">
+          <a href="https://github.com/kagisearch/smallweb/edit/main/smallweb.txt" target="_blank" class="modal-btn">Add Blog</a>
+          <a href="https://github.com/kagisearch/smallweb/edit/main/smallyt.txt" target="_blank" class="modal-btn">Add YouTube</a>
+          <a href="https://github.com/kagisearch/smallweb/edit/main/smallcomic.txt" target="_blank" class="modal-btn">Add Comic</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
