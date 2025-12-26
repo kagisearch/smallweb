@@ -614,38 +614,6 @@ def appreciated():
     return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
 
 
-@app.route("/smallweb/appreciated/meta")
-def appreciated_meta():
-    """Lightweight metadata endpoint for appreciated feed.
-    
-    Returns a small JSON with version info for client-side polling.
-    Clients use this to detect when the feed has changed.
-    
-    Response:
-    {
-        "version": "abc123...",      # sha1 of sorted URLs (changes when feed changes)
-        "total_count": 123,          # number of appreciated items
-        "estimated_gzip_bytes": 1234 # approximate size of full JSON response (gzipped)
-    }
-    """
-    global appreciated_version, appreciated_json_gzip, urls_app_cache
-    
-    # Ensure cache exists
-    if appreciated_version is None:
-        generate_appreciated_json()
-    
-    meta_data = {
-        "version": appreciated_version,
-        "total_count": len(urls_app_cache),
-        "estimated_gzip_bytes": len(appreciated_json_gzip) if appreciated_json_gzip else 0,
-    }
-    
-    response = make_response(jsonify(meta_data))
-    response.headers["Cache-Control"] = "public, max-age=60"  # cache for 1 min
-    response.headers["Access-Control-Allow-Origin"] = "*"  # CORS
-    return response
-
-
 @app.route("/smallweb/appreciated.json")
 def appreciated_json():
     """Full appreciated feed as JSON for client-side random selection.

@@ -389,14 +389,12 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
   
   // Configuration (overrides defaults in smallweb-queue.js)
   const SMALLWEB_QUEUE_CONFIG = {
-    metaUrl: '{{ prefix }}smallweb/appreciated/meta',
     fullListUrl: '{{ prefix }}smallweb/appreciated.json',
-    checkOnNext: false,           // check version on every Next click
-    periodicCheckEnabled: false,  // periodic background checks
-    periodicCheckMinutes: 300,     // check interval (minutes)
+    enablePeriodicResetQueue: true,  // periodic reset queue checks
+    periodicResetQueueMinutes: 720,     // check interval (minutes)
     checkOnExhaustion: true,      // check when all items visited
     persistKey: 'kagi_smallweb_queue_v2',
-    enableDebug: false,           // console logging
+    enableDebug: false,            // console logging
   };
   
   const nextLink = document.getElementById('appreciated-next-link');
@@ -404,9 +402,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
   
   if (!nextLink || !nextBtn || typeof SmallWebQueue === 'undefined') return;
   
-  SmallWebQueue.init(SMALLWEB_QUEUE_CONFIG).then(() => {
-    const currentUrl = '{{ url }}';
-    if (currentUrl) SmallWebQueue.markVisited(currentUrl);
+  SmallWebQueue.init(SMALLWEB_QUEUE_CONFIG, '{{ url }}').then(() => {
     preloadNextItem();
   }).catch(err => console.error('[SmallWebQueue] Init failed:', err));
   

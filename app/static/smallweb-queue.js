@@ -6,14 +6,11 @@
   'use strict';
 
   const DEFAULT_CONFIG = {
-    metaUrl: '/smallweb/appreciated/meta',
     fullListUrl: '/smallweb/appreciated.json',
-    checkOnNext: false,
-    periodicCheckEnabled: false,
-    periodicCheckMinutes: 60,
+    enablePeriodicResetQueue: true,
+    periodicResetQueueMinutes: 720,
     checkOnExhaustion: true,
     persistKey: 'kagi_smallweb_queue_v2',
-    resetOnVersionChange: false,
     enableDebug: false,
   };
 
@@ -41,7 +38,19 @@
       const stored = localStorage.getItem(config.persistKey);
       if (stored) {
         state = JSON.parse(stored);
-        log('Loaded state:', state.version, 'items:', Object.keys(state.items || {}).length, 'visited:', state.visited_fifo?.length || 0);
+
+        // Validate and clean up loaded state
+        if (state && state.items && state.visited_fifo) {
+          const originalFifoLen = state.visited_fifo.length;
+
+          // Remove invalid entries (non-existent item IDs) and deduplicate
+          const seen = new Set();
+          state.visited_fifo = state.visited_fifo.filter(id => {
+            if (!state.items[id] || seen.has(id)) return false;
+            seen.add(id);
+            return true;
+          });
+        }
         return true;
       }
     } catch (e) {
@@ -71,22 +80,12 @@
   function setupStorageListener() {
     window.addEventListener('storage', (event) => {
       if (event.key === config.persistKey) {
-        log('State updated by another tab');
         loadState();
       }
     });
   }
 
   // API calls
-  async function fetchMeta() {
-    const response = await fetch(config.metaUrl, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-    });
-    if (!response.ok) throw new Error(`Meta fetch failed: ${response.status}`);
-    return await response.json();
-  }
-
   async function fetchFullList(currentEtag = null) {
     const headers = {
       'Accept': 'application/json',
@@ -102,22 +101,18 @@
     if (!response.ok) throw new Error(`Full list fetch failed: ${response.status}`);
     
     const data = await response.json();
-    log('Fetched', data.urls.length, 'items');
     return { notModified: false, version: data.version, urls: data.urls };
   }
 
   // Version checking
   async function maybeRefreshMeta() {
     try {
-      log('Checking version...');
-      const meta = await fetchMeta();
-      
-      if (!state || state.version !== meta.version) {
-        log('Version changed:', state?.version, '->', meta.version);
-        await refreshFullList();
+      const data = await fetchFullList(state?.version);
+
+      if (!data.notModified) {
+        await resetQueueCompletely();
         return true;
       }
-      log('Version unchanged');
       return false;
     } catch (e) {
       error('Version check failed:', e);
@@ -125,73 +120,24 @@
     }
   }
 
-  async function refreshFullList() {
-    try {
-      const data = await fetchFullList(state?.version);
-      if (data.notModified) return;
-      
-      if (config.resetOnVersionChange || !state) {
-        state = createEmptyState();
-        state.version = data.version;
-        state.lastUpdated = Date.now();
-        for (const item of data.urls) state.items[item.id] = item;
-      } else {
-        mergeNewItems(data.urls, data.version);
-      }
-      saveState();
-    } catch (e) {
-      error('Refresh failed:', e);
-    }
-  }
-
-  function mergeNewItems(newUrls, newVersion) {
-    const shownSet = new Set(state.visited_fifo);
-    
-    const newItems = {};
-    for (const item of newUrls) newItems[item.id] = item;
-    
-    const newIds = Object.keys(newItems).filter(id => !shownSet.has(id));
-    
-    state.version = newVersion;
-    state.items = newItems;
-    state.lastUpdated = Date.now();
-    
-    // Remove deleted items from FIFO
-    const oldFifoLen = state.visited_fifo.length;
-    state.visited_fifo = state.visited_fifo.filter(id => newItems[id]);
-    state.roundRobinCounter = 0;
-    
-    log('Merged: total:', Object.keys(state.items).length, 'new:', newIds.length, 'removed from FIFO:', oldFifoLen - state.visited_fifo.length);
-  }
-
-  async function forceRefresh() {
-    state = createEmptyState();
-    await refreshFullList();
-    return state;
-  }
 
   // Selection logic
   async function getNext() {
-    if (config.checkOnNext) await maybeRefreshMeta();
-    
+
     if (!state || Object.keys(state.items).length === 0) {
-      await refreshFullList();
-      if (!state || Object.keys(state.items).length === 0) {
-        warn('No items available');
-        return null;
-      }
+      warn('No items available');
+      return null;
     }
-    
+
     // Reload state in case another tab updated it
     loadState();
-    
+
     const item = await selectNextRandom();
-    
     if (item && !state.visited_fifo.includes(item.id)) {
       addToVisited(item.id);
     }
     if (item) saveState();
-    
+
     for (const cb of onNextCallbacks) {
       try { cb(item); } catch (e) { error('Callback error:', e); }
     }
@@ -201,9 +147,7 @@
   async function selectNextRandom() {
     const visitedSet = new Set(state.visited_fifo);
     const candidates = Object.keys(state.items).filter(id => !visitedSet.has(id));
-    
-    log('Selection: total:', Object.keys(state.items).length, 'visited:', state.visited_fifo.length, 'candidates:', candidates.length);
-    
+        
     if (candidates.length === 0) return await handleExhaustion();
     
     const idx = Math.floor(Math.random() * candidates.length);
@@ -213,24 +157,24 @@
   async function handleExhaustion() {
     const totalItems = Object.keys(state.items).length;
     if (typeof state.roundRobinCounter !== 'number') state.roundRobinCounter = 0;
-    
-    log('Exhaustion: FIFO:', state.visited_fifo.length, 'total:', totalItems, 'round-robin:', state.roundRobinCounter);
-    
+        
     const shouldFetch = state.roundRobinCounter === 0 || state.roundRobinCounter >= totalItems;
     
     if (shouldFetch && config.checkOnExhaustion) {
-      log('Fetching new items (', state.roundRobinCounter === 0 ? 'first exhaustion' : 'full rotation', ')');
       state.roundRobinCounter = 0;
       const refreshed = await maybeRefreshMeta();
       
       if (refreshed) {
-        const visitedSet = new Set(state.visited_fifo);
-        const newCandidates = Object.keys(state.items).filter(id => !visitedSet.has(id));
-        if (newCandidates.length > 0) {
-          state.roundRobinCounter = 0;
-          const idx = Math.floor(Math.random() * newCandidates.length);
+        // Version changed - queue was reset, re-initialize immediately
+        await init();
+        // Now we have fresh state, get a random item from the new data
+        const allItems = Object.keys(state.items);
+        if (allItems.length > 0) {
+          const idx = Math.floor(Math.random() * allItems.length);
+          const selectedId = allItems[idx];
+          addToVisited(selectedId);
           saveState();
-          return state.items[newCandidates[idx]];
+          return state.items[selectedId];
         }
       }
     }
@@ -242,7 +186,6 @@
     state.visited_fifo.push(oldestId);
     state.roundRobinCounter++;
     
-    log('Round-robin:', state.roundRobinCounter, '/', totalItems);
     saveState();
     return state.items[oldestId];
   }
@@ -251,23 +194,20 @@
     const existingIdx = state.visited_fifo.indexOf(id);
     if (existingIdx !== -1) state.visited_fifo.splice(existingIdx, 1);
     state.visited_fifo.push(id);
-    log('Added to FIFO:', state.visited_fifo.length, '/', Object.keys(state.items).length);
   }
 
   // Periodic checking
-  function startPeriodicCheck() {
-    if (!config.periodicCheckEnabled) return;
+  function startPeriodicReset() {
+    if (!config.enablePeriodicResetQueue) return;
     if (periodicTimer) clearInterval(periodicTimer);
-    
-    const intervalMs = config.periodicCheckMinutes * 60 * 1000;
+
+    const intervalMs = config.periodicResetQueueMinutes * 60 * 1000;
     periodicTimer = setInterval(async () => {
-      log('Periodic check');
-      await maybeRefreshMeta();
+      await resetQueueCompletely();
     }, intervalMs);
-    log('Periodic check started:', config.periodicCheckMinutes, 'min');
   }
 
-  function stopPeriodicCheck() {
+  function stopPeriodicReset() {
     if (periodicTimer) {
       clearInterval(periodicTimer);
       periodicTimer = null;
@@ -275,23 +215,48 @@
   }
 
   // Public API
-  async function init(userConfig = {}) {
-    if (initialized) { warn('Already initialized'); return; }
-    
-    config = { ...DEFAULT_CONFIG, ...userConfig };
-    log('Init with config:', config);
-    
-    setupStorageListener();
-    
-    if (!loadState()) {
-      log('No saved state, fetching...');
-      state = createEmptyState();
-      await refreshFullList();
+  async function init(userConfig = {}, currentUrl = null) {
+    // If already initialized and we have state, don't re-initialize
+    if (initialized && state) {
+      return;
     }
-    
-    startPeriodicCheck();
+
+    config = { ...DEFAULT_CONFIG, ...userConfig };
+    setupStorageListener();
+
+    // Check if state exists in localStorage (persistent across page loads)
+    const hasExistingState = loadState();
+
+    if (!hasExistingState) {
+      const data = await fetchFullList();
+      state = createEmptyState();
+      state.version = data.version;
+      state.lastUpdated = Date.now();
+      for (const item of data.urls) state.items[item.id] = item;
+      startPeriodicReset();
+      saveState();
+    } else {
+      // Check if we need to reset due to time-based reset (window was closed during reset period)
+      const timeSinceLastUpdate = Date.now() - (state.lastUpdated || 0);
+      const resetIntervalMs = config.periodicResetQueueMinutes * 60 * 1000;
+
+      if (config.enablePeriodicResetQueue && timeSinceLastUpdate >= resetIntervalMs) {
+        await resetQueueCompletely();
+        // After reset, we need to re-initialize
+        const data = await fetchFullList();
+        state = createEmptyState();
+        state.version = data.version;
+        state.lastUpdated = Date.now();
+        for (const item of data.urls) state.items[item.id] = item;
+        saveState();
+      }
+    }
+
+    // Mark current URL as visited if provided (for page load scenario)
+    if (currentUrl) {
+      markVisited(currentUrl);
+    }
     initialized = true;
-    log('Initialized: items:', Object.keys(state.items).length, 'visited:', state.visited_fifo.length);
   }
 
   function getDebugInfo() {
@@ -325,20 +290,35 @@
 
   function markVisited(idOrUrl) {
     if (!state) return;
-    let id = idOrUrl;
-    for (const [itemId, item] of Object.entries(state.items)) {
-      if (item.url === idOrUrl) { id = itemId; break; }
+
+    // First try to find by ID
+    if (state.items[idOrUrl]) {
+      addToVisited(idOrUrl);
+      saveState();
+      return;
     }
-    addToVisited(id);
-    saveState();
+
+    // Then try to find by URL
+    for (const [itemId, item] of Object.entries(state.items)) {
+      if (item.url === idOrUrl) {
+        addToVisited(itemId);
+        saveState();
+        return;
+      }
+    }
+
+    // If not found, log warning but don't add to FIFO
+    console.warn('markVisited: URL not found in queue items:', idOrUrl);
   }
 
-  function clearVisited() {
-    if (!state) return;
-    state.visited_fifo = [];
-    state.roundRobinCounter = 0;
-    saveState();
-    log('Cleared visited');
+  async function resetQueueCompletely() {
+  
+    // Clear all localStorage data for this queue
+    localStorage.removeItem(config.persistKey);
+
+    // Reset all global state variables
+    state = null;
+    initialized = false;
   }
 
   function getVersion() { return state?.version || null; }
@@ -357,18 +337,17 @@
   }
 
   function updateConfig(newConfig) {
-    const oldPeriodic = config.periodicCheckEnabled;
-    const oldMinutes = config.periodicCheckMinutes;
+    const oldPeriodic = config.enablePeriodicResetQueue;
+    const oldMinutes = config.periodicResetQueueMinutes;
     config = { ...config, ...newConfig };
-    if (config.periodicCheckEnabled !== oldPeriodic || config.periodicCheckMinutes !== oldMinutes) {
-      stopPeriodicCheck();
-      startPeriodicCheck();
+    if (config.enablePeriodicResetQueue !== oldPeriodic || config.periodicResetQueueMinutes !== oldMinutes) {
+      stopPeriodicReset();
+      startPeriodicReset();
     }
-    log('Config updated');
   }
 
   function shutdown() {
-    stopPeriodicCheck();
+    stopPeriodicReset();
     saveState();
     initialized = false;
   }
@@ -377,7 +356,6 @@
     init,
     shutdown,
     getNext,
-    forceRefresh,
     maybeRefreshMeta,
     getDebugInfo,
     getVersion,
@@ -385,7 +363,7 @@
     getAllItems,
     isVisited,
     markVisited,
-    clearVisited,
+    resetQueue: resetQueueCompletely,
     updateConfig,
     onNext,
     DEFAULT_CONFIG,
