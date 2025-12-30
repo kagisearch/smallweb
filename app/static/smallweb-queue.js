@@ -6,7 +6,7 @@
   'use strict';
 
   const DEFAULT_CONFIG = {
-    fullListUrl: '/smallweb/appreciated.json',
+    fullListUrl: '/appreciated.json',
     enablePeriodicResetQueue: true,
     periodicResetQueueMinutes: 720,
     checkOnExhaustion: true,
