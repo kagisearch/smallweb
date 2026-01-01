@@ -1,4 +1,3 @@
-import pickle
 import re
 import hashlib
 import gzip
@@ -143,9 +142,30 @@ if not os.path.isdir(DIR_DATA):
     # trying to write a file in a non-existent dir
     # will fail, so we need to make sure this exists
     os.makedirs(DIR_DATA)
-PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.pkl")
-PATH_NOTES = os.path.join(DIR_DATA, "notes.pkl")
-PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.pkl")
+PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.json")
+PATH_NOTES = os.path.join(DIR_DATA, "notes.json")
+PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.json")
+
+# Legacy paths for one-time migration to JSON
+PATH_FAVORITES_LEGACY = os.path.join(DIR_DATA, "favorites.pkl")
+PATH_NOTES_LEGACY = os.path.join(DIR_DATA, "notes.pkl")
+PATH_FLAGGED_LEGACY = os.path.join(DIR_DATA, "flagged_content.pkl")
+
+
+def serialize_notes(notes: dict) -> dict:
+    """Convert notes_dict to JSON-serializable format (datetime -> ISO string)."""
+    return {
+        url: [[content, ts.isoformat()] for content, ts in entries]
+        for url, entries in notes.items()
+    }
+
+
+def deserialize_notes(data: dict) -> dict:
+    """Convert JSON data back to notes_dict format (ISO string -> datetime)."""
+    return {
+        url: [(content, datetime.fromisoformat(ts)) for content, ts in entries]
+        for url, entries in data.items()
+    }
 
 
 def time_ago(timestamp):
@@ -512,8 +532,8 @@ def favorite():
         # Save to disk immediately (multi-instance deployment requires immediate persistence)
         time_saved_favorites = datetime.now()
         try:
-            with open(PATH_FAVORITES, "wb") as file:
-                pickle.dump(favorites_dict, file)
+            with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
+                json.dump({url: dict(emojis) for url, emojis in favorites_dict.items()}, file)
         except:
             print("can not write fav file")
 
@@ -549,8 +569,8 @@ def note():
         if (datetime.now() - time_saved_notes).total_seconds() > 60:
             time_saved_notes = datetime.now()
             try:
-                with open(PATH_NOTES, "wb") as file:
-                    pickle.dump(notes_dict, file)
+                with open(PATH_NOTES, "w", encoding="utf-8") as file:
+                    json.dump(serialize_notes(notes_dict), file)
             except:
                 print("can not write notes file")
     # Preserve all query parameters except 'url' and 'note_content'
@@ -586,8 +606,8 @@ def flag_content():
         if (datetime.now() - time_saved_flagged_content).total_seconds() > 60:
             time_saved_flagged_content = datetime.now()
             try:
-                with open(PATH_FLAGGED, "wb") as file:
-                    pickle.dump(flagged_content_dict, file)
+                with open(PATH_FLAGGED, "w", encoding="utf-8") as file:
+                    json.dump(flagged_content_dict, file)
             except:
                 print("can not write flagged content file")
 
@@ -685,41 +705,114 @@ urls_flagged_cache = []
 
 favorites_dict = {}  # Dictionary to store favorites count
 
+def load_favorites():
+    """Load favorites from JSON, falling back to legacy format for migration."""
+    global favorites_dict
+    # Try JSON first
+    if os.path.exists(PATH_FAVORITES):
+        try:
+            with open(PATH_FAVORITES, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                favorites_dict = {url: OrderedDict(emojis) for url, emojis in data.items()}
+                print("Loaded favorites from JSON", len(favorites_dict))
+                return
+        except Exception as e:
+            print(f"Error loading favorites JSON: {e}")
 
+    # Fall back to legacy format for migration
+    if os.path.exists(PATH_FAVORITES_LEGACY):
+        try:
+            import pickle as pkl_migrate
+            with open(PATH_FAVORITES_LEGACY, "rb") as f:
+                favorites_dict = pkl_migrate.load(f)
+                print("Migrating favorites from legacy format", len(favorites_dict))
+                # Migrate old int-only data to emoji dict
+                for u, v in list(favorites_dict.items()):
+                    if isinstance(v, int):
+                        favorites_dict[u] = OrderedDict({"👍": v})
+                # Save as JSON immediately
+                with open(PATH_FAVORITES, "w", encoding="utf-8") as jf:
+                    json.dump({url: dict(emojis) for url, emojis in favorites_dict.items()}, jf)
+                print("Migrated favorites to JSON format")
+                return
+        except Exception as e:
+            print(f"Error migrating favorites: {e}")
 
-try:
-    with open(PATH_FAVORITES, "rb") as file:
-        favorites_dict = pickle.load(file)
-        print("Loaded favorites", len(favorites_dict))
-        # ---- migrate old int-only data to emoji dict -------------------
-        for u, v in list(favorites_dict.items()):
-            if isinstance(v, int):
-                favorites_dict[u] = OrderedDict({"👍": v})
-except:
     print("No favorites data found.")
-finally:
-    # Initialize urls_app_cache based on favorites_dict
-    urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
-    generate_appreciated_feed()  # Initialize the appreciated feed
+
+load_favorites()
+urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
+generate_appreciated_feed()  # Initialize the appreciated feed
 
 
 notes_dict = {}  # Dictionary to store notes
 
-try:
-    with open(PATH_NOTES, "rb") as file:
-        notes_dict = pickle.load(file)
-        print("Loaded notes", len(notes_dict))
-except:
+def load_notes():
+    """Load notes from JSON, falling back to legacy format for migration."""
+    global notes_dict
+    # Try JSON first
+    if os.path.exists(PATH_NOTES):
+        try:
+            with open(PATH_NOTES, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                notes_dict = deserialize_notes(data)
+                print("Loaded notes from JSON", len(notes_dict))
+                return
+        except Exception as e:
+            print(f"Error loading notes JSON: {e}")
+
+    # Fall back to legacy format for migration
+    if os.path.exists(PATH_NOTES_LEGACY):
+        try:
+            import pickle as pkl_migrate
+            with open(PATH_NOTES_LEGACY, "rb") as f:
+                notes_dict = pkl_migrate.load(f)
+                print("Migrating notes from legacy format", len(notes_dict))
+                # Save as JSON immediately
+                with open(PATH_NOTES, "w", encoding="utf-8") as jf:
+                    json.dump(serialize_notes(notes_dict), jf)
+                print("Migrated notes to JSON format")
+                return
+        except Exception as e:
+            print(f"Error migrating notes: {e}")
+
     print("No notes data found.")
+
+load_notes()
 
 flagged_content_dict = {}  # Dictionary to store flagged content count
 
-try:
-    with open(PATH_FLAGGED, "rb") as file:
-        flagged_content_dict = pickle.load(file)
-        print("Loaded flagged content", len(flagged_content_dict))
-except:
+def load_flagged():
+    """Load flagged content from JSON, falling back to legacy format for migration."""
+    global flagged_content_dict
+    # Try JSON first
+    if os.path.exists(PATH_FLAGGED):
+        try:
+            with open(PATH_FLAGGED, "r", encoding="utf-8") as f:
+                flagged_content_dict = json.load(f)
+                print("Loaded flagged content from JSON", len(flagged_content_dict))
+                return
+        except Exception as e:
+            print(f"Error loading flagged content JSON: {e}")
+
+    # Fall back to legacy format for migration
+    if os.path.exists(PATH_FLAGGED_LEGACY):
+        try:
+            import pickle as pkl_migrate
+            with open(PATH_FLAGGED_LEGACY, "rb") as f:
+                flagged_content_dict = pkl_migrate.load(f)
+                print("Migrating flagged content from legacy format", len(flagged_content_dict))
+                # Save as JSON immediately
+                with open(PATH_FLAGGED, "w", encoding="utf-8") as jf:
+                    json.dump(flagged_content_dict, jf)
+                print("Migrated flagged content to JSON format")
+                return
+        except Exception as e:
+            print(f"Error migrating flagged content: {e}")
+
     print("No flagged content data found.")
+
+load_flagged()
 
 
 # get feeds
@@ -737,22 +830,22 @@ def save_all_data():
     """Save all data before shutdown"""
     print("[DEBUG] Saving all data before shutdown...")
     try:
-        with open(PATH_FAVORITES, "wb") as file:
-            pickle.dump(favorites_dict, file)
+        with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
+            json.dump({url: dict(emojis) for url, emojis in favorites_dict.items()}, file)
             print(f"[DEBUG] Saved {len(favorites_dict)} favorites")
     except Exception as e:
         print(f"Error saving favorites: {e}")
-    
+
     try:
-        with open(PATH_NOTES, "wb") as file:
-            pickle.dump(notes_dict, file)
+        with open(PATH_NOTES, "w", encoding="utf-8") as file:
+            json.dump(serialize_notes(notes_dict), file)
             print(f"[DEBUG] Saved {len(notes_dict)} notes")
     except Exception as e:
         print(f"Error saving notes: {e}")
-    
+
     try:
-        with open(PATH_FLAGGED, "wb") as file:
-            pickle.dump(flagged_content_dict, file)
+        with open(PATH_FLAGGED, "w", encoding="utf-8") as file:
+            json.dump(flagged_content_dict, file)
             print(f"[DEBUG] Saved {len(flagged_content_dict)} flagged items")
     except Exception as e:
         print(f"Error saving flagged content: {e}")
