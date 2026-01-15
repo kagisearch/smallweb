@@ -44,7 +44,6 @@
         <button class="next-button" title="Show next post">Next Post</button>
       </a>
       {% endif %}
-      {% endif %}
       <div id="reactions">
 
 {# --- always show the default 👍 button --- #}
@@ -103,6 +102,7 @@
         <a class="phone" href="{{url}}">{{domain}}</a>
 
       </div>
+      {% endif %}
 
       <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
@@ -115,6 +115,7 @@
         <button type="submit" style="display: none;" aria-hidden="true">Search</button>
       </form>
 
+      {% if not no_results %}
       <!-- Share Popup -->
       <div class="popup-container">
         <label for="spread-love" class="popup-link" title="Share this post">Share</label>
@@ -150,6 +151,7 @@
                 onclick="return confirm('Are you sure you want to flag this post?');">
                 Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
       </form>
+      {% endif %}
 
     </div>
     <div class="middle">
