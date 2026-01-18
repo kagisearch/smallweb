@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
   <meta property="og:title" content="Kagi Small Web">
   <meta property="og:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
   <meta property="og:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
@@ -388,7 +389,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
 <script>
 (() => {
   'use strict';
-  
+
   // Configuration (overrides defaults in smallweb-queue.js)
   const SMALLWEB_QUEUE_CONFIG = {
     fullListUrl: '{{ prefix }}/appreciated.json',
@@ -398,26 +399,26 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
     persistKey: 'kagi_smallweb_queue_v2',
     enableDebug: false,            // console logging
   };
-  
+
   const nextLink = document.getElementById('appreciated-next-link');
   const nextBtn = document.getElementById('appreciated-next-btn');
-  
+
   if (!nextLink || !nextBtn || typeof SmallWebQueue === 'undefined') return;
-  
+
   SmallWebQueue.init(SMALLWEB_QUEUE_CONFIG, '{{ url }}').then(() => {
     preloadNextItem();
   }).catch(err => console.error('[SmallWebQueue] Init failed:', err));
-  
+
   let isNavigating = false;
-  
+
   nextLink.addEventListener('click', async (e) => {
     e.preventDefault();
     if (isNavigating) return;
     isNavigating = true;
-    
+
     nextBtn.textContent = 'Loading...';
     nextBtn.disabled = true;
-    
+
     try {
       const item = await SmallWebQueue.getNext();
       if (item && item.url) {
@@ -432,15 +433,15 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
       window.location.href = nextLink.getAttribute('href') || '{{ prefix }}?app';
     }
   });
-  
+
   async function preloadNextItem() {
     try {
       const debugInfo = SmallWebQueue.getDebugInfo();
       if (!debugInfo.initialized || debugInfo.totalItems === 0) return;
-      
+
       const allItems = SmallWebQueue.getAllItems();
       const visitedSet = new Set(debugInfo.visitedFifo);
-      
+
       for (const item of allItems) {
         if (!visitedSet.has(item.id)) {
           const prefetchLink = document.createElement('link');
@@ -448,7 +449,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
           prefetchLink.href = item.url;
           prefetchLink.as = 'document';
           document.head.appendChild(prefetchLink);
-          
+
           const url = new URL(window.location.href);
           url.searchParams.set('url', item.url);
           nextLink.setAttribute('href', url.toString());
