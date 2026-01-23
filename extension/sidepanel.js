@@ -130,20 +130,6 @@ async function updateTabCounts() {
   }
 }
 
-// Show count on hover
-modeTabs.forEach(tab => {
-  tab.addEventListener('mouseenter', () => {
-    const mode = tab.dataset.mode;
-    const count = tab.dataset.count;
-    if (count !== undefined) {
-      tab.textContent = `${tabLabels[mode]} (${count})`;
-    }
-  });
-  tab.addEventListener('mouseleave', () => {
-    const mode = tab.dataset.mode;
-    tab.textContent = tabLabels[mode];
-  });
-});
 
 // Prefetch next URL in the actual browser tab
 function setPreload(url) {
@@ -456,13 +442,13 @@ async function renderList() {
   } else {
     // Show recent history for this mode
     const modeLabels = {
-      blogs: 'Recent Blogs',
-      appreciated: 'Recent Appreciated',
-      youtube: 'Recent Videos',
-      github: 'Recent Code',
-      comics: 'Recent Comics'
+      blogs: 'Recently Viewed Blogs',
+      appreciated: 'Recently Viewed Appreciated',
+      youtube: 'Recently Viewed Videos',
+      github: 'Recently Viewed Code',
+      comics: 'Recently Viewed Comics'
     };
-    listLabel.textContent = modeLabels[currentMode] || 'Recent';
+    listLabel.textContent = modeLabels[currentMode] || 'Recently Viewed';
     clearListBtn.style.display = 'block';
 
     const items = history[currentMode] || [];
