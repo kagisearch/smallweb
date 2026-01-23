@@ -21,7 +21,7 @@ If the blog is included in small web feed list (which means it has content in En
 - Blog has recent posts (<7 days old)
 - The website can appear in an iframe
   
-## Guidelines for adding a site or channel to the list
+## ⚠️ Guidelines for adding a site or channel to the list ⚠️
 
 Add a new personal blog RSS feed to the list. Rules:
 
