@@ -29,7 +29,6 @@ http://archimago.blogspot.com/feeds/posts/default
 http://arcturus-labs.com/feed_rss_created.xml
 http://armueller.github.io/feed.xml
 http://articles.emptycrate.com/node/feed.xml
-https://asawicki.info/news_rss.php
 http://astroblogger.blogspot.com/atom.xml
 http://athiemann.net/feed.xml
 http://awfullibrarybooks.wordpress.com/feed/
@@ -60,7 +59,6 @@ http://blog.bgcarlisle.com/feed/
 http://blog.brakmic.com/feed/rss/
 http://blog.colinmarshall.org/?feed=rss2
 http://blog.dancrisan.com/feed
-https://blog.demofox.org/feed/
 http://blog.derrickko.com/feed
 http://blog.elliottkember.com/feed
 http://blog.emilianbold.ro/atom.xml
@@ -193,7 +191,6 @@ http://evanfields.net/feed.xml
 http://evantravers.com/feed.xml
 http://everydayislikewednesday.blogspot.com/feeds/posts/default
 http://exploits.run/feed.xml
-https://fabiensanglard.net/rss.xml
 http://fabriq.fm/feed/
 http://feda.croco.net/rss.xml
 http://feed.jefclaes.be
@@ -418,6 +415,7 @@ http://oceanicwilderness.com/feed/
 http://odb.ar/feed.xml
 http://okayfail.com/atom.xml
 http://oldvcr.blogspot.com/atom.xml
+http://oldvcr.blogspot.com/feeds/posts/default
 http://omersha.github.io//feed.xml
 http://onsmalltalk.com/seaside/atomFeed
 http://onsmalltalk.com/seaside/rssFeed
@@ -2247,7 +2245,6 @@ https://arhan.sh/rss.xml
 https://ari.lt/rss.xml
 https://aria.coffee/rss.xml
 https://ariadacapo.net/feed/atom/
-https://ariadnavigo.xyz/index.xml
 https://ariadne.space/atom.xml
 https://ariaieboy.ir/blog/feed.atom
 https://arialdomartini.github.io/feed.xml
@@ -4670,6 +4667,7 @@ https://blog.startifact.com/atom.xml
 https://blog.startuptaxaccounting.com/rss
 https://blog.stateless.co/rss
 https://blog.steadycoding.com/rss/
+https://blog.stef.be/rss/
 https://blog.stelvio.dev/feeds/atom.xml
 https://blog.stephanbehnke.com/index.xml
 https://blog.stephaniestimac.com/feed/feed.xml
@@ -7771,6 +7769,7 @@ https://dlants.me/atom
 https://dlay.eu/feed/
 https://dlewis.net/blog/rss/
 https://dlo.me/atom.xml
+https://dlt.github.io/blog/index.xml
 https://dlvhdr.me/rss/feed.xml
 https://dm13450.github.io/feed.xml
 https://dmanco.dev/feed.xml
@@ -15816,6 +15815,7 @@ https://modess.io/feed.xml
 https://modexp.wordpress.com/feed/
 https://modularcircuits.com/blog/rss/
 https://modulovalue.com/feed
+https://modulovalue.com/feed.xml
 https://moebuta.org/index.xml
 https://moehrenzahn.de/feed.xml
 https://moezying.com/atom/
