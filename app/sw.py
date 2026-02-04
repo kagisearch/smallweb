@@ -319,6 +319,7 @@ def get_registered_domain(url):
         possible_suffix = ".".join(netloc_parts[i:])
         if possible_suffix in public_suffix_list:
             return ".".join(netloc_parts[:i]) + "." + possible_suffix
+    return parsed_url.netloc
 
 
 @app.route("/")
