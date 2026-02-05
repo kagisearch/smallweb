@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Web Apps & Extensions</title>
+    <meta name="description" content="Your gateway to the Small Web on your device and browser">
+    <link rel="icon" type="image/png" href="static/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+    <style>
+      :root {
+        --bg: #2c3e50;
+        --text: #ecf0f1;
+        --blue: #3498db;
+        --white: #ffffff;
+        --glass: rgba(255, 255, 255, 0.1);
+        --panel-light: #556472;
+        --yellow: #ffb319;
+        --cta-size: 22px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "VT323", "Courier New", monospace;
+        font-size: 18px;
+        line-height: 1.35;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        min-height: 100vh;
+        min-height: 100dvh;
+        justify-content: center;
+      }
+
+      .page > * {
+        min-width: 0;
+      }
+
+      .panel {
+        background: var(--glass);
+        border: 2px solid var(--bg);
+        border-top-color: var(--text);
+        border-left-color: var(--text);
+        padding: 20px;
+        box-shadow: inset -1px -1px 0 var(--bg), inset 1px 1px 0 var(--text);
+      }
+
+      .panel-button {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+        border: 2px solid var(--bg);
+        border-top-color: var(--text);
+        border-left-color: var(--text);
+        background: var(--panel-light);
+        color: var(--text);
+        cursor: pointer;
+        transition: filter 0.12s ease, transform 0.12s ease;
+        box-shadow: none;
+      }
+
+      .panel-button:hover {
+        filter: brightness(0.88);
+      }
+
+      .panel-button:active {
+        border-top-color: var(--bg);
+        border-left-color: var(--bg);
+        border-right-color: var(--text);
+        border-bottom-color: var(--text);
+        transform: translate(1px, 1px);
+      }
+
+      .hero {
+        padding: 12px 16px;
+      }
+
+      .hero-bar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 16px;
+        text-align: left;
+      }
+
+      .hero-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .doggo {
+        width: 72px;
+        max-width: 32vw;
+        height: auto;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+
+      .hero-title {
+        margin: 0;
+        font-size: clamp(22px, 3.6vw, 38px);
+        letter-spacing: 1px;
+      }
+
+      .hero-subtitle {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.3;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .section-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .section-grid > * {
+        min-width: 0;
+      }
+
+      .section-grid .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .download-table {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .mobile-apps-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr 2fr;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .mobile-apps-heading {
+        margin: 0;
+        font-size: 24px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        text-align: left;
+        justify-self: center;
+        width: max-content;
+      }
+
+      .mobile-app-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 26px;
+      }
+
+      .mobile-app-header .row-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      .mobile-app-store {
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .mobile-app-store .mobile-app-header {
+        justify-content: flex-start;
+      }
+
+      .mobile-app-store .store-badge {
+        margin-top: auto;
+        align-self: flex-end;
+      }
+
+      .download-row {
+        display: grid;
+        grid-template-columns: minmax(140px, 180px) 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 14px;
+        background: var(--glass);
+        border: 2px solid var(--bg);
+        border-right-color: var(--text);
+        border-bottom-color: var(--text);
+      }
+
+      .row-title {
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .row-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        object-fit: contain;
+      }
+
+      .row-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 8px 14px;
+        border: 2px solid var(--bg);
+        border-top-color: var(--text);
+        border-left-color: var(--text);
+        text-transform: uppercase;
+        font-size: 18px;
+        letter-spacing: 1px;
+        background: var(--blue);
+        color: var(--text);
+        cursor: pointer;
+        gap: 8px;
+        transition: filter 0.12s ease;
+      }
+
+      .btn:hover {
+        filter: brightness(0.88);
+      }
+
+      .btn:active {
+        border-top-color: var(--bg);
+        border-left-color: var(--bg);
+        border-right-color: var(--text);
+        border-bottom-color: var(--text);
+        transform: translate(1px, 1px);
+      }
+
+      .btn.ghost {
+        background: var(--panel-light);
+      }
+
+      .hero-actions .btn.ghost {
+        background: var(--yellow);
+        color: var(--bg);
+      }
+
+      .btn-strong {
+        font-weight: 700;
+      }
+
+      .download .btn.direct {
+        background: var(--white);
+        color: var(--bg);
+      }
+
+      .button-stack {
+        display: grid;
+        grid-template-columns: 3fr 4fr;
+        gap: 12px;
+      }
+
+      .button-stack .btn {
+        width: 100%;
+        padding: 32px 24px;
+        font-size: var(--cta-size);
+        gap: 14px;
+      }
+
+      .badge-inline {
+        height: 30px;
+        width: auto;
+      }
+
+      .badges-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .badges-content {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .store-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        height: 50px;
+      }
+
+      .store-badge svg {
+        height: 100%;
+        width: auto;
+        display: block;
+      }
+
+      .link-button {
+        width: 100%;
+        text-transform: none;
+        font-size: var(--cta-size);
+        line-height: 1.3;
+        padding: 18px 20px;
+        min-height: 96px;
+        text-align: center;
+      }
+
+      .external-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        vertical-align: -3px;
+        margin-left: 6px;
+      }
+
+      .brand {
+        color: var(--yellow);
+        font-weight: 700;
+      }
+
+      .link-button .brand {
+        color: var(--blue);
+      }
+
+      .footer {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .footer-inner {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 16px;
+      }
+
+      .footer-inner a {
+        color: var(--text);
+        text-decoration: underline;
+      }
+
+      .footer-right {
+        flex-shrink: 0;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: 24px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn:focus-visible,
+      .footer-inner a:focus-visible,
+      .panel-button:focus-visible {
+        outline: 2px solid var(--white);
+        outline-offset: 2px;
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          padding: 16px;
+        }
+
+        .hero-bar {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-actions {
+          width: 100%;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          align-items: stretch;
+        }
+
+        .hero-actions .btn {
+          width: 100%;
+        }
+
+        .row-buttons .btn {
+          width: 100%;
+        }
+
+        .download-row {
+          grid-template-columns: 1fr;
+        }
+
+        .doggo {
+          width: 80px;
+        }
+
+        .button-stack {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .mobile-apps-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .mobile-apps-heading {
+          display: block;
+          width: 100%;
+          justify-self: start;
+          white-space: nowrap;
+        }
+
+        .badges-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .link-button {
+          justify-content: flex-start;
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero panel">
+        <div class="hero-bar">
+          <div class="hero-brand">
+            <svg class="doggo" width="472" height="467" viewBox="0 0 472 467" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kagi doggo">
+              <g clip-path="url(#a)" fill-rule="evenodd" clip-rule="evenodd">
+                <path d="M428.845 460.465H138.136v-20.931h5.756V425.93h23.023v13.604h40.29v-25.116h5.308v-46.046h6.204v-46.047h5.756v-46.046h-69.07V155.407h190.674v5.756h16.53v11.512h5.756v103.604h2.418v166.918h31.254V425.93h23.886v17.267h2.924v17.268Z" fill="#fff"/>
+                <path d="M212.956 224.477h-5.755v-28.78h103.604v34.535h-5.756v-28.779h-17.267v17.268h-5.756v5.756h-11.512v-5.756h-5.756v17.267h-11.511v-11.511h5.756v-23.024H235.98v17.268h-5.756v5.756h-11.512v-5.756h-5.756v5.756Zm92.093 5.755v11.512h-5.756v5.756h-5.755v-11.512h5.755v-5.756h5.756ZM293.538 247.5v5.756h-23.024V247.5h23.024Zm-23.024 0h-5.756v-11.512h5.756V247.5Zm-17.267-11.512V247.5h-5.756v-11.512h5.756Zm-5.756 11.512v5.756h-23.023V247.5h23.023Zm-23.023 0h-5.756v-11.512h5.756V247.5Zm-5.756-11.512h-5.756v-11.511h5.756v11.511ZM235.98 166.919h-23.024v-5.756h23.024v5.756Zm74.825 11.511H207.201v-5.756h28.779v-5.755h57.558v5.755h17.267v5.756Z" fill="#18181A"/>
+                <path d="M40.287 443.197h-5.756v-23.023h5.756v-5.756H51.8v-5.756h28.779v5.756h5.756v5.756h5.755v23.023h-5.755v5.756h-5.756v5.756H46.043v-5.756h-5.756v-5.756Z" fill="#FFB319"/>
+                <path d="M425.921 425.927h5.756v34.538h40.29v5.755H-.008v-5.755h46.046v-5.754h28.78v5.754h63.313v-34.538h5.756v34.538h80.581v-46.047h5.756v46.047h34.534v-46.047h5.757v46.047h28.778v-46.047h5.756v46.047h34.535v-46.047h5.756v46.047h80.581v-34.538ZM46.038 454.711h-5.756v-5.755h5.756v5.755Zm-5.756-5.755h-5.755v-11.509h11.511v5.754h-5.756v5.755Zm-5.755-11.509H28.77v-17.274h5.756v17.274Zm0-17.274v-5.755h5.755v5.755h-5.755Zm5.755-5.755v-5.755h11.512v5.755H40.282Zm11.512-5.755v-5.754h28.779v5.754h-28.78Zm28.779 0h5.756v5.755h-5.756v-5.755Zm5.756 5.755h5.755v11.509H80.573v-5.754h5.756v-5.755Zm5.755 11.509h5.757v17.274h-5.757v-17.274Zm0 17.274v5.755H86.33v-5.755h5.755Zm-5.755 5.755v5.755H74.817v-5.755H86.33Zm57.558-23.029v-5.754h23.023v5.754h-23.023Zm23.023 0h5.756v11.52h28.779v-23.029h5.756v28.783H166.91v-17.274Zm40.291-11.509v-46.047h5.755v46.047h-5.755Zm5.755-46.047v-46.046h5.756v46.046h-5.756Zm5.756-46.046v-46.046H115.108v-5.756h-11.511v-5.755h-5.756v-5.756h-5.757v-5.756H86.33V247.5h-5.756v-11.512h-5.756v-46.046h5.756v-11.511h5.756v-5.756h5.755v-5.756h5.757v-5.756h5.756v-5.756h11.511v-5.756h138.139v-46.046h-5.756V46.047h-5.755v-5.755h-5.756v-5.757h-40.291v-5.756h-5.755v-5.755h-5.756V11.512h5.756V5.757h5.755V0h40.291v5.756h11.511v5.755h5.756v5.756h5.756v5.756h5.755v5.755h5.757v80.582h-5.757v40.29h80.582v5.756H155.399v115.116h92.092v5.756h-23.023v34.535h143.895V172.675h-5.755v-11.512H345.34v-5.756h11.512v-40.291h-5.757V80.582h5.757V69.07h5.756v-5.756h5.755V57.56h5.756v-5.756h5.756v-5.756h23.023v-5.755h28.779v5.755h5.755v28.695h-5.755v5.84h-23.023v-5.756h-17.268v5.756h-5.756v5.756h-5.755v5.756h-5.756v46.046h-5.756v28.779h5.756v241.744h11.511v-5.754h5.756v-5.755h5.756v-5.755h5.756v-5.754h5.756v-17.274h5.756v23.028h-5.756v11.51h-5.756v5.754h-5.756v5.755h-5.756v5.755h-5.756v5.754h-11.511v11.52h23.023v-11.52h5.756v17.274h-34.535V322.325h-80.581v11.512h11.511v5.76h-28.778v-5.76h11.511v-11.512h-63.314Zm184.186 103.602v-5.754h23.023v5.754h-23.023Zm-132.383-11.509v-5.755h28.779v5.755h-28.779Z" fill="#18181A"/>
+                <path d="M189.933 241.753v-11.512h11.512v5.756h-5.756v5.756h-5.756Zm-17.267-.009v-11.503h11.512v5.756h-5.756v5.747h-5.756Zm23.023 17.268V247.5H207.2v5.756h-5.755v5.756h-5.756Zm-17.267 0V247.5h11.511v5.756h-5.755v5.756h-5.756Z" fill="#18181A"/>
+              </g>
+              <defs>
+                <clipPath id="a">
+                  <path fill="#fff" d="M0 0h472v467H0z"/>
+                </clipPath>
+              </defs>
+            </svg>
+            <div>
+              <h1 class="hero-title">Small Web Apps & Extensions</h1>
+              <p class="hero-subtitle">Your gateway to the Small Web on your device and browser</p>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn ghost" href="https://kagi.com/api/v1/smallweb/feed" target="_blank" rel="noopener noreferrer"><span class="btn-strong">RSS feed</span></a>
+            <a class="btn ghost" href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener noreferrer"><span class="btn-strong">GitHub</span></a>
+          </div>
+        </div>
+      </header>
+
+      <main class="section-grid">
+        <section class="panel download">
+          <h2>Browser extensions</h2>
+          <div class="download-table">
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://translate.kagi.com/orion_logo.svg" alt="Orion logo" loading="lazy">
+                Orion
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="#" onclick="return false;" aria-label="Chrome Web Store (link coming soon)"><span class="btn-strong">Chrome</span> Web Store</a>
+                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
+              </div>
+            </div>
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg" alt="Chromium logo" loading="lazy">
+                Chromium-based
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="#" onclick="return false;" aria-label="Chrome Web Store (link coming soon)"><span class="btn-strong">Chrome</span> Web Store</a>
+                <a class="btn" href="#" onclick="return false;" aria-label="Edge Add-ons (link coming soon)"><span class="btn-strong">Edge</span> Add-ons</a>
+                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
+              </div>
+            </div>
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Firefox_logo%2C_2017.svg" alt="Firefox logo" loading="lazy">
+                Firefox-based
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="#" onclick="return false;" aria-label="Firefox Add-ons (link coming soon)"><span class="btn-strong">Firefox</span> Add-ons</a>
+                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
+              </div>
+            </div>
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/52/Safari_browser_logo.svg" alt="Safari logo" loading="lazy">
+                Safari
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="#" onclick="return false;" aria-label="TestFlight (link coming soon)"><span class="btn-strong">TestFlight</span></a>
+                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mobile-apps-grid">
+          <h2 class="mobile-apps-heading">
+            <span>MOBILE</span>
+            <span>APPS</span>
+          </h2>
+          <a class="mobile-app-store panel-button" href="#" onclick="return false;" aria-label="App Store (coming soon)">
+            <div class="mobile-app-header">
+              <svg class="row-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              iOS
+            </div>
+            <span class="store-badge" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="119.66407" height="40" viewBox="0 0 119.66407 40" aria-hidden="true">
+                <title>Download on the App Store</title>
+                <g>
+                  <g>
+                    <g>
+                      <path d="M110.13477,0H9.53468c-.3667,0-.729,0-1.09473.002-.30615.002-.60986.00781-.91895.0127A13.21476,13.21476,0,0,0,5.5171.19141a6.66509,6.66509,0,0,0-1.90088.627A6.43779,6.43779,0,0,0,1.99757,1.99707,6.25844,6.25844,0,0,0,.81935,3.61816a6.60119,6.60119,0,0,0-.625,1.90332,12.993,12.993,0,0,0-.1792,2.002C.00587,7.83008.00489,8.1377,0,8.44434V31.5586c.00489.3105.00587.6113.01515.9219a12.99232,12.99232,0,0,0,.1792,2.0019,6.58756,6.58756,0,0,0,.625,1.9043A6.20778,6.20778,0,0,0,1.99757,38.001a6.27445,6.27445,0,0,0,1.61865,1.1787,6.70082,6.70082,0,0,0,1.90088.6308,13.45514,13.45514,0,0,0,2.0039.1768c.30909.0068.6128.0107.91895.0107C8.80567,40,9.168,40,9.53468,40H110.13477c.3594,0,.7246,0,1.084-.002.3047,0,.6172-.0039.9219-.0107a13.279,13.279,0,0,0,2-.1768,6.80432,6.80432,0,0,0,1.9082-.6308,6.27742,6.27742,0,0,0,1.6172-1.1787,6.39482,6.39482,0,0,0,1.1816-1.6143,6.60413,6.60413,0,0,0,.6191-1.9043,13.50643,13.50643,0,0,0,.1856-2.0019c.0039-.3106.0039-.6114.0039-.9219.0078-.3633.0078-.7246.0078-1.0938V9.53613c0-.36621,0-.72949-.0078-1.09179,0-.30664,0-.61426-.0039-.9209a13.5071,13.5071,0,0,0-.1856-2.002,6.6177,6.6177,0,0,0-.6191-1.90332,6.46619,6.46619,0,0,0-2.7988-2.7998,6.76754,6.76754,0,0,0-1.9082-.627,13.04394,13.04394,0,0,0-2-.17676c-.3047-.00488-.6172-.01074-.9219-.01269-.3594-.002-.7246-.002-1.084-.002Z" style="fill:#a6a6a6"/>
+                      <path d="M8.44483,39.125c-.30468,0-.602-.0039-.90429-.0107a12.68714,12.68714,0,0,1-1.86914-.1631,5.88381,5.88381,0,0,1-1.65674-.5479,5.40573,5.40573,0,0,1-1.397-1.0166,5.32082,5.32082,0,0,1-1.02051-1.3965,5.72186,5.72186,0,0,1-.543-1.6572,12.41351,12.41351,0,0,1-.1665-1.875c-.00634-.2109-.01464-.9131-.01464-.9131V8.44434S.88185,7.75293.8877,7.5498a12.37039,12.37039,0,0,1,.16553-1.87207,5.7555,5.7555,0,0,1,.54346-1.6621A5.37349,5.37349,0,0,1,2.61183,2.61768,5.56543,5.56543,0,0,1,4.01417,1.59521a5.82309,5.82309,0,0,1,1.65332-.54394A12.58589,12.58589,0,0,1,7.543.88721L8.44532.875H111.21387l.9131.0127a12.38493,12.38493,0,0,1,1.8584.16259,5.93833,5.93833,0,0,1,1.6709.54785,5.59374,5.59374,0,0,1,2.415,2.41993,5.76267,5.76267,0,0,1,.5352,1.64892,12.995,12.995,0,0,1,.1738,1.88721c.0029.2832.0029.5874.0029.89014.0079.375.0079.73193.0079,1.09179V30.4648c0,.3633,0,.7178-.0079,1.0752,0,.3252,0,.6231-.0039.9297a12.73126,12.73126,0,0,1-.1709,1.8535,5.739,5.739,0,0,1-.54,1.67,5.48029,5.48029,0,0,1-1.0156,1.3857,5.4129,5.4129,0,0,1-1.3994,1.0225,5.86168,5.86168,0,0,1-1.668.5498,12.54218,12.54218,0,0,1-1.8692.1631c-.2929.0068-.5996.0107-.8974.0107l-1.084.002Z"/>
+                    </g>
+                    <g>
+                      <path d="M24.76888,20.30068a4.94881,4.94881,0,0,1,2.35656-4.15206,5.06566,5.06566,0,0,0-3.99116-2.15768c-1.67924-.17626-3.30719,1.00483-4.1629,1.00483-.87227,0-2.18977-.98733-3.6085-.95814a5.31529,5.31529,0,0,0-4.47292,2.72787c-1.934,3.34842-.49141,8.26947,1.3612,10.97608.9269,1.32535,2.01018,2.8058,3.42763,2.7533,1.38706-.05753,1.9051-.88448,3.5794-.88448,1.65876,0,2.14479.88448,3.591.8511,1.48838-.02416,2.42613-1.33124,3.32051-2.66914a10.962,10.962,0,0,0,1.51842-3.09251A4.78205,4.78205,0,0,1,24.76888,20.30068Z" style="fill:#fff"/>
+                      <path d="M22.03725,12.21089a4.87248,4.87248,0,0,0,1.11452-3.49062,4.95746,4.95746,0,0,0-3.20758,1.65961,4.63634,4.63634,0,0,0-1.14371,3.36139A4.09905,4.09905,0,0,0,22.03725,12.21089Z" style="fill:#fff"/>
+                    </g>
+                    <g>
+                      <path d="M42.30227,27.13965h-4.7334l-1.13672,3.35645H34.42727l4.4834-12.418h2.083l4.4834,12.418H43.438ZM38.0591,25.59082h3.752l-1.84961-5.44727h-.05176Z" style="fill:#fff"/>
+                      <path d="M55.15969,25.96973c0,2.81348-1.50586,4.62109-3.77832,4.62109a3.0693,3.0693,0,0,1-2.84863-1.584h-.043v4.48438h-1.8584V21.44238H48.4302v1.50586h.03418a3.21162,3.21162,0,0,1,2.88281-1.60059C53.645,21.34766,55.15969,23.16406,55.15969,25.96973Zm-1.91016,0c0-1.833-.94727-3.03809-2.39258-3.03809-1.41992,0-2.375,1.23047-2.375,3.03809,0,1.82422.95508,3.0459,2.375,3.0459C52.30227,29.01563,53.24953,27.81934,53.24953,25.96973Z" style="fill:#fff"/>
+                      <path d="M65.12453,25.96973c0,2.81348-1.50586,4.62109-3.77832,4.62109a3.0693,3.0693,0,0,1-2.84863-1.584h-.043v4.48438h-1.8584V21.44238H58.395v1.50586h.03418A3.21162,3.21162,0,0,1,61.312,21.34766C63.60988,21.34766,65.12453,23.16406,65.12453,25.96973Zm-1.91016,0c0-1.833-.94727-3.03809-2.39258-3.03809-1.41992,0-2.375,1.23047-2.375,3.03809,0,1.82422.95508,3.0459,2.375,3.0459C62.26711,29.01563,63.21438,27.81934,63.21438,25.96973Z" style="fill:#fff"/>
+                      <path d="M71.71047,27.03613c.1377,1.23145,1.334,2.04,2.96875,2.04,1.56641,0,2.69336-.80859,2.69336-1.91895,0-.96387-.67969-1.541-2.28906-1.93652l-1.60937-.3877c-2.28027-.55078-3.33887-1.61719-3.33887-3.34766,0-2.14258,1.86719-3.61426,4.51855-3.61426,2.624,0,4.42285,1.47168,4.4834,3.61426h-1.876c-.1123-1.23926-1.13672-1.9873-2.63379-1.9873s-2.52148.75684-2.52148,1.8584c0,.87793.6543,1.39453,2.25488,1.79l1.36816.33594c2.54785.60254,3.60645,1.626,3.60645,3.44238,0,2.32324-1.85059,3.77832-4.79395,3.77832-2.75391,0-4.61328-1.4209-4.7334-3.667Z" style="fill:#fff"/>
+                      <path d="M83.34621,19.2998v2.14258h1.72168v1.47168H83.34621v4.99121c0,.77539.34473,1.13672,1.10156,1.13672a5.80752,5.80752,0,0,0,.61133-.043v1.46289a5.10351,5.10351,0,0,1-1.03223.08594c-1.833,0-2.54785-.68848-2.54785-2.44434V22.91406H80.16262V21.44238H81.479V19.2998Z" style="fill:#fff"/>
+                      <path d="M86.065,25.96973c0-2.84863,1.67773-4.63867,4.29395-4.63867,2.625,0,4.29492,1.79,4.29492,4.63867,0,2.85645-1.66113,4.63867-4.29492,4.63867C87.72609,30.6084,86.065,28.82617,86.065,25.96973Zm6.69531,0c0-1.9541-.89551-3.10742-2.40137-3.10742s-2.40039,1.16211-2.40039,3.10742c0,1.96191.89453,3.10645,2.40039,3.10645S92.76027,27.93164,92.76027,25.96973Z" style="fill:#fff"/>
+                      <path d="M96.18606,21.44238h1.77246v1.541h.043a2.1594,2.1594,0,0,1,2.17773-1.63574,2.86616,2.86616,0,0,1,.63672.06934v1.73828a2.59794,2.59794,0,0,0-.835-.1123,1.87264,1.87264,0,0,0-1.93652,2.083v5.37012h-1.8584Z" style="fill:#fff"/>
+                      <path d="M109.3843,27.83691c-.25,1.64355-1.85059,2.77148-3.89844,2.77148-2.63379,0-4.26855-1.76465-4.26855-4.5957,0-2.83984,1.64355-4.68164,4.19043-4.68164,2.50488,0,4.08008,1.7207,4.08008,4.46582v.63672h-6.39453v.1123a2.358,2.358,0,0,0,2.43555,2.56445,2.04834,2.04834,0,0,0,2.09082-1.27344Zm-6.28223-2.70215h4.52637a2.1773,2.1773,0,0,0-2.2207-2.29785A2.292,2.292,0,0,0,103.10207,25.13477Z" style="fill:#fff"/>
+                    </g>
+                  </g>
+                  <g>
+                    <path d="M37.82619,8.731a2.63964,2.63964,0,0,1,2.80762,2.96484c0,1.90625-1.03027,3.002-2.80762,3.002H35.67092V8.731Zm-1.22852,5.123h1.125a1.87588,1.87588,0,0,0,1.96777-2.146,1.881,1.881,0,0,0-1.96777-2.13379h-1.125Z" style="fill:#fff"/>
+                    <path d="M41.68068,12.44434a2.13323,2.13323,0,1,1,4.24707,0,2.13358,2.13358,0,1,1-4.24707,0Zm3.333,0c0-.97607-.43848-1.54687-1.208-1.54687-.77246,0-1.207.5708-1.207,1.54688,0,.98389.43457,1.55029,1.207,1.55029C44.57522,13.99463,45.01369,13.42432,45.01369,12.44434Z" style="fill:#fff"/>
+                    <path d="M51.57326,14.69775h-.92187l-.93066-3.31641h-.07031l-.92676,3.31641h-.91309l-1.24121-4.50293h.90137l.80664,3.436h.06641l.92578-3.436h.85254l.92578,3.436h.07031l.80273-3.436h.88867Z" style="fill:#fff"/>
+                    <path d="M53.85354,10.19482H54.709v.71533h.06641a1.348,1.348,0,0,1,1.34375-.80225,1.46456,1.46456,0,0,1,1.55859,1.6748v2.915h-.88867V12.00586c0-.72363-.31445-1.0835-.97168-1.0835a1.03294,1.03294,0,0,0-1.0752,1.14111v2.63428h-.88867Z" style="fill:#fff"/>
+                    <path d="M59.09377,8.437h.88867v6.26074h-.88867Z" style="fill:#fff"/>
+                    <path d="M61.21779,12.44434a2.13346,2.13346,0,1,1,4.24756,0,2.1338,2.1338,0,1,1-4.24756,0Zm3.333,0c0-.97607-.43848-1.54687-1.208-1.54687-.77246,0-1.207.5708-1.207,1.54688,0,.98389.43457,1.55029,1.207,1.55029C64.11232,13.99463,64.5508,13.42432,64.5508,12.44434Z" style="fill:#fff"/>
+                    <path d="M66.4009,13.42432c0-.81055.60352-1.27783,1.6748-1.34424l1.21973-.07031v-.38867c0-.47559-.31445-.74414-.92187-.74414-.49609,0-.83984.18213-.93848.50049h-.86035c.09082-.77344.81836-1.26953,1.83984-1.26953,1.12891,0,1.76563.562,1.76563,1.51318v3.07666h-.85547v-.63281h-.07031a1.515,1.515,0,0,1-1.35254.707A1.36026,1.36026,0,0,1,66.4009,13.42432Zm2.89453-.38477v-.37646l-1.09961.07031c-.62012.0415-.90137.25244-.90137.64941,0,.40527.35156.64111.835.64111A1.0615,1.0615,0,0,0,69.29543,13.03955Z" style="fill:#fff"/>
+                    <path d="M71.34816,12.44434c0-1.42285.73145-2.32422,1.86914-2.32422a1.484,1.484,0,0,1,1.38086.79h.06641V8.437h.88867v6.26074h-.85156v-.71143h-.07031a1.56284,1.56284,0,0,1-1.41406.78564C72.0718,14.772,71.34816,13.87061,71.34816,12.44434Zm.918,0c0,.95508.4502,1.52979,1.20313,1.52979.749,0,1.21191-.583,1.21191-1.52588,0-.93848-.46777-1.52979-1.21191-1.52979C72.72121,10.91846,72.26613,11.49707,72.26613,12.44434Z" style="fill:#fff"/>
+                    <path d="M79.23,12.44434a2.13323,2.13323,0,1,1,4.24707,0,2.13358,2.13358,0,1,1-4.24707,0Zm3.333,0c0-.97607-.43848-1.54687-1.208-1.54687-.77246,0-1.207.5708-1.207,1.54688,0,.98389.43457,1.55029,1.207,1.55029C82.12453,13.99463,82.563,13.42432,82.563,12.44434Z" style="fill:#fff"/>
+                    <path d="M84.66945,10.19482h.85547v.71533h.06641a1.348,1.348,0,0,1,1.34375-.80225,1.46456,1.46456,0,0,1,1.55859,1.6748v2.915H87.605V12.00586c0-.72363-.31445-1.0835-.97168-1.0835a1.03294,1.03294,0,0,0-1.0752,1.14111v2.63428h-.88867Z" style="fill:#fff"/>
+                    <path d="M93.51516,9.07373v1.1416h.97559v.74854h-.97559V13.2793c0,.47168.19434.67822.63672.67822a2.96657,2.96657,0,0,0,.33887-.02051v.74023a2.9155,2.9155,0,0,1-.4834.04541c-.98828,0-1.38184-.34766-1.38184-1.21582v-2.543h-.71484v-.74854h.71484V9.07373Z" style="fill:#fff"/>
+                    <path d="M95.70461,8.437h.88086v2.48145h.07031a1.3856,1.3856,0,0,1,1.373-.80664,1.48339,1.48339,0,0,1,1.55078,1.67871v2.90723H98.69v-2.688c0-.71924-.335-1.0835-.96289-1.0835a1.05194,1.05194,0,0,0-1.13379,1.1416v2.62988h-.88867Z" style="fill:#fff"/>
+                    <path d="M104.76125,13.48193a1.828,1.828,0,0,1-1.95117,1.30273A2.04531,2.04531,0,0,1,100.73,12.46045a2.07685,2.07685,0,0,1,2.07617-2.35254c1.25293,0,2.00879.856,2.00879,2.27V12.688h-3.17969v.0498a1.1902,1.1902,0,0,0,1.19922,1.29,1.07934,1.07934,0,0,0,1.07129-.5459Zm-3.126-1.45117h2.27441a1.08647,1.08647,0,0,0-1.1084-1.1665A1.15162,1.15162,0,0,0,101.63527,12.03076Z" style="fill:#fff"/>
+                  </g>
+                </g>
+              </svg>
+            </span>
+          </a>
+          <a class="mobile-app-store panel-button" href="#" onclick="return false;" aria-label="Google Play (coming soon)">
+            <div class="mobile-app-header">
+              <svg class="row-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.523 2.047a.5.5 0 0 0-.682.181L15.07 5.326A8.87 8.87 0 0 0 12 4.818a8.87 8.87 0 0 0-3.07.508L7.16 2.228a.5.5 0 1 0-.863.501l1.72 2.96A8.96 8.96 0 0 0 3.09 12.5h17.82a8.96 8.96 0 0 0-4.927-6.811l1.72-2.96a.5.5 0 0 0-.18-.682M8.5 10.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2m7 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2M3 13.5v6A2.5 2.5 0 0 0 5.5 22h13a2.5 2.5 0 0 0 2.5-2.5v-6z"/></svg>
+              Android
+            </div>
+            <span class="store-badge" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 238.96 70.87" aria-hidden="true">
+                <title>Get it on Google Play</title>
+                <defs>
+                  <style>
+                    .gp-gray{fill:#a6a6a6}
+                    .gp-white-stroke{fill:#fff;stroke:#fff;stroke-miterlimit:10;stroke-width:.2px}
+                    .gp-white{fill:#fff}
+                    .gp-blue{fill:#4285f4}
+                    .gp-green{fill:#34a853}
+                    .gp-yellow{fill:#fbbc04}
+                    .gp-red{fill:#ea4335}
+                  </style>
+                </defs>
+                <rect x="-.11" width="239.17" height="70.87" rx="8.86" ry="8.86"/>
+                <path class="gp-gray" d="M230.21,1.42c4.1,0,7.44,3.34,7.44,7.44v53.15c0,4.1-3.34,7.44-7.44,7.44H8.75c-4.1,0-7.44-3.34-7.44-7.44V8.86C1.31,4.76,4.65,1.42,8.75,1.42h221.46M230.21,0H8.75C3.88,0-.11,3.99-.11,8.86v53.15c0,4.87,3.99,8.86,8.86,8.86h221.46c4.87,0,8.86-3.99,8.86-8.86V8.86c0-4.87-3.99-8.86-8.86-8.86h0Z"/>
+                <g>
+                  <path class="gp-white-stroke" d="M83.9,18.15c0,1.48-.44,2.67-1.32,3.55-1,1.05-2.3,1.57-3.9,1.57s-2.84-.53-3.91-1.59c-1.07-1.06-1.61-2.38-1.61-3.96s.54-2.89,1.61-3.96c1.07-1.06,2.38-1.6,3.91-1.6.76,0,1.49.15,2.18.44.69.3,1.25.69,1.66,1.19l-.93.94c-.7-.84-1.67-1.26-2.91-1.26-1.12,0-2.09.39-2.9,1.18s-1.22,1.81-1.22,3.06.41,2.28,1.22,3.06c.82.79,1.78,1.18,2.9,1.18,1.19,0,2.18-.4,2.97-1.19.51-.52.81-1.23.89-2.15h-3.86v-1.28h5.15c.05.28.07.54.07.8Z"/>
+                  <path class="gp-white-stroke" d="M92.07,13.71h-4.84v3.37h4.37v1.28h-4.37v3.37h4.84v1.31h-6.21v-10.63h6.21v1.31h0Z"/>
+                  <path class="gp-white-stroke" d="M97.83,23.03h-1.37v-9.32h-2.97v-1.31h7.3v1.31h-2.97s0,9.32,0,9.32Z"/>
+                  <path class="gp-white-stroke" d="M106.08,23.03v-10.63h1.36v10.63h-1.36Z"/>
+                  <path class="gp-white-stroke" d="M113.51,23.03h-1.37v-9.32h-2.97v-1.31h7.3v1.31h-2.97s0,9.32,0,9.32Z"/>
+                  <path class="gp-white-stroke" d="M130.3,21.66c-1.05,1.08-2.34,1.61-3.9,1.61s-2.85-.54-3.9-1.61c-1.05-1.07-1.57-2.39-1.57-3.94s.52-2.87,1.57-3.94c1.04-1.08,2.34-1.61,3.9-1.61s2.84.54,3.89,1.62c1.05,1.08,1.57,2.39,1.57,3.93s-.52,2.87-1.57,3.94ZM123.52,20.77c.79.8,1.75,1.19,2.89,1.19s2.1-.4,2.89-1.19c.79-.8,1.18-1.81,1.18-3.05s-.4-2.26-1.18-3.05c-.78-.8-1.75-1.19-2.89-1.19s-2.1.4-2.89,1.19c-.78.8-1.18,1.81-1.18,3.05s.4,2.26,1.18,3.05Z"/>
+                  <path class="gp-white-stroke" d="M133.79,23.03v-10.63h1.66l5.17,8.27h.06l-.06-2.05v-6.22h1.37v10.63h-1.43l-5.41-8.67h-.06l.06,2.05v6.62h-1.37,0Z"/>
+                </g>
+                <path class="gp-white" d="M120.61,38.54c-4.17,0-7.56,3.17-7.56,7.53s3.4,7.53,7.56,7.53,7.56-3.2,7.56-7.53-3.4-7.53-7.56-7.53ZM120.61,50.64c-2.28,0-4.25-1.88-4.25-4.57s1.97-4.57,4.25-4.57,4.25,1.85,4.25,4.57-1.97,4.57-4.25,4.57ZM104.11,38.54c-4.17,0-7.56,3.17-7.56,7.53s3.4,7.53,7.56,7.53,7.56-3.2,7.56-7.53-3.4-7.53-7.56-7.53ZM104.11,50.64c-2.28,0-4.25-1.88-4.25-4.57s1.97-4.57,4.25-4.57,4.25,1.85,4.25,4.57-1.97,4.57-4.25,4.57ZM84.48,40.85v3.2h7.65c-.23,1.8-.83,3.11-1.74,4.03-1.11,1.11-2.85,2.34-5.91,2.34-4.71,0-8.39-3.8-8.39-8.51s3.68-8.51,8.39-8.51c2.54,0,4.4,1,5.76,2.28l2.26-2.26c-1.91-1.83-4.45-3.22-8.02-3.22-6.45,0-11.87,5.25-11.87,11.7s5.42,11.7,11.87,11.7c3.48,0,6.11-1.14,8.16-3.28,2.11-2.11,2.77-5.08,2.77-7.48,0-.74-.06-1.43-.17-2h-10.76,0ZM164.75,43.33c-.63-1.68-2.54-4.8-6.45-4.8s-7.11,3.05-7.11,7.53c0,4.22,3.2,7.53,7.48,7.53,3.45,0,5.45-2.11,6.28-3.34l-2.57-1.71c-.86,1.26-2.03,2.08-3.71,2.08s-2.88-.77-3.65-2.28l10.08-4.17-.34-.86h0ZM154.47,45.84c-.09-2.91,2.26-4.4,3.94-4.4,1.31,0,2.43.66,2.8,1.6l-6.74,2.8ZM146.28,53.15h3.31v-22.15h-3.31v22.15ZM140.86,40.22h-.11c-.74-.88-2.17-1.68-3.97-1.68-3.77,0-7.22,3.31-7.22,7.56s3.45,7.51,7.22,7.51c1.8,0,3.22-.8,3.97-1.71h.11v1.08c0,2.88-1.54,4.42-4.03,4.42-2.03,0-3.28-1.46-3.8-2.68l-2.88,1.2c.83,2,3.03,4.45,6.68,4.45,3.88,0,7.16-2.28,7.16-7.85v-13.53h-3.14v1.23ZM137.06,50.64c-2.28,0-4.2-1.91-4.2-4.54s1.91-4.6,4.2-4.6,4.03,1.94,4.03,4.6-1.77,4.54-4.03,4.54ZM180.26,31h-7.92v22.15h3.31v-8.39h4.62c3.66,0,7.27-2.65,7.27-6.88s-3.6-6.88-7.27-6.88ZM180.34,41.68h-4.7v-7.59h4.7c2.47,0,3.87,2.05,3.87,3.8s-1.4,3.8-3.87,3.8h0ZM200.77,38.5c-2.39,0-4.87,1.05-5.9,3.39l2.94,1.23c.63-1.23,1.79-1.62,3.02-1.62,1.71,0,3.45,1.03,3.48,2.85v.23c-.6-.34-1.88-.86-3.45-.86-3.16,0-6.38,1.74-6.38,4.99,0,2.96,2.59,4.87,5.5,4.87,2.22,0,3.45-1,4.22-2.16h.11v1.71h3.19v-8.49c0-3.93-2.94-6.13-6.73-6.13h0ZM200.38,50.63c-1.08,0-2.59-.54-2.59-1.88,0-1.71,1.88-2.37,3.5-2.37,1.45,0,2.14.31,3.02.74-.26,2.05-2.02,3.5-3.93,3.5ZM219.12,38.98l-3.79,9.6h-.11l-3.93-9.6h-3.56l5.9,13.42-3.36,7.47h3.45l9.09-20.89h-3.68ZM189.35,53.15h3.31v-22.15h-3.31v22.15Z"/>
+                <g>
+                  <path class="gp-red" d="M36.6,34.41l-18.86,20.02s0,0,0,.01c.58,2.17,2.56,3.77,4.92,3.77.94,0,1.83-.26,2.58-.7l.06-.04,21.23-12.25-9.94-10.82Z"/>
+                  <path class="gp-yellow" d="M55.68,31h-.02s-9.17-5.33-9.17-5.33l-10.33,9.19,10.36,10.36,9.12-5.26c1.6-.86,2.68-2.55,2.68-4.49s-1.07-3.61-2.65-4.47h0Z"/>
+                  <path class="gp-blue" d="M17.73,16.44c-.11.42-.17.86-.17,1.31v35.38c0,.45.06.89.17,1.31l19.51-19.51-19.51-18.49Z"/>
+                  <path class="gp-green" d="M36.74,35.43l9.76-9.76-21.21-12.3c-.77-.46-1.67-.73-2.63-.73-2.36,0-4.34,1.6-4.92,3.78h0s19,19,19,19h0Z"/>
+                </g>
+              </svg>
+            </span>
+          </a>
+        </section>
+        <section class="panel">
+          <h2>How to participate</h2>
+          <div class="button-stack">
+            <a class="btn" href="https://github.com/kagisearch/smallweb#%EF%B8%8F-guidelines-for-adding-a-site-or-channel-to-the-list-%EF%B8%8F" target="_blank" rel="noopener noreferrer">Add a site or channel</a>
+            <a class="btn ghost" href="https://github.com/kagisearch/smallweb#the-small-web-seal-badge-of-authentic-creation" target="_blank" rel="noopener noreferrer">
+              <span class="badges-content">
+                <span>Display badges</span>
+                <span class="badges-row">
+                  <img class="badge-inline" src="https://kagifeedback.org/assets/files/2025-11-27/1764251011-383809-88x31-3.jpg" alt="Small Web seal badge">
+                  <img class="badge-inline" src="https://kagifeedback.org/assets/files/2025-11-27/1764250993-634450-88x31-2.png" alt="Small Web seal badge">
+                </span>
+              </span>
+            </a>
+          </div>
+        </section>
+
+        <a class="btn ghost link-button" href="https://www.youtube.com/watch?v=af0OjIkt9dY" target="_blank" rel="noopener noreferrer">
+          <span>
+            Learn more about why <span class="brand">Kagi</span> is committed to the <span class="brand">Small Web</span>
+            <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </span>
+        </a>
+      </main>
+
+      <footer class="footer">
+        <div class="footer-inner">
+          <div>Small Web highlights genuine human voices across the web. Read the <a href="https://blog.kagi.com/small-web" target="_blank" rel="noopener noreferrer">blog post</a> and explore the <a href="https://github.com/kagisearch/smallweb#small-web" target="_blank" rel="noopener noreferrer">sources</a>.</div>
+          <a class="footer-right" href="https://kagi.com" target="_blank" rel="noopener noreferrer">kagi.com</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
