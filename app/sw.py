@@ -41,7 +41,7 @@ favorite_emoji_list = ["👍","😍","😀","😘","😆","😜","🫶","😂","
 
 def compute_appreciated_version(urls_list):
     """Compute sha1 hash of sorted URLs for version tracking.
-    
+
     The version changes whenever the appreciated feed contents change
     (add/remove URLs, or if the canonical ordering changes).
     """
@@ -52,7 +52,7 @@ def compute_appreciated_version(urls_list):
 
 def generate_appreciated_json():
     """Generate and cache JSON representation of appreciated feed.
-    
+
     Response format:
     {
         "version": "abc123...",  # sha1 hash of sorted URLs
@@ -63,10 +63,10 @@ def generate_appreciated_json():
     }
     """
     global appreciated_version, appreciated_json_cache, appreciated_json_gzip
-    
+
     # Compute version from current appreciated list
     appreciated_version = compute_appreciated_version(urls_app_cache)
-    
+
     # Build the urls array with minimal data per item
     urls_array = []
     for idx, entry in enumerate(urls_app_cache):
@@ -79,17 +79,17 @@ def generate_appreciated_json():
             "title": title or "",
             "author": author or "",
         })
-    
+
     # Build response object
     response_data = {
         "version": appreciated_version,
         "urls": urls_array,
     }
-    
+
     # Cache JSON and gzipped version
     appreciated_json_cache = json.dumps(response_data, separators=(",", ":"))
     appreciated_json_gzip = gzip.compress(appreciated_json_cache.encode("utf-8"))
-    
+
     return appreciated_json_cache
 
 
@@ -110,7 +110,7 @@ def generate_appreciated_feed():
             updated=updated,
             author=author,
         )
-    
+
     # Also regenerate JSON cache when feed changes
     generate_appreciated_json()
 
@@ -192,6 +192,44 @@ app = Flask(__name__, static_url_path=prefix + "/static")
 app.jinja_env.filters["time_ago"] = time_ago
 
 master_feed = False
+
+# Simple bot detection state
+_bot_detection = {}
+
+RATE_LIMIT = 30  # max requests per window
+WINDOW_SECONDS = 60
+BLOCK_SECONDS = 300
+
+def is_bot_request():
+    # Determine if request is from a bot by UA and rate limit per IP
+    ip = request.remote_addr or request.headers.get('X-Forwarded-For', '')
+    ua = request.headers.get('User-Agent', '') or ''
+    ua_lc = ua.lower()
+    bot_indicators = ['bot','crawl','spider','slurp','libcurl','wget','curl','python-urllib','httpclient','semrush','ahrefs']
+    if not ua or any(b in ua_lc for b in bot_indicators):
+        return True
+    # simple rate limit per IP
+    now = datetime.utcnow()
+    rec = _bot_detection.get(ip)
+    if rec is None:
+        rec = {'start': now, 'count': 0, 'blocked_until': None}
+        _bot_detection[ip] = rec
+    if rec.get('blocked_until') and now < rec['blocked_until']:
+        return True
+    if (now - rec['start']).total_seconds() > WINDOW_SECONDS:
+        rec['start'] = now
+        rec['count'] = 0
+    rec['count'] += 1
+    if rec['count'] > RATE_LIMIT:
+        rec['blocked_until'] = now + timedelta(seconds=BLOCK_SECONDS)
+        return True
+    return False
+
+@app.before_request
+def _bot_before_request():
+    if is_bot_request():
+        return make_response('Bot detected', 429)
+
 
 
 def update_all():
@@ -300,7 +338,7 @@ def update_entries(url):
 
 def load_public_suffix_list(file_path):
     public_suffix_list = set()
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line and not line.startswith("//"):
@@ -453,7 +491,7 @@ def index():
 
     # get flagged content
     flag_content_count = flagged_content_dict.get(url, 0)
-    
+
 
     if url.startswith("http://"):
         url = url.replace(
@@ -526,7 +564,7 @@ def favorite():
         # Update urls_app_cache with the new favorite from both regular and YouTube feeds
         urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
                           if e[0] in favorites_dict]
-        
+
         # Regenerate the appreciated feed
         generate_appreciated_feed()
 
@@ -638,10 +676,10 @@ def appreciated():
 @app.route("/smallweb/appreciated.json")
 def appreciated_json():
     """Full appreciated feed as JSON for client-side random selection.
-    
+
     Returns the complete list of appreciated URLs with version info.
     Supports ETag for conditional requests (304 Not Modified).
-    
+
     Response:
     {
         "version": "abc123...",
@@ -652,11 +690,11 @@ def appreciated_json():
     }
     """
     global appreciated_version, appreciated_json_cache, appreciated_json_gzip
-    
+
     # Ensure cache exists
     if appreciated_json_cache is None:
         generate_appreciated_json()
-    
+
     # Check for conditional request (ETag)
     etag = f'"{appreciated_version}"'
     if_none_match = request.headers.get("If-None-Match")
@@ -665,7 +703,7 @@ def appreciated_json():
         response.headers["ETag"] = etag
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
-    
+
     # Check if client accepts gzip
     accept_encoding = request.headers.get("Accept-Encoding", "")
     if "gzip" in accept_encoding and appreciated_json_gzip:
@@ -673,7 +711,7 @@ def appreciated_json():
         response.headers["Content-Encoding"] = "gzip"
     else:
         response = make_response(appreciated_json_cache)
-    
+
     response.headers["Content-Type"] = "application/json"
     response.headers["ETag"] = etag
     response.headers["Cache-Control"] = "public, max-age=300"  # cache for 5 min
@@ -850,7 +888,7 @@ def save_all_data():
             print(f"[DEBUG] Saved {len(flagged_content_dict)} flagged items")
     except Exception as e:
         print(f"Error saving flagged content: {e}")
-    
+
 
 atexit.register(save_all_data)
 atexit.register(lambda: scheduler.shutdown())
