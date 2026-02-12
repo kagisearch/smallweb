@@ -647,6 +647,12 @@ body.dark .emoji-badge,
   transition: all 0.15s ease;
   white-space: nowrap;
 }
+.category-toggle svg {
+  margin-top: 2px;
+}
+.category-toggle .cat-inline-clear {
+  margin-top: 2px;
+}
 .category-toggle:hover,
 .category-toggle.active {
   background: rgba(255, 255, 255, 0.12);
@@ -668,10 +674,10 @@ body.dark .emoji-badge,
   padding: 0 0 0 4px;
   font-family: pixel, Arial, sans-serif;
   line-height: 1;
-  vertical-align: middle;
+  align-self: center;
 }
 .cat-inline-clear:hover { color: #e74c3c; }
-.category-toggle.has-filter .cat-inline-clear { display: inline; }
+.category-toggle.has-filter .cat-inline-clear { display: inline-flex; }
 
 .category-dropdown {
   position: absolute;

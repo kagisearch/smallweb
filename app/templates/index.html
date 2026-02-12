@@ -190,7 +190,7 @@
           </svg>
           {% if current_cat and current_cat in categories %}
             <span id="catLabel">{{ categories[current_cat][0] }}</span>
-            <a href="{{ prefix }}" class="cat-inline-clear" style="display:inline" title="Clear filter">&times;</a>
+            <a href="{{ prefix }}" class="cat-inline-clear" title="Clear filter">&times;</a>
           {% else %}
             <span id="catLabel">All Topics</span>
           {% endif %}
@@ -294,8 +294,13 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
 
   {% if no_results %}
     <div id="content" class="no-results" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: calc(100vh - 60px);">
+      {% if no_results_cat is defined and no_results_cat %}
+      <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
+      <a href="{{ prefix }}" class="clear-search-button">Show All Topics</a>
+      {% else %}
       <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No results found for "{{ search_query }}"</h2>
       <a href="{{ prefix }}" class="clear-search-button">Clear Search</a>
+      {% endif %}
     </div>
   {% elif current_mode == 1 %}
     <div id="content-yt">

@@ -448,6 +448,37 @@ def index():
         else:
             cache = [entry for entry in cache if current_cat in entry[5]]
 
+        if not cache:
+            return render_template(
+                "index.html",
+                url="",
+                short_url="",
+                query_string="",
+                title="",
+                author="",
+                domain="",
+                prefix=prefix + "/",
+                videoid="",
+                current_mode=current_mode,
+                favorites_count=0,
+                notes_count=0,
+                notes_list=[],
+                flag_content_count=0,
+                search_query="",
+                no_results=True,
+                no_results_cat=current_cat,
+                reactions_dict=OrderedDict(),
+                reactions_list=[],
+                favorites_total=0,
+                next_link="",
+                next_doc_url="",
+                next_host="",
+                categories=CATEGORIES,
+                category_groups=CATEGORY_GROUPS,
+                current_cat=current_cat,
+                category_counts=category_counts,
+            )
+
     if url is not None:
         http_url = url.replace("https://", "http://")
         title, author, description = next(
