@@ -27,6 +27,41 @@ from collections import OrderedDict
 import uuid
 import json
 
+# Category definitions — slug → label · description
+CATEGORIES = OrderedDict([
+    ("ai",           ("AI",                "LLMs · machine learning · AI tools · ethics · agents")),
+    ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases")),
+    ("tech",         ("Technology",         "Tech news · apps · networking · sysadmin · social media")),
+    ("hardware",     ("Hardware",           "Electronics · DIY · 3D printing · gadgets · home lab")),
+    ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software")),
+    ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities")),
+    ("science",      ("Science",            "Physics · biology · climate · math · space · medicine")),
+    ("humanities",   ("Humanities",         "History · philosophy · language · linguistics · literature")),
+    ("essays",       ("Essays",             "Long-form pieces · original arguments · in-depth analysis")),
+    ("art",          ("Art & Design",       "Visual art · illustration · architecture · graphic design")),
+    ("photography",  ("Photography",        "Cameras · photo essays · visual storytelling")),
+    ("culture",      ("Pop Culture",        "Film · TV · music · books · fandom · comics")),
+    ("gaming",       ("Gaming",             "Video games · tabletop RPGs · game dev · interactive fiction")),
+    ("politics",     ("Politics",           "Government · policy · elections · law · political commentary")),
+    ("economy",      ("Economy",            "Economics · finance · markets · business · labor · trade")),
+    ("society",      ("Society",            "Social issues · civil rights · current events · community")),
+    ("daily",        ("Daily Life",         "Personal updates · diary entries · day-to-day · mundane life")),
+    ("life",         ("Life & Personal",    "Health · parenting · pets · personal growth · relationships")),
+    ("food",         ("Food & Drink",       "Recipes · cooking · restaurants · coffee · wine · baking")),
+    ("nature",       ("Nature & Outdoors",  "Hiking · travel · adventure · wildlife · gardening")),
+    ("uncategorized",("Uncategorized",      "Posts that don\u2019t fit neatly into any topic")),
+])
+
+# Groups for dropdown display
+CATEGORY_GROUPS = OrderedDict([
+    ("Tech & Science",    ["ai", "programming", "tech", "hardware", "retro", "security", "science"]),
+    ("Culture & Creative",["humanities", "essays", "art", "photography", "culture", "gaming"]),
+    ("Life & World",      ["politics", "economy", "society", "daily", "life", "food", "nature"]),
+    ("Other",             ["uncategorized"]),
+])
+
+CATEGORY_SCHEME = "https://kagi.com/smallweb/categories"
+
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None          # will hold generated OPML xml
 
@@ -276,6 +311,14 @@ def update_entries(url):
                 except Exception:
                     pass
 
+            # Parse category tags from Atom <category> elements
+            categories = []
+            for tag in entry.get('tags', []):
+                term = tag.get('term', '')
+                scheme = tag.get('scheme', '')
+                if scheme == CATEGORY_SCHEME and term in CATEGORIES:
+                    categories.append(term)
+
             formatted_entries.append(
                 {
                     "domain": domain,
@@ -284,11 +327,12 @@ def update_entries(url):
                     "author": entry.author,
                     "description": entry.get('description', ''),
                     "updated": updated,
+                    "categories": categories,
                 }
             )
 
         cache = [
-            (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"])
+            (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"], entry["categories"])
             for entry in formatted_entries
             if entry["link"].startswith("https://")  # Only allow https:// URLs for iframe embedding
         ]
@@ -381,7 +425,28 @@ def index():
                 next_link="",
                 next_doc_url="",
                 next_host="",
+                categories=CATEGORIES,
+                category_groups=CATEGORY_GROUPS,
+                current_cat="",
+                category_counts={},
             )
+
+    # Category counts (before filtering, so user sees totals)
+    category_counts = {}
+    if current_mode == 0:
+        for entry in cache:
+            for cat_slug in entry[5]:
+                category_counts[cat_slug] = category_counts.get(cat_slug, 0) + 1
+            if not entry[5]:
+                category_counts["uncategorized"] = category_counts.get("uncategorized", 0) + 1
+
+    # Category filtering
+    current_cat = request.args.get("cat", "")
+    if current_cat and current_cat in CATEGORIES:
+        if current_cat == "uncategorized":
+            cache = [entry for entry in cache if not entry[5]]
+        else:
+            cache = [entry for entry in cache if current_cat in entry[5]]
 
     if url is not None:
         http_url = url.replace("https://", "http://")
@@ -396,7 +461,7 @@ def index():
 
     if title is None:
         if cache and len(cache):
-            url, title, author, _description, _date = random.choice(cache)
+            url, title, author, _description, _date, _cats = random.choice(cache)
         else:
             url, title, author = (
                 "https://blog.kagi.com/small-web",
@@ -500,6 +565,10 @@ def index():
         favorites_total=favorites_total,
         favorite_emoji_list=favorite_emoji_list,
         reactions_dict=reactions_dict,
+        categories=CATEGORIES,
+        category_groups=CATEGORY_GROUPS,
+        current_cat=current_cat,
+        category_counts=category_counts,
     )
 
 
