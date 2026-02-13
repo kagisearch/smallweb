@@ -180,6 +180,40 @@
       </div>
       -->
 
+      {% if current_mode == 0 %}
+      <!-- Categories dropdown — web mode only -->
+      <div class="category-wrapper">
+        <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          {% if current_cat and current_cat in categories %}
+            <span id="catLabel">{{ categories[current_cat][0] }}</span>
+            <a href="{{ prefix }}" class="cat-inline-clear" title="Clear filter">&times;</a>
+          {% else %}
+            <span id="catLabel">All Topics</span>
+          {% endif %}
+        </button>
+        <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
+          <div class="cat-columns">
+          {% for group_name, slugs in category_groups.items() %}
+            <div class="cat-group-label">{{ group_name }}</div>
+            {% for slug in slugs %}
+              {% set cat = categories[slug] %}
+              <a href="{{ prefix }}?cat={{ slug }}"
+                 class="cat-item{% if current_cat == slug %} selected{% endif %}"
+                 data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
+                <div class="cat-name">{{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
+                <div class="cat-desc">{{ cat[1] }}</div>
+              </a>
+            {% endfor %}
+          {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       {% if current_mode==1 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
         <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
@@ -256,10 +290,17 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
         </div>
   </div>
 
+  <div class="cat-backdrop" id="catBackdrop"></div>
+
   {% if no_results %}
     <div id="content" class="no-results" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: calc(100vh - 60px);">
+      {% if no_results_cat is defined and no_results_cat %}
+      <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
+      <a href="{{ prefix }}" class="clear-search-button">Show All Topics</a>
+      {% else %}
       <h2 style="font-family: pixel, Arial, sans-serif; color: #2c3e50; margin-bottom: 20px;">No results found for "{{ search_query }}"</h2>
       <a href="{{ prefix }}" class="clear-search-button">Clear Search</a>
+      {% endif %}
     </div>
   {% elif current_mode == 1 %}
     <div id="content-yt">
@@ -295,6 +336,77 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
       referrerpolicy="no-referrer"
       style="display:none;width:0;height:0;border:0;visibility:hidden;"></iframe>
   {% endif %}
+
+<script>
+// ── Categories dropdown ──
+(() => {
+  const toggle   = document.getElementById('catToggle');
+  const dropdown = document.getElementById('catDropdown');
+  const backdrop = document.getElementById('catBackdrop');
+  if (!toggle || !dropdown) return;
+
+  const allItems = [...dropdown.querySelectorAll('.cat-item')];
+  let focusIndex = -1;
+
+  function openDropdown() {
+    dropdown.classList.add('open');
+    backdrop.classList.add('open');
+    toggle.classList.add('active');
+    toggle.setAttribute('aria-expanded', 'true');
+    focusIndex = -1;
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('open');
+    backdrop.classList.remove('open');
+    toggle.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.focus();
+  }
+
+  toggle.addEventListener('click', (e) => {
+    if (e.target.closest('.cat-inline-clear')) return;
+    dropdown.classList.contains('open') ? closeDropdown() : openDropdown();
+  });
+
+  backdrop.addEventListener('click', closeDropdown);
+
+  document.addEventListener('keydown', (e) => {
+    const isOpen = dropdown.classList.contains('open');
+    if (e.key === 'Escape' && isOpen) { closeDropdown(); return; }
+    if (!isOpen) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      focusIndex = Math.min(focusIndex + 1, allItems.length - 1);
+      updateFocus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      focusIndex = Math.max(focusIndex - 1, 0);
+      updateFocus();
+    } else if (e.key === 'Enter' && focusIndex >= 0) {
+      e.preventDefault();
+      window.location.href = allItems[focusIndex].href;
+    } else if (e.key.length === 1 && /[a-z]/i.test(e.key)) {
+      const char = e.key.toLowerCase();
+      const idx = allItems.findIndex(i =>
+        i.querySelector('.cat-name').textContent.toLowerCase().startsWith(char));
+      if (idx >= 0) { focusIndex = idx; updateFocus(); }
+    }
+  });
+
+  function updateFocus() {
+    allItems.forEach((item, i) => {
+      if (i === focusIndex) {
+        item.style.background = 'rgba(52,152,219,0.3)';
+        item.scrollIntoView({ block: 'nearest' });
+      } else if (!item.classList.contains('selected')) {
+        item.style.background = '';
+      }
+    });
+  }
+})();
+</script>
 
 <script>
 (() => {                 // IIFE – keeps global scope clean
