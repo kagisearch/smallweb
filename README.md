@@ -21,11 +21,11 @@ If the blog is included in small web feed list (which means it has content in En
 - Blog has recent posts (<7 days old)
 - The website can appear in an iframe
   
-## Guidelines for adding a site or channel to the list
+## ⚠️ Guidelines for adding a site or channel to the list ⚠️
 
 Add a new personal blog RSS feed to the list. Rules:
 
-- **Do not submit your own website unless you submit 2 other sites that are not yours (and are not in list).**
+- **If submitting your own website, you must add at least 2 other sites that are not yours (and are not in list yet) in the same commit.**
 - Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - No illegal or NSFW content.
