@@ -444,7 +444,7 @@ def index():
     current_cat = request.args.get("cat", "")
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
-            cache = [entry for entry in cache if not entry[5]]
+            cache = [entry for entry in cache if not entry[5] or "uncategorized" in entry[5]]
         else:
             cache = [entry for entry in cache if current_cat in entry[5]]
 
@@ -766,7 +766,7 @@ def feed():
             title += f" - {CATEGORIES[cat][0]}"
             feed_url = f"https://kagi.com/smallweb/feed?cat={cat}"
             if cat == "uncategorized":
-                cache = [e for e in cache if not e[5]]
+                cache = [e for e in cache if not e[5] or "uncategorized" in e[5]]
             else:
                 cache = [e for e in cache if cat in e[5]]
         else:
