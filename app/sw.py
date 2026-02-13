@@ -745,6 +745,7 @@ def flag_content():
 
 
 @app.route("/feed")
+@app.route(f"{prefix}/feed")
 def feed():
     """Per-mode Atom feed. Accepts the same query params as the main route."""
     if "yt" in request.args:
