@@ -305,6 +305,8 @@ body {
   cursor: pointer;
   position: relative;
   display: inline-block;
+  font-family: pixel, Arial, sans-serif;
+  font-size: 20px;
 }
 
 .note {
