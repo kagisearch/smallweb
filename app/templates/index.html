@@ -16,6 +16,9 @@
   <meta name="twitter:title" content="Kagi Small Web">
   <meta name="twitter:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
   <meta name="twitter:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
+  {% if feed_url is defined and feed_url %}
+  <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
+  {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if current_mode != 2 %}
   {# Prefetch next link for non-appreciated modes (appreciated uses client-side queue) #}

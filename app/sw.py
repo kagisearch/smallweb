@@ -556,6 +556,20 @@ def index():
             "http://", "https://"
         )  # force https as http will not work inside https iframe anyway
 
+    # Build feed URL for <link rel="alternate">
+    if current_mode == 1:
+        feed_url = prefix + "/feed?yt"
+    elif current_mode == 2:
+        feed_url = prefix + "/feed?app"
+    elif current_mode == 3:
+        feed_url = prefix + "/feed?gh"
+    elif current_mode == 4:
+        feed_url = prefix + "/feed?comic"
+    elif current_cat:
+        feed_url = prefix + "/feed?cat=" + current_cat
+    else:
+        feed_url = prefix + "/feed"
+
     # Calculate counts
     all_count = len(urls_cache) if urls_cache else 0
     appreciated_count = len(urls_app_cache) if urls_app_cache else 0
@@ -600,6 +614,7 @@ def index():
         category_groups=CATEGORY_GROUPS,
         current_cat=current_cat,
         category_counts=category_counts,
+        feed_url=feed_url,
     )
 
 
@@ -727,6 +742,47 @@ def flag_content():
     response.set_cookie("flagged_urls", "|".join(flagged_urls_list), max_age=31536000)  # 1 year
 
     return response
+
+
+@app.route("/feed")
+def feed():
+    """Per-mode Atom feed. Accepts the same query params as the main route."""
+    if "yt" in request.args:
+        cache, title = urls_yt_cache, "Kagi Small Web - Videos"
+        feed_url = "https://kagi.com/smallweb/feed?yt"
+    elif "app" in request.args:
+        cache, title = urls_app_cache, "Kagi Small Web - Appreciated"
+        feed_url = "https://kagi.com/smallweb/feed?app"
+    elif "gh" in request.args:
+        cache, title = urls_gh_cache, "Kagi Small Web - Code"
+        feed_url = "https://kagi.com/smallweb/feed?gh"
+    elif "comic" in request.args:
+        cache, title = urls_comic_cache, "Kagi Small Web - Comics"
+        feed_url = "https://kagi.com/smallweb/feed?comic"
+    else:
+        cache, title = urls_cache, "Kagi Small Web"
+        cat = request.args.get("cat", "")
+        if cat and cat in CATEGORIES:
+            title += f" - {CATEGORIES[cat][0]}"
+            feed_url = f"https://kagi.com/smallweb/feed?cat={cat}"
+            if cat == "uncategorized":
+                cache = [e for e in cache if not e[5]]
+            else:
+                cache = [e for e in cache if cat in e[5]]
+        else:
+            feed_url = "https://kagi.com/smallweb/feed"
+
+    atom = AtomFeed(title, feed_url=feed_url)
+    for url_item, entry_title, author, description, updated, *_ in cache:
+        atom.add(
+            title=entry_title,
+            content=description,
+            content_type="html",
+            url=url_item,
+            updated=updated,
+            author=author,
+        )
+    return Response(atom.to_string(), mimetype="application/atom+xml")
 
 
 @app.route("/appreciated")
