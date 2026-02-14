@@ -626,6 +626,7 @@ def index():
 
 
 @app.post("/favorite")
+@app.post(f"{prefix}/favorite")
 def favorite():
     global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
     url = request.form.get("url")
@@ -676,6 +677,7 @@ def favorite():
 
 
 @app.post("/note")
+@app.post(f"{prefix}/note")
 def note():
     global notes_dict, time_saved_notes
     url = request.form.get("url")
@@ -709,6 +711,7 @@ def note():
 
 
 @app.post("/flag_content")
+@app.post(f"{prefix}/flag_content")
 def flag_content():
     global flagged_content_dict, time_saved_flagged_content
     url = request.form.get("url")
