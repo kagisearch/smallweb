@@ -106,6 +106,13 @@
         <a class="phone" href="{{url}}">{{domain}}</a>
 
       </div>
+      {% if current_mode == 0 and post_categories %}
+      <div class="post-cats">
+        {% for slug, label in post_categories %}
+        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip">{{ label }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
       {% endif %}
 
       <form action="{{ prefix }}" method="get" id="search-form">

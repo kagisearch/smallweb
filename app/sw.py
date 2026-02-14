@@ -373,6 +373,7 @@ def index():
     url = request.args.get("url")
     search_query = request.args.get("search", "").lower()
     title = None
+    post_cats = []
     current_mode = 0
     if "yt" in request.args:
         cache = urls_yt_cache
@@ -429,6 +430,7 @@ def index():
                 category_groups=CATEGORY_GROUPS,
                 current_cat="",
                 category_counts={},
+                post_categories=[],
             )
 
     # Category counts (before filtering, so user sees totals)
@@ -477,22 +479,23 @@ def index():
                 category_groups=CATEGORY_GROUPS,
                 current_cat=current_cat,
                 category_counts=category_counts,
+                post_categories=[],
             )
 
     if url is not None:
         http_url = url.replace("https://", "http://")
-        title, author, description = next(
+        title, author, description, post_cats = next(
             (
-                (url_tuple[1], url_tuple[2], url_tuple[3])
+                (url_tuple[1], url_tuple[2], url_tuple[3], url_tuple[5])
                 for url_tuple in cache
                 if url_tuple[0] == url or url_tuple[0] == http_url
             ),
-            (None, None, None),
+            (None, None, None, []),
         )
 
     if title is None:
         if cache and len(cache):
-            url, title, author, _description, _date, _cats = random.choice(cache)
+            url, title, author, _description, _date, post_cats = random.choice(cache)
         else:
             url, title, author = (
                 "https://blog.kagi.com/small-web",
@@ -549,7 +552,9 @@ def index():
 
     # get flagged content
     flag_content_count = flagged_content_dict.get(url, 0)
-    
+
+    # Build (slug, label) tuples for the current post's categories
+    post_categories = [(s, CATEGORIES[s][0]) for s in post_cats if s in CATEGORIES]
 
     if url.startswith("http://"):
         url = url.replace(
@@ -614,6 +619,7 @@ def index():
         category_groups=CATEGORY_GROUPS,
         current_cat=current_cat,
         category_counts=category_counts,
+        post_categories=post_categories,
         feed_url=feed_url,
     )
 
