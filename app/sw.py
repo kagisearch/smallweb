@@ -46,18 +46,18 @@ CATEGORIES = OrderedDict([
     ("politics",     ("Politics",           "Government · policy · elections · law · political commentary")),
     ("economy",      ("Economy",            "Economics · finance · markets · business · labor · trade")),
     ("society",      ("Society",            "Social issues · civil rights · current events · community")),
-    ("daily",        ("Daily Life",         "Personal updates · diary entries · day-to-day · mundane life")),
     ("life",         ("Life & Personal",    "Health · parenting · pets · personal growth · relationships")),
     ("food",         ("Food & Drink",       "Recipes · cooking · restaurants · coffee · wine · baking")),
     ("nature",       ("Nature & Outdoors",  "Hiking · travel · adventure · wildlife · gardening")),
     ("uncategorized",("Uncategorized",      "Posts that don\u2019t fit neatly into any topic")),
+    ("spam",         ("Spam",              "Suspected spam or low-quality content")),
 ])
 
 # Groups for dropdown display
 CATEGORY_GROUPS = OrderedDict([
     ("Tech & Science",    ["ai", "programming", "tech", "sysadmin", "hardware", "retro", "security", "science"]),
     ("Culture & Creative",["humanities", "essays", "art", "photography", "culture", "gaming"]),
-    ("Life & World",      ["politics", "economy", "society", "daily", "life", "food", "nature"]),
+    ("Life & World",      ["politics", "economy", "society", "life", "food", "nature"]),
     ("Other",             ["uncategorized"]),
 ])
 
@@ -388,7 +388,7 @@ def index():
     elif "comic" in request.args:
         cache = urls_comic_cache
         current_mode = 4
-    elif "viewflagged" in request.args:
+    elif "flagged" in request.args:
         cache = urls_flagged_cache
         current_mode = 5
     else:
