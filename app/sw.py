@@ -106,7 +106,7 @@ def generate_appreciated_json():
     # Build the urls array with minimal data per item
     urls_array = []
     for idx, entry in enumerate(urls_app_cache):
-        url_item, title, author, description, updated = entry
+        url_item, title, author, description, updated, *_ = entry
         # Generate stable ID from URL hash (consistent across restarts)
         item_id = hashlib.sha1(url_item.encode("utf-8")).hexdigest()[:12]
         urls_array.append({
@@ -137,7 +137,7 @@ def generate_appreciated_feed():
         feed_url="https://kagi.com/smallweb/appreciated"
     )
     for url_entry in urls_app_cache:
-        url_item, title, author, description, updated = url_entry
+        url_item, title, author, description, updated, *_ = url_entry
         appreciated_feed.add(
             title=title,
             content=description,
