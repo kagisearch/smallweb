@@ -31,7 +31,8 @@ import json
 CATEGORIES = OrderedDict([
     ("ai",           ("AI",                "LLMs · machine learning · AI tools · ethics · agents")),
     ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases")),
-    ("tech",         ("Technology",         "Tech news · apps · networking · sysadmin · social media")),
+    ("tech",         ("Technology",         "Tech news · apps · networking · social media")),
+    ("sysadmin",     ("Sysadmin",           "Deployment · cloud · containers · CI/CD · networking · self-hosting")),
     ("hardware",     ("Hardware",           "Electronics · DIY · 3D printing · gadgets · home lab")),
     ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software")),
     ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities")),
@@ -54,7 +55,7 @@ CATEGORIES = OrderedDict([
 
 # Groups for dropdown display
 CATEGORY_GROUPS = OrderedDict([
-    ("Tech & Science",    ["ai", "programming", "tech", "hardware", "retro", "security", "science"]),
+    ("Tech & Science",    ["ai", "programming", "tech", "sysadmin", "hardware", "retro", "security", "science"]),
     ("Culture & Creative",["humanities", "essays", "art", "photography", "culture", "gaming"]),
     ("Life & World",      ["politics", "economy", "society", "daily", "life", "food", "nature"]),
     ("Other",             ["uncategorized"]),

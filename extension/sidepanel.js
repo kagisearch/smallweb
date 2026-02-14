@@ -17,6 +17,7 @@ const CATEGORIES = {
   ai:            'AI',
   programming:   'Programming',
   tech:          'Technology',
+  sysadmin:      'Sysadmin',
   hardware:      'Hardware',
   retro:         'Retro',
   security:      'Security',
@@ -38,7 +39,7 @@ const CATEGORIES = {
 };
 
 const CATEGORY_GROUPS = [
-  { name: 'Tech & Science',     slugs: ['ai', 'programming', 'tech', 'hardware', 'retro', 'security', 'science'] },
+  { name: 'Tech & Science',     slugs: ['ai', 'programming', 'tech', 'sysadmin', 'hardware', 'retro', 'security', 'science'] },
   { name: 'Culture & Creative', slugs: ['humanities', 'essays', 'art', 'photography', 'culture', 'gaming'] },
   { name: 'Life & World',       slugs: ['politics', 'economy', 'society', 'daily', 'life', 'food', 'nature'] },
   { name: 'Other',              slugs: ['uncategorized'] }
