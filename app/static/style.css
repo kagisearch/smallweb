@@ -556,10 +556,12 @@ svg {
   }
 }
 
+@media (min-width: 1331px) {
+  /* .right is visible above 1330px and takes the space #switch needs */
+  #switch { display: none; }
+}
 @media (max-width: 960px) {
-  #switch {
-    display: none;
-  }
+  #switch { display: none; }
 }
 
 @media (max-width: 500px) {
