@@ -26,50 +26,38 @@
       </button>
     </div>
 
-    <!-- Current Post Card -->
-    <div class="post-card" id="postCard">
-      <!-- Loading State (shown during init) -->
-      <div class="post-loading" id="postLoading">
-        <div class="loading-spinner"></div>
-        <div class="post-loading-text">Loading feeds...</div>
-      </div>
-      <!-- Empty State (shown after init, before first discover) -->
-      <div class="post-empty" id="postEmpty" style="display: none;">
-        <div class="post-empty-icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="2" y1="12" x2="22" y2="12"></line>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-          </svg>
-        </div>
-        <div class="post-empty-text">Click Discover to find<br>a random blog post</div>
-      </div>
-      <div class="post-content" id="postContent" style="display: none;">
-        <div class="post-header">
-          <div class="post-info">
-            <div class="post-domain" id="postDomain"></div>
-            <div class="post-title" id="postTitle"></div>
-            <div class="post-author" id="postAuthor"></div>
-          </div>
-          <div class="post-actions">
-            <button class="action-btn save-btn" id="saveBtn" title="Save for later">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+    <!-- Loading State (shown during init) -->
+    <div class="init-loading" id="postLoading">
+      <div class="loading-spinner"></div>
+      <div class="post-loading-text">Loading feeds...</div>
     </div>
 
     <!-- Mode Tabs -->
-    <div class="mode-tabs">
-      <button class="mode-tab active" data-mode="blogs">Blogs</button>
-      <button class="mode-tab" data-mode="appreciated">Appreciated</button>
-      <button class="mode-tab" data-mode="youtube">Videos</button>
-      <button class="mode-tab" data-mode="github">Code</button>
-      <button class="mode-tab" data-mode="comics">Comics</button>
-      <button class="mode-tab" data-mode="saved">Saved</button>
+    <div class="mode-tabs-wrapper">
+      <div class="mode-tabs mode-tabs-primary">
+        <button class="mode-tab active" data-mode="blogs">Web</button>
+        <div class="category-filter" id="categoryFilter" style="display: none;">
+          <button class="category-toggle" id="categoryToggle">
+            <span class="category-toggle-label" id="categoryToggleLabel">All Topics</span>
+            <svg class="category-toggle-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="category-dropdown" id="categoryDropdown">
+            <button class="category-item category-item-all" id="categoryClearBtn" data-slug="">All Topics</button>
+            <div id="categoryGroups">
+              <!-- Groups populated by JS -->
+            </div>
+          </div>
+        </div>
+        <button class="mode-tab" data-mode="appreciated">Appreciated</button>
+      </div>
+      <div class="mode-tabs mode-tabs-secondary">
+        <button class="mode-tab" data-mode="youtube">Videos</button>
+        <button class="mode-tab" data-mode="github">Code</button>
+        <button class="mode-tab" data-mode="comics">Comics</button>
+        <button class="mode-tab" data-mode="saved">Saved</button>
+      </div>
     </div>
 
     <!-- List Section (context-sensitive) -->
@@ -119,9 +107,9 @@
         <div class="shortcuts-title">Keyboard Shortcuts</div>
         <div class="shortcut-row"><kbd>Space</kbd> <span>Discover next post</span></div>
         <div class="shortcut-row"><kbd>R</kbd> <span>Toggle reader mode</span></div>
-        <div class="shortcut-row"><kbd>S</kbd> <span>Save/unsave post</span></div>
         <div class="shortcut-row"><kbd>T</kbd> <span>Listen (TTS)</span></div>
         <div class="shortcut-row"><kbd>D</kbd> <span>Dyslexia font</span></div>
+        <div class="shortcut-row"><kbd>C</kbd> <span>Filter by topic</span></div>
       </div>
     </div>
 

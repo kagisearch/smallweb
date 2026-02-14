@@ -158,17 +158,10 @@ body {
 }
 
 /* ═══════════════════════════════════════
-   POST CARD - Minimal, text-focused
+   INIT LOADING
    ═══════════════════════════════════════ */
 
-.post-card {
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border);
-  min-height: 80px;
-}
-
-.post-empty,
-.post-loading {
+.init-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -178,11 +171,6 @@ body {
   color: var(--text-muted);
 }
 
-.post-empty-icon {
-  opacity: 0.4;
-}
-
-.post-empty-text,
 .post-loading-text {
   font-size: 14px;
   text-align: center;
@@ -201,93 +189,22 @@ body {
   to { transform: rotate(360deg); }
 }
 
-.post-content {
-  animation: fade-in 0.2s ease;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.post-header {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.post-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.post-domain {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--orange);
-  margin-bottom: 4px;
-}
-
-.post-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.4;
-  letter-spacing: -0.02em;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.post-author {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
-.post-actions {
-  flex-shrink: 0;
-}
-
-.action-btn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.action-btn:hover {
-  border-color: var(--text-muted);
-  color: var(--text);
-}
-
-.action-btn.active {
-  background: var(--orange);
-  border-color: var(--orange);
-  color: white;
-}
-
-.action-btn.active svg {
-  fill: white;
-}
-
 /* ═══════════════════════════════════════
    MODE TABS - Near-invisible, text-focused
    Like Kagi's filter pills but even more subtle
    ═══════════════════════════════════════ */
 
+.mode-tabs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .mode-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
 }
 
 .mode-tab {
@@ -745,4 +662,148 @@ body {
 
 .modal-btn:hover {
   opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════
+   CATEGORY FILTER - Topic dropdown
+   ═══════════════════════════════════════ */
+
+.category-filter {
+  position: relative;
+  display: inline-flex;
+}
+
+.category-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.category-toggle:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.category-toggle.active {
+  background: var(--orange-soft);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.category-toggle-chevron {
+  transition: transform 0.15s;
+}
+
+.category-dropdown.show + .category-toggle .category-toggle-chevron,
+.category-toggle[aria-expanded="true"] .category-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+.category-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 240px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+}
+
+.category-dropdown.show {
+  display: block;
+  animation: dropdown-in 0.15s ease;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.1s;
+  text-align: left;
+}
+
+.category-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.category-item.selected {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.category-item-all {
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 8px 8px 0 0;
+}
+
+.category-item-count {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.category-group {
+  margin-top: 4px;
+}
+
+.category-group-label {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Scrollbar for dropdown */
+.category-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.category-dropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
 }
