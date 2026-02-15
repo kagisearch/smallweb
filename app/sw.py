@@ -33,7 +33,8 @@ CATEGORIES = OrderedDict([
     ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases")),
     ("tech",         ("Technology",         "Tech news · apps · networking · social media")),
     ("sysadmin",     ("Sysadmin",           "Deployment · cloud · containers · CI/CD · networking · self-hosting")),
-    ("hardware",     ("Hardware",           "Electronics · DIY · 3D printing · gadgets · home lab")),
+    ("hardware",     ("Hardware",           "Electronics · PCB design · gadgets · home lab")),
+    ("diy",          ("DIY & Making",       "Woodworking · metalworking · 3D printing · home renovation · maker projects")),
     ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software")),
     ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities")),
     ("science",      ("Science",            "Physics · biology · climate · math · space · medicine")),
@@ -55,7 +56,7 @@ CATEGORIES = OrderedDict([
 
 # Groups for dropdown display
 CATEGORY_GROUPS = OrderedDict([
-    ("Tech & Science",    ["ai", "programming", "tech", "sysadmin", "hardware", "retro", "security", "science"]),
+    ("Tech & Science",    ["ai", "programming", "tech", "sysadmin", "hardware", "diy", "retro", "security", "science"]),
     ("Culture & Creative",["humanities", "essays", "art", "photography", "culture", "gaming"]),
     ("Life & World",      ["politics", "economy", "society", "life", "food", "nature"]),
     ("Other",             ["uncategorized"]),
@@ -150,20 +151,87 @@ def generate_appreciated_feed():
     # Also regenerate JSON cache when feed changes
     generate_appreciated_json()
 
+def _find_feed_file(name):
+    """Locate a feed list file (check CWD first, then parent for local dev)."""
+    for path in (name, os.path.join("..", name)):
+        if os.path.isfile(path):
+            return path
+    return None
+
+
 def generate_opml_feed() -> str:
-    """Return OPML text that lists all cached Small-Web posts as RSS items."""
-    outlines, seen = [], set()
-    for feed in (urls_cache, urls_yt_cache, urls_app_cache,
-                 urls_gh_cache, urls_comic_cache):
-        for link, title, *_ in feed or []:
-            if link in seen:
-                continue
-            seen.add(link)
-            safe_title = escape(title or link, quote=True)
-            outlines.append(
-                f'    <outline text="{safe_title}" title="{safe_title}" '
-                f'type="rss" xmlUrl="{link}" htmlUrl="{link}"/>'
-            )
+    """Return OPML subscription list built from the curated feed URL files."""
+    outlines = []
+
+    # Blog feeds — one URL per line
+    path = _find_feed_file("smallweb.txt")
+    if path:
+        with open(path) as f:
+            for line in f:
+                feed_url = line.split("#")[0].strip()
+                if not feed_url:
+                    continue
+                parsed = urlparse(feed_url)
+                domain = parsed.hostname or ""
+                domain = domain.removeprefix("www.")
+                html_url = f"{parsed.scheme}://{parsed.hostname}"
+                safe = escape(domain, quote=True)
+                outlines.append(
+                    f'    <outline text="{safe}" title="{safe}" '
+                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
+                )
+
+    # YouTube feeds — format: URL # Channel Name https://...
+    path = _find_feed_file("smallyt.txt")
+    if path:
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split("#", 1)
+                feed_url = parts[0].strip()
+                if not feed_url:
+                    continue
+                # Extract channel name and URL from comment
+                title = "YouTube"
+                html_url = "https://www.youtube.com"
+                if len(parts) > 1:
+                    comment = parts[1].strip()
+                    # "Channel Name https://www.youtube.com/channel/XXX"
+                    idx = comment.find("https://")
+                    if idx > 0:
+                        title = comment[:idx].strip()
+                        html_url = comment[idx:].strip()
+                    elif comment:
+                        title = comment.strip()
+                safe = escape(title, quote=True)
+                outlines.append(
+                    f'    <outline text="{safe}" title="{safe}" '
+                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
+                )
+
+    # Comic feeds — one URL per line
+    path = _find_feed_file("smallcomic.txt")
+    if path:
+        with open(path) as f:
+            for line in f:
+                feed_url = line.split("#")[0].strip()
+                if not feed_url:
+                    continue
+                parsed = urlparse(feed_url)
+                domain = parsed.hostname or ""
+                domain = domain.removeprefix("www.")
+                html_url = f"{parsed.scheme}://{parsed.hostname}"
+                safe = escape(domain, quote=True)
+                outlines.append(
+                    f'    <outline text="{safe}" title="{safe}" '
+                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
+                )
+
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<opml version="1.0">\n'
