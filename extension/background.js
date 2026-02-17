@@ -80,6 +80,8 @@ async function isPostSaved(url) {
 // FEED PARSING & FETCHING
 // ═══════════════════════════════════════
 
+const CATEGORY_SCHEME = 'https://kagi.com/smallweb/categories';
+
 function parseFeed(text) {
   const entries = [];
   const entryRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/g;
@@ -91,10 +93,23 @@ function parseFeed(text) {
     const link = xml.match(/<link[^>]*href="([^"]+)"/)?.[1] || '';
     const author = xml.match(/<author>\s*<name>([^<]*)<\/name>/)?.[1] || '';
 
+    // Extract category terms matching our scheme
+    const categories = [];
+    const catRegex = /<category\s[^>]*?\/?>/g;
+    let catMatch;
+    while ((catMatch = catRegex.exec(xml)) !== null) {
+      const tag = catMatch[0];
+      const scheme = tag.match(/scheme="([^"]*)"/)?.[1];
+      const term = tag.match(/term="([^"]*)"/)?.[1];
+      if (scheme === CATEGORY_SCHEME && term) {
+        categories.push(term);
+      }
+    }
+
     if (link?.startsWith('https://')) {
       try {
         const domain = new URL(link).hostname.replace(/^www\./, '');
-        entries.push({ title: decodeXml(title), link, author: decodeXml(author), domain });
+        entries.push({ title: decodeXml(title), link, author: decodeXml(author), domain, categories });
       } catch (e) {}
     }
   }
@@ -167,18 +182,27 @@ setInterval(() => {
 // POST QUEUE
 // ═══════════════════════════════════════
 
-function pickRandom(mode) {
-  const entries = cache[mode].entries;
+function filterByCategory(entries, category) {
+  if (!category) return entries;
+  if (category === 'uncategorized') {
+    return entries.filter(e => !e.categories || e.categories.length === 0 || e.categories.includes('uncategorized'));
+  }
+  return entries.filter(e => e.categories && e.categories.includes(category));
+}
+
+function pickRandom(mode, category) {
+  const entries = filterByCategory(cache[mode].entries, category);
   return entries.length ? entries[Math.floor(Math.random() * entries.length)] : null;
 }
 
-function prepareNext(mode) {
-  nextQueue[mode] = pickRandom(mode);
+function prepareNext(mode, category) {
+  nextQueue[mode] = pickRandom(mode, category);
 }
 
-function getNextPost(mode) {
-  const post = nextQueue[mode] || pickRandom(mode);
-  prepareNext(mode);
+function getNextPost(mode, category) {
+  // If category changed, discard queued post
+  const post = (category ? pickRandom(mode, category) : nextQueue[mode]) || pickRandom(mode, category);
+  prepareNext(mode, category);
   return post;
 }
 
@@ -395,8 +419,24 @@ async function handleMessage(message) {
 
   if (type === 'getNextPost') {
     const mode = message.mode || 'blogs';
+    const category = message.category || null;
     await (mode === 'saved' ? loadSavedPosts() : ensureFeedLoaded(mode));
-    return { post: getNextPost(mode), preloadUrl: getPreloadUrl(mode) };
+    return { post: getNextPost(mode, category), preloadUrl: getPreloadUrl(mode) };
+  }
+
+  if (type === 'getCategoryCounts') {
+    await ensureFeedLoaded('blogs');
+    const counts = {};
+    for (const entry of cache.blogs.entries) {
+      if (!entry.categories || entry.categories.length === 0) {
+        counts.uncategorized = (counts.uncategorized || 0) + 1;
+      } else {
+        for (const cat of entry.categories) {
+          counts[cat] = (counts[cat] || 0) + 1;
+        }
+      }
+    }
+    return counts;
   }
 
   if (type === 'getPreloadUrl') {

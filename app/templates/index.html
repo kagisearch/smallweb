@@ -16,6 +16,9 @@
   <meta name="twitter:title" content="Kagi Small Web">
   <meta name="twitter:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
   <meta name="twitter:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
+  {% if feed_url is defined and feed_url %}
+  <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
+  {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if current_mode != 2 %}
   {# Prefetch next link for non-appreciated modes (appreciated uses client-side queue) #}
@@ -103,6 +106,50 @@
         <a class="phone" href="{{url}}">{{domain}}</a>
 
       </div>
+      {% if current_mode == 0 and post_categories %}
+      <div class="post-cats">
+        {% for slug, label in post_categories %}
+        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip">{{ label }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% endif %}
+
+      {% if current_mode == 0 %}
+      <!-- Categories dropdown — inline in controls -->
+      <div class="category-wrapper">
+        <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          {% if current_cat and current_cat in categories %}
+            <span id="catLabel">{{ categories[current_cat][0] }}</span>
+            <a href="{{ prefix }}" class="cat-inline-clear" title="Clear filter">&times;</a>
+          {% endif %}
+        </button>
+        <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
+          <div class="cat-columns">
+          {% for group_name, slugs in category_groups.items() %}
+            {% if slugs != ['uncategorized'] or category_counts.get('uncategorized', 0) %}
+            <div class="cat-group-label">{{ group_name }}</div>
+            {% endif %}
+            {% for slug in slugs %}
+              {% if slug != 'uncategorized' or category_counts.get('uncategorized', 0) %}
+              {% set cat = categories[slug] %}
+              <a href="{{ prefix }}?cat={{ slug }}"
+                 class="cat-item{% if current_cat == slug %} selected{% endif %}"
+                 data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
+                <div class="cat-name">{{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
+                <div class="cat-desc">{{ cat[1] }}</div>
+              </a>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+          </div>
+        </div>
+      </div>
       {% endif %}
 
       <form action="{{ prefix }}" method="get" id="search-form">
@@ -179,40 +226,6 @@
         </div>
       </div>
       -->
-
-      {% if current_mode == 0 %}
-      <!-- Categories dropdown — web mode only -->
-      <div class="category-wrapper">
-        <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-          </svg>
-          {% if current_cat and current_cat in categories %}
-            <span id="catLabel">{{ categories[current_cat][0] }}</span>
-            <a href="{{ prefix }}" class="cat-inline-clear" title="Clear filter">&times;</a>
-          {% else %}
-            <span id="catLabel">All Topics</span>
-          {% endif %}
-        </button>
-        <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
-          <div class="cat-columns">
-          {% for group_name, slugs in category_groups.items() %}
-            <div class="cat-group-label">{{ group_name }}</div>
-            {% for slug in slugs %}
-              {% set cat = categories[slug] %}
-              <a href="{{ prefix }}?cat={{ slug }}"
-                 class="cat-item{% if current_cat == slug %} selected{% endif %}"
-                 data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
-                <div class="cat-name">{{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
-                <div class="cat-desc">{{ cat[1] }}</div>
-              </a>
-            {% endfor %}
-          {% endfor %}
-          </div>
-        </div>
-      </div>
-      {% endif %}
 
       {% if current_mode==1 %}
         <a id="switch"  href="{{ prefix }}">Web</a>

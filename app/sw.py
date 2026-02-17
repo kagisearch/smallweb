@@ -31,8 +31,10 @@ import json
 CATEGORIES = OrderedDict([
     ("ai",           ("AI",                "LLMs · machine learning · AI tools · ethics · agents")),
     ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases")),
-    ("tech",         ("Technology",         "Tech news · apps · networking · sysadmin · social media")),
-    ("hardware",     ("Hardware",           "Electronics · DIY · 3D printing · gadgets · home lab")),
+    ("tech",         ("Technology",         "Tech news · apps · networking · social media")),
+    ("sysadmin",     ("Sysadmin",           "Deployment · cloud · containers · CI/CD · networking · self-hosting")),
+    ("hardware",     ("Hardware",           "Electronics · PCB design · gadgets · home lab")),
+    ("diy",          ("DIY & Making",       "Woodworking · metalworking · 3D printing · home renovation · maker projects")),
     ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software")),
     ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities")),
     ("science",      ("Science",            "Physics · biology · climate · math · space · medicine")),
@@ -45,18 +47,18 @@ CATEGORIES = OrderedDict([
     ("politics",     ("Politics",           "Government · policy · elections · law · political commentary")),
     ("economy",      ("Economy",            "Economics · finance · markets · business · labor · trade")),
     ("society",      ("Society",            "Social issues · civil rights · current events · community")),
-    ("daily",        ("Daily Life",         "Personal updates · diary entries · day-to-day · mundane life")),
     ("life",         ("Life & Personal",    "Health · parenting · pets · personal growth · relationships")),
     ("food",         ("Food & Drink",       "Recipes · cooking · restaurants · coffee · wine · baking")),
     ("nature",       ("Nature & Outdoors",  "Hiking · travel · adventure · wildlife · gardening")),
     ("uncategorized",("Uncategorized",      "Posts that don\u2019t fit neatly into any topic")),
+    ("spam",         ("Spam",              "Suspected spam or low-quality content")),
 ])
 
 # Groups for dropdown display
 CATEGORY_GROUPS = OrderedDict([
-    ("Tech & Science",    ["ai", "programming", "tech", "hardware", "retro", "security", "science"]),
+    ("Tech & Science",    ["ai", "programming", "tech", "sysadmin", "hardware", "diy", "retro", "security", "science"]),
     ("Culture & Creative",["humanities", "essays", "art", "photography", "culture", "gaming"]),
-    ("Life & World",      ["politics", "economy", "society", "daily", "life", "food", "nature"]),
+    ("Life & World",      ["politics", "economy", "society", "life", "food", "nature"]),
     ("Other",             ["uncategorized"]),
 ])
 
@@ -105,7 +107,7 @@ def generate_appreciated_json():
     # Build the urls array with minimal data per item
     urls_array = []
     for idx, entry in enumerate(urls_app_cache):
-        url_item, title, author, description, updated = entry
+        url_item, title, author, description, updated, *_ = entry
         # Generate stable ID from URL hash (consistent across restarts)
         item_id = hashlib.sha1(url_item.encode("utf-8")).hexdigest()[:12]
         urls_array.append({
@@ -136,7 +138,7 @@ def generate_appreciated_feed():
         feed_url="https://kagi.com/smallweb/appreciated"
     )
     for url_entry in urls_app_cache:
-        url_item, title, author, description, updated = url_entry
+        url_item, title, author, description, updated, *_ = url_entry
         appreciated_feed.add(
             title=title,
             content=description,
@@ -149,20 +151,87 @@ def generate_appreciated_feed():
     # Also regenerate JSON cache when feed changes
     generate_appreciated_json()
 
+def _find_feed_file(name):
+    """Locate a feed list file (check CWD first, then parent for local dev)."""
+    for path in (name, os.path.join("..", name)):
+        if os.path.isfile(path):
+            return path
+    return None
+
+
 def generate_opml_feed() -> str:
-    """Return OPML text that lists all cached Small-Web posts as RSS items."""
-    outlines, seen = [], set()
-    for feed in (urls_cache, urls_yt_cache, urls_app_cache,
-                 urls_gh_cache, urls_comic_cache):
-        for link, title, *_ in feed or []:
-            if link in seen:
-                continue
-            seen.add(link)
-            safe_title = escape(title or link, quote=True)
-            outlines.append(
-                f'    <outline text="{safe_title}" title="{safe_title}" '
-                f'type="rss" xmlUrl="{link}" htmlUrl="{link}"/>'
-            )
+    """Return OPML subscription list built from the curated feed URL files."""
+    outlines = []
+
+    # Blog feeds — one URL per line
+    path = _find_feed_file("smallweb.txt")
+    if path:
+        with open(path) as f:
+            for line in f:
+                feed_url = line.split("#")[0].strip()
+                if not feed_url:
+                    continue
+                parsed = urlparse(feed_url)
+                domain = parsed.hostname or ""
+                domain = domain.removeprefix("www.")
+                html_url = f"{parsed.scheme}://{parsed.hostname}"
+                safe = escape(domain, quote=True)
+                outlines.append(
+                    f'    <outline text="{safe}" title="{safe}" '
+                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
+                )
+
+    # YouTube feeds — format: URL # Channel Name https://...
+    path = _find_feed_file("smallyt.txt")
+    if path:
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split("#", 1)
+                feed_url = parts[0].strip()
+                if not feed_url:
+                    continue
+                # Extract channel name and URL from comment
+                title = "YouTube"
+                html_url = "https://www.youtube.com"
+                if len(parts) > 1:
+                    comment = parts[1].strip()
+                    # "Channel Name https://www.youtube.com/channel/XXX"
+                    idx = comment.find("https://")
+                    if idx > 0:
+                        title = comment[:idx].strip()
+                        html_url = comment[idx:].strip()
+                    elif comment:
+                        title = comment.strip()
+                safe = escape(title, quote=True)
+                outlines.append(
+                    f'    <outline text="{safe}" title="{safe}" '
+                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
+                )
+
+    # Comic feeds — one URL per line
+    path = _find_feed_file("smallcomic.txt")
+    if path:
+        with open(path) as f:
+            for line in f:
+                feed_url = line.split("#")[0].strip()
+                if not feed_url:
+                    continue
+                parsed = urlparse(feed_url)
+                domain = parsed.hostname or ""
+                domain = domain.removeprefix("www.")
+                html_url = f"{parsed.scheme}://{parsed.hostname}"
+                safe = escape(domain, quote=True)
+                outlines.append(
+                    f'    <outline text="{safe}" title="{safe}" '
+                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
+                )
+
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<opml version="1.0">\n'
@@ -373,6 +442,7 @@ def index():
     url = request.args.get("url")
     search_query = request.args.get("search", "").lower()
     title = None
+    post_cats = []
     current_mode = 0
     if "yt" in request.args:
         cache = urls_yt_cache
@@ -386,7 +456,7 @@ def index():
     elif "comic" in request.args:
         cache = urls_comic_cache
         current_mode = 4
-    elif "viewflagged" in request.args:
+    elif "flagged" in request.args:
         cache = urls_flagged_cache
         current_mode = 5
     else:
@@ -429,6 +499,7 @@ def index():
                 category_groups=CATEGORY_GROUPS,
                 current_cat="",
                 category_counts={},
+                post_categories=[],
             )
 
     # Category counts (before filtering, so user sees totals)
@@ -444,7 +515,7 @@ def index():
     current_cat = request.args.get("cat", "")
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
-            cache = [entry for entry in cache if not entry[5]]
+            cache = [entry for entry in cache if not entry[5] or "uncategorized" in entry[5]]
         else:
             cache = [entry for entry in cache if current_cat in entry[5]]
 
@@ -477,22 +548,23 @@ def index():
                 category_groups=CATEGORY_GROUPS,
                 current_cat=current_cat,
                 category_counts=category_counts,
+                post_categories=[],
             )
 
     if url is not None:
         http_url = url.replace("https://", "http://")
-        title, author, description = next(
+        title, author, description, post_cats = next(
             (
-                (url_tuple[1], url_tuple[2], url_tuple[3])
+                (url_tuple[1], url_tuple[2], url_tuple[3], url_tuple[5])
                 for url_tuple in cache
                 if url_tuple[0] == url or url_tuple[0] == http_url
             ),
-            (None, None, None),
+            (None, None, None, []),
         )
 
     if title is None:
         if cache and len(cache):
-            url, title, author, _description, _date, _cats = random.choice(cache)
+            url, title, author, _description, _date, post_cats = random.choice(cache)
         else:
             url, title, author = (
                 "https://blog.kagi.com/small-web",
@@ -549,12 +621,28 @@ def index():
 
     # get flagged content
     flag_content_count = flagged_content_dict.get(url, 0)
-    
+
+    # Build (slug, label) tuples for the current post's categories
+    post_categories = [(s, CATEGORIES[s][0]) for s in post_cats if s in CATEGORIES]
 
     if url.startswith("http://"):
         url = url.replace(
             "http://", "https://"
         )  # force https as http will not work inside https iframe anyway
+
+    # Build feed URL for <link rel="alternate">
+    if current_mode == 1:
+        feed_url = prefix + "/feed?yt"
+    elif current_mode == 2:
+        feed_url = prefix + "/feed?app"
+    elif current_mode == 3:
+        feed_url = prefix + "/feed?gh"
+    elif current_mode == 4:
+        feed_url = prefix + "/feed?comic"
+    elif current_cat:
+        feed_url = prefix + "/feed?cat=" + current_cat
+    else:
+        feed_url = prefix + "/feed"
 
     # Calculate counts
     all_count = len(urls_cache) if urls_cache else 0
@@ -600,10 +688,13 @@ def index():
         category_groups=CATEGORY_GROUPS,
         current_cat=current_cat,
         category_counts=category_counts,
+        post_categories=post_categories,
+        feed_url=feed_url,
     )
 
 
 @app.post("/favorite")
+@app.post(f"{prefix}/favorite")
 def favorite():
     global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
     url = request.form.get("url")
@@ -654,6 +745,7 @@ def favorite():
 
 
 @app.post("/note")
+@app.post(f"{prefix}/note")
 def note():
     global notes_dict, time_saved_notes
     url = request.form.get("url")
@@ -687,6 +779,7 @@ def note():
 
 
 @app.post("/flag_content")
+@app.post(f"{prefix}/flag_content")
 def flag_content():
     global flagged_content_dict, time_saved_flagged_content
     url = request.form.get("url")
@@ -727,6 +820,48 @@ def flag_content():
     response.set_cookie("flagged_urls", "|".join(flagged_urls_list), max_age=31536000)  # 1 year
 
     return response
+
+
+@app.route("/feed")
+@app.route(f"{prefix}/feed")
+def feed():
+    """Per-mode Atom feed. Accepts the same query params as the main route."""
+    if "yt" in request.args:
+        cache, title = urls_yt_cache, "Kagi Small Web - Videos"
+        feed_url = "https://kagi.com/smallweb/feed?yt"
+    elif "app" in request.args:
+        cache, title = urls_app_cache, "Kagi Small Web - Appreciated"
+        feed_url = "https://kagi.com/smallweb/feed?app"
+    elif "gh" in request.args:
+        cache, title = urls_gh_cache, "Kagi Small Web - Code"
+        feed_url = "https://kagi.com/smallweb/feed?gh"
+    elif "comic" in request.args:
+        cache, title = urls_comic_cache, "Kagi Small Web - Comics"
+        feed_url = "https://kagi.com/smallweb/feed?comic"
+    else:
+        cache, title = urls_cache, "Kagi Small Web"
+        cat = request.args.get("cat", "")
+        if cat and cat in CATEGORIES:
+            title += f" - {CATEGORIES[cat][0]}"
+            feed_url = f"https://kagi.com/smallweb/feed?cat={cat}"
+            if cat == "uncategorized":
+                cache = [e for e in cache if not e[5] or "uncategorized" in e[5]]
+            else:
+                cache = [e for e in cache if cat in e[5]]
+        else:
+            feed_url = "https://kagi.com/smallweb/feed"
+
+    atom = AtomFeed(title, feed_url=feed_url)
+    for url_item, entry_title, author, description, updated, *_ in cache:
+        atom.add(
+            title=entry_title,
+            content=description,
+            content_type="html",
+            url=url_item,
+            updated=updated,
+            author=author,
+        )
+    return Response(atom.to_string(), mimetype="application/atom+xml")
 
 
 @app.route("/appreciated")

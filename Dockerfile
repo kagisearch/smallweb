@@ -28,6 +28,8 @@ COPY app/requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY smallweb.txt smallweb.txt
+COPY smallyt.txt smallyt.txt
+COPY smallcomic.txt smallcomic.txt
 
 COPY app/ .
 EXPOSE $PORT

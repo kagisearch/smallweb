@@ -11,16 +11,43 @@ let readerModeEnabled = false;
 let dyslexiaModeEnabled = false;
 let ttsEnabled = false;
 let isSpeaking = false;
+let currentCategory = null;
+
+const CATEGORIES = {
+  ai:            'AI',
+  programming:   'Programming',
+  tech:          'Technology',
+  sysadmin:      'Sysadmin',
+  hardware:      'Hardware',
+  retro:         'Retro',
+  security:      'Security',
+  science:       'Science',
+  humanities:    'Humanities',
+  essays:        'Essays',
+  art:           'Art & Design',
+  photography:   'Photography',
+  culture:       'Pop Culture',
+  gaming:        'Gaming',
+  politics:      'Politics',
+  economy:       'Economy',
+  society:       'Society',
+  daily:         'Daily Life',
+  life:          'Life & Personal',
+  food:          'Food & Drink',
+  nature:        'Nature & Outdoors',
+  uncategorized: 'Uncategorized'
+};
+
+const CATEGORY_GROUPS = [
+  { name: 'Tech & Science',     slugs: ['ai', 'programming', 'tech', 'sysadmin', 'hardware', 'retro', 'security', 'science'] },
+  { name: 'Culture & Creative', slugs: ['humanities', 'essays', 'art', 'photography', 'culture', 'gaming'] },
+  { name: 'Life & World',       slugs: ['politics', 'economy', 'society', 'daily', 'life', 'food', 'nature'] },
+  { name: 'Other',              slugs: ['uncategorized'] }
+];
 
 // DOM Elements
 const discoverBtn = document.getElementById('nextPost');
 const postLoading = document.getElementById('postLoading');
-const postEmpty = document.getElementById('postEmpty');
-const postContent = document.getElementById('postContent');
-const postTitle = document.getElementById('postTitle');
-const postDomain = document.getElementById('postDomain');
-const postAuthor = document.getElementById('postAuthor');
-const saveBtn = document.getElementById('saveBtn');
 const readerBtn = document.getElementById('readerBtn');
 const appreciateBtn = document.getElementById('appreciateBtn');
 const listLabel = document.getElementById('listLabel');
@@ -35,6 +62,12 @@ const ttsBtn = document.getElementById('ttsBtn');
 const dyslexiaBtn = document.getElementById('dyslexiaBtn');
 const shortcutsBtn = document.getElementById('shortcutsBtn');
 const shortcutsTooltip = document.getElementById('shortcutsTooltip');
+const categoryFilter = document.getElementById('categoryFilter');
+const categoryToggle = document.getElementById('categoryToggle');
+const categoryToggleLabel = document.getElementById('categoryToggleLabel');
+const categoryDropdown = document.getElementById('categoryDropdown');
+const categoryGroups = document.getElementById('categoryGroups');
+const categoryClearBtn = document.getElementById('categoryClearBtn');
 
 // Initialize - load feeds in background
 async function init() {
@@ -42,7 +75,7 @@ async function init() {
   discoverBtn.disabled = true;
 
   // Load saved state
-  const stored = await api.storage.local.get(['history', 'currentMode', 'readerModeEnabled', 'dyslexiaModeEnabled', 'ttsEnabled']);
+  const stored = await api.storage.local.get(['history', 'currentMode', 'readerModeEnabled', 'dyslexiaModeEnabled', 'ttsEnabled', 'currentCategory']);
   if (stored.history) {
     history = stored.history;
   }
@@ -62,8 +95,12 @@ async function init() {
     ttsEnabled = true;
     ttsBtn.classList.add('active');
   }
+  if (stored.currentCategory) {
+    currentCategory = stored.currentCategory;
+  }
 
   updateModeUI();
+  updateCategoryUI();
   renderList();
 
   // Initialize feeds (this fetches all feeds and waits)
@@ -79,7 +116,6 @@ async function init() {
 
     if (response?.error) {
       console.error('Init failed:', response.error);
-      postEmpty.style.display = 'flex';
       showToast('Failed to load feeds', true);
       return;
     }
@@ -91,25 +127,21 @@ async function init() {
     // Auto-discover first post for a great first experience
     if (response?.ready) {
       discover();
-    } else {
-      // Feeds didn't load, show empty state - user can click Discover to retry
-      postEmpty.style.display = 'flex';
-      console.log('Init completed but no entries loaded');
     }
 
     // Update tooltips with counts
     updateTabCounts();
+    updateCategoryCounts();
   } catch (error) {
     console.error('Init error:', error);
     postLoading.style.display = 'none';
     discoverBtn.disabled = false;
-    postEmpty.style.display = 'flex';
   }
 }
 
 // Update mode tabs with item counts (shown on hover)
 const tabLabels = {
-  blogs: 'Blogs',
+  blogs: 'Web',
   appreciated: 'Appreciated',
   youtube: 'Videos',
   github: 'Code',
@@ -151,7 +183,8 @@ async function discover() {
   try {
     const response = await api.runtime.sendMessage({
       type: 'getNextPost',
-      mode: currentMode
+      mode: currentMode,
+      category: currentMode === 'blogs' ? currentCategory : null
     });
 
     if (response?.post) {
@@ -191,69 +224,18 @@ async function discover() {
   }
 }
 
-// Update post card UI
-async function updatePostUI() {
-  if (!currentPost) {
-    postLoading.style.display = 'none';
-    postEmpty.style.display = 'flex';
-    postContent.style.display = 'none';
-    return;
-  }
-
-  postLoading.style.display = 'none';
-  postEmpty.style.display = 'none';
-  postContent.style.display = 'flex';
-
-  postDomain.textContent = currentPost.domain || '';
-  postTitle.textContent = currentPost.title || 'Untitled';
-  postAuthor.textContent = currentPost.author ? `by ${currentPost.author}` : '';
+// Update UI after discovering a post
+function updatePostUI() {
+  if (!currentPost) return;
 
   // Update "Open in Small Web" link
   openInSmallWebLink.href = `https://kagi.com/smallweb/?url=${encodeURIComponent(currentPost.link)}`;
-
-  // Check if post is saved
-  const { saved } = await api.runtime.sendMessage({
-    type: 'isPostSaved',
-    url: currentPost.link
-  });
-  saveBtn.classList.toggle('active', saved);
 
   // Keep reader mode state
   readerBtn.classList.toggle('active', readerModeEnabled);
 
   // Reset appreciate button
   appreciateBtn.classList.remove('active');
-}
-
-// Save/unsave current post
-async function toggleSave() {
-  if (!currentPost) return;
-
-  const isSaved = saveBtn.classList.contains('active');
-
-  if (isSaved) {
-    await api.runtime.sendMessage({
-      type: 'unsavePost',
-      url: currentPost.link
-    });
-    saveBtn.classList.remove('active');
-    showToast('Removed from saved');
-
-    // Refresh list if on saved tab
-    if (currentMode === 'saved') {
-      renderList();
-    }
-  } else {
-    const result = await api.runtime.sendMessage({
-      type: 'savePost',
-      post: currentPost
-    });
-    saveBtn.classList.add('active');
-    showToast(result.alreadySaved ? 'Already saved' : 'Saved for later');
-  }
-
-  // Update tab counts to reflect the change
-  updateTabCounts();
 }
 
 // Toggle reader mode
@@ -281,7 +263,7 @@ async function toggleReaderMode() {
   }
 }
 
-// Appreciate current post
+// Appreciate current post (also saves it automatically)
 async function appreciatePost() {
   if (!currentPost) {
     showToast('Discover a post first', true);
@@ -291,10 +273,11 @@ async function appreciatePost() {
   appreciateBtn.classList.add('active');
 
   try {
-    await api.runtime.sendMessage({
-      type: 'appreciate',
-      url: currentPost.link
-    });
+    await Promise.all([
+      api.runtime.sendMessage({ type: 'appreciate', url: currentPost.link }),
+      api.runtime.sendMessage({ type: 'savePost', post: currentPost })
+    ]);
+    updateTabCounts();
   } catch (error) {
     appreciateBtn.classList.remove('active');
   }
@@ -442,7 +425,7 @@ async function renderList() {
   } else {
     // Show recent history for this mode
     const modeLabels = {
-      blogs: 'Recently Viewed Blogs',
+      blogs: 'Recently Viewed',
       appreciated: 'Recently Viewed Appreciated',
       youtube: 'Recently Viewed Videos',
       github: 'Recently Viewed Code',
@@ -521,8 +504,80 @@ async function switchMode(mode) {
   currentMode = mode;
   api.storage.local.set({ currentMode });
   updateModeUI();
+  updateCategoryUI();
   renderList();
   discover();
+  if (mode === 'blogs') updateCategoryCounts();
+}
+
+// ═══════════════════════════════════════
+// CATEGORY FILTER
+// ═══════════════════════════════════════
+
+function updateCategoryUI() {
+  const show = currentMode === 'blogs';
+  categoryFilter.style.display = show ? '' : 'none';
+  if (!show) closeCategoryDropdown();
+  categoryToggleLabel.textContent = currentCategory ? CATEGORIES[currentCategory] : 'All Topics';
+  categoryToggle.classList.toggle('active', !!currentCategory);
+}
+
+function closeCategoryDropdown() {
+  categoryDropdown.classList.remove('show');
+  categoryToggle.setAttribute('aria-expanded', 'false');
+}
+
+function toggleCategoryDropdown() {
+  const isOpen = categoryDropdown.classList.contains('show');
+  if (isOpen) {
+    closeCategoryDropdown();
+  } else {
+    categoryDropdown.classList.add('show');
+    categoryToggle.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function selectCategory(slug) {
+  currentCategory = slug || null;
+  api.storage.local.set({ currentCategory });
+  closeCategoryDropdown();
+  updateCategoryUI();
+  // Highlight selected item
+  categoryDropdown.querySelectorAll('.category-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.slug === (currentCategory || ''));
+  });
+  discover();
+}
+
+async function updateCategoryCounts() {
+  try {
+    const counts = await api.runtime.sendMessage({ type: 'getCategoryCounts' });
+    renderCategoryGroups(counts);
+  } catch (e) {}
+}
+
+function renderCategoryGroups(counts) {
+  categoryGroups.innerHTML = CATEGORY_GROUPS.map(group => `
+    <div class="category-group">
+      <div class="category-group-label">${escapeHtml(group.name)}</div>
+      ${group.slugs.map(slug => {
+        const count = counts[slug] || 0;
+        const selected = slug === currentCategory ? ' selected' : '';
+        return `<button class="category-item${selected}" data-slug="${slug}">
+          <span class="category-item-name">${escapeHtml(CATEGORIES[slug])}</span>
+          <span class="category-item-count">${count}</span>
+        </button>`;
+      }).join('')}
+    </div>
+  `).join('');
+
+  // Update "All Topics" selected state
+  categoryClearBtn.classList.toggle('selected', !currentCategory);
+
+  // Click handlers on group items
+  categoryGroups.querySelectorAll('.category-item').forEach(el => {
+    el.addEventListener('click', () => selectCategory(el.dataset.slug));
+  });
 }
 
 // Toast
@@ -551,7 +606,6 @@ function escapeHtml(text) {
 // Event Listeners
 discoverBtn.addEventListener('click', discover);
 clearListBtn.addEventListener('click', clearList);
-saveBtn.addEventListener('click', toggleSave);
 readerBtn.addEventListener('click', toggleReaderMode);
 appreciateBtn.addEventListener('click', appreciatePost);
 ttsBtn.addEventListener('click', toggleTTS);
@@ -560,6 +614,10 @@ dyslexiaBtn.addEventListener('click', toggleDyslexia);
 modeTabs.forEach(tab => {
   tab.addEventListener('click', () => switchMode(tab.dataset.mode));
 });
+
+// Category dropdown handlers
+categoryToggle.addEventListener('click', toggleCategoryDropdown);
+categoryClearBtn.addEventListener('click', () => selectCategory(''));
 
 // Modal handlers
 contributeBtn.addEventListener('click', () => {
@@ -586,6 +644,9 @@ document.addEventListener('click', (e) => {
   if (!shortcutsTooltip.contains(e.target) && e.target !== shortcutsBtn) {
     shortcutsTooltip.classList.remove('show');
   }
+  if (!categoryFilter.contains(e.target)) {
+    closeCategoryDropdown();
+  }
 });
 
 // Keyboard: Space to discover, R for reader mode, S to save, T for TTS, D for dyslexia
@@ -598,15 +659,15 @@ document.addEventListener('keydown', (e) => {
   } else if (e.code === 'KeyR') {
     e.preventDefault();
     toggleReaderMode();
-  } else if (e.code === 'KeyS') {
-    e.preventDefault();
-    toggleSave();
   } else if (e.code === 'KeyT') {
     e.preventDefault();
     toggleTTS();
   } else if (e.code === 'KeyD') {
     e.preventDefault();
     toggleDyslexia();
+  } else if (e.code === 'KeyC') {
+    e.preventDefault();
+    if (currentMode === 'blogs') toggleCategoryDropdown();
   }
 });
 
