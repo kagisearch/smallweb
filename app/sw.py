@@ -1,6 +1,9 @@
 import re
 import hashlib
 import gzip
+import logging
+from typing import NamedTuple
+
 from flask import (
     Flask,
     request,
@@ -11,21 +14,30 @@ from flask import (
     make_response,
 )
 from html import escape
-import feedparser
-import feedparser
+import fastfeedparser
+import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 import random
-from datetime import datetime, timedelta
-from urllib.parse import urlparse, parse_qs
-from urllib.parse import urlencode
+from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse, parse_qs, urlencode
 import atexit
 import os
-import time
-from urllib.parse import urlparse
+import json
 from feedwerk.atom import AtomFeed
 from collections import OrderedDict
-import uuid
-import json
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class FeedEntry(NamedTuple):
+    link: str
+    title: str
+    author: str
+    description: str
+    updated: datetime
+    categories: list
+
 
 # Category definitions — slug → label · description · emoji
 CATEGORIES = OrderedDict([
@@ -62,8 +74,6 @@ CATEGORY_GROUPS = OrderedDict([
     ("Other",             ["uncategorized"]),
 ])
 
-CATEGORY_SCHEME = "https://kagi.com/smallweb/categories"
-
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None          # will hold generated OPML xml
 
@@ -78,18 +88,18 @@ favorite_emoji_list = ["👍","😍","😀","😘","😆","😜","🫶","😂","
 
 def compute_appreciated_version(urls_list):
     """Compute sha1 hash of sorted URLs for version tracking.
-    
+
     The version changes whenever the appreciated feed contents change
     (add/remove URLs, or if the canonical ordering changes).
     """
-    sorted_urls = sorted(entry[0] for entry in urls_list)
+    sorted_urls = sorted(entry.link for entry in urls_list)
     content = "\n".join(sorted_urls).encode("utf-8")
     return hashlib.sha1(content).hexdigest()[:16]
 
 
 def generate_appreciated_json():
     """Generate and cache JSON representation of appreciated feed.
-    
+
     Response format:
     {
         "version": "abc123...",  # sha1 hash of sorted URLs
@@ -100,33 +110,32 @@ def generate_appreciated_json():
     }
     """
     global appreciated_version, appreciated_json_cache, appreciated_json_gzip
-    
+
     # Compute version from current appreciated list
     appreciated_version = compute_appreciated_version(urls_app_cache)
-    
+
     # Build the urls array with minimal data per item
     urls_array = []
-    for idx, entry in enumerate(urls_app_cache):
-        url_item, title, author, description, updated, *_ = entry
+    for entry in urls_app_cache:
         # Generate stable ID from URL hash (consistent across restarts)
-        item_id = hashlib.sha1(url_item.encode("utf-8")).hexdigest()[:12]
+        item_id = hashlib.sha1(entry.link.encode("utf-8")).hexdigest()[:12]
         urls_array.append({
             "id": item_id,
-            "url": url_item,
-            "title": title or "",
-            "author": author or "",
+            "url": entry.link,
+            "title": entry.title or "",
+            "author": entry.author or "",
         })
-    
+
     # Build response object
     response_data = {
         "version": appreciated_version,
         "urls": urls_array,
     }
-    
+
     # Cache JSON and gzipped version
     appreciated_json_cache = json.dumps(response_data, separators=(",", ":"))
     appreciated_json_gzip = gzip.compress(appreciated_json_cache.encode("utf-8"))
-    
+
     return appreciated_json_cache
 
 
@@ -137,17 +146,16 @@ def generate_appreciated_feed():
         "Kagi Small Web Appreciated",
         feed_url="https://kagi.com/smallweb/appreciated"
     )
-    for url_entry in urls_app_cache:
-        url_item, title, author, description, updated, *_ = url_entry
+    for entry in urls_app_cache:
         appreciated_feed.add(
-            title=title,
-            content=description,
+            title=entry.title,
+            content=entry.description,
             content_type="html",
-            url=url_item,
-            updated=updated,
-            author=author,
+            url=entry.link,
+            updated=entry.updated,
+            author=entry.author,
         )
-    
+
     # Also regenerate JSON cache when feed changes
     generate_appreciated_json()
 
@@ -157,6 +165,20 @@ def _find_feed_file(name):
         if os.path.isfile(path):
             return path
     return None
+
+
+def _build_opml_outline(feed_url):
+    """Build an OPML outline element from a simple feed URL."""
+    parsed = urlparse(feed_url)
+    domain = parsed.hostname or ""
+    domain = domain.removeprefix("www.")
+    html_url = f"{parsed.scheme}://{parsed.hostname}"
+    safe = escape(domain, quote=True)
+    return (
+        f'    <outline text="{safe}" title="{safe}" '
+        f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
+        f'htmlUrl="{escape(html_url, quote=True)}"/>'
+    )
 
 
 def generate_opml_feed() -> str:
@@ -169,18 +191,8 @@ def generate_opml_feed() -> str:
         with open(path) as f:
             for line in f:
                 feed_url = line.split("#")[0].strip()
-                if not feed_url:
-                    continue
-                parsed = urlparse(feed_url)
-                domain = parsed.hostname or ""
-                domain = domain.removeprefix("www.")
-                html_url = f"{parsed.scheme}://{parsed.hostname}"
-                safe = escape(domain, quote=True)
-                outlines.append(
-                    f'    <outline text="{safe}" title="{safe}" '
-                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
-                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
-                )
+                if feed_url:
+                    outlines.append(_build_opml_outline(feed_url))
 
     # YouTube feeds — format: URL # Channel Name https://...
     path = _find_feed_file("smallyt.txt")
@@ -219,18 +231,8 @@ def generate_opml_feed() -> str:
         with open(path) as f:
             for line in f:
                 feed_url = line.split("#")[0].strip()
-                if not feed_url:
-                    continue
-                parsed = urlparse(feed_url)
-                domain = parsed.hostname or ""
-                domain = domain.removeprefix("www.")
-                html_url = f"{parsed.scheme}://{parsed.hostname}"
-                safe = escape(domain, quote=True)
-                outlines.append(
-                    f'    <outline text="{safe}" title="{safe}" '
-                    f'type="rss" xmlUrl="{escape(feed_url, quote=True)}" '
-                    f'htmlUrl="{escape(html_url, quote=True)}"/>'
-                )
+                if feed_url:
+                    outlines.append(_build_opml_outline(feed_url))
 
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -243,17 +245,10 @@ def generate_opml_feed() -> str:
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
-    # trying to write a file in a non-existent dir
-    # will fail, so we need to make sure this exists
     os.makedirs(DIR_DATA)
 PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.json")
 PATH_NOTES = os.path.join(DIR_DATA, "notes.json")
 PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.json")
-
-# Legacy paths for one-time migration to JSON
-PATH_FAVORITES_LEGACY = os.path.join(DIR_DATA, "favorites.pkl")
-PATH_NOTES_LEGACY = os.path.join(DIR_DATA, "notes.pkl")
-PATH_FLAGGED_LEGACY = os.path.join(DIR_DATA, "flagged_content.pkl")
 
 
 def serialize_notes(notes: dict) -> dict:
@@ -272,6 +267,22 @@ def deserialize_notes(data: dict) -> dict:
     }
 
 
+def _load_json(path, deserializer=None):
+    """Load JSON data from path, applying optional deserializer."""
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if deserializer:
+                data = deserializer(data)
+            logger.info("Loaded %s (%d entries)", path, len(data))
+            return data
+    except Exception as e:
+        logger.error("Failed to load %s: %s", path, e)
+        return None
+
+
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
     seconds = delta.total_seconds()
@@ -286,11 +297,6 @@ def time_ago(timestamp):
         return f"{int(seconds // 86400)} days"
 
 
-
-
-random.seed(time.time())
-
-
 prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
 app.jinja_env.filters["time_ago"] = time_ago
@@ -298,117 +304,164 @@ app.jinja_env.filters["time_ago"] = time_ago
 master_feed = False
 
 
+def _build_redirect_params():
+    """Build query string from request.args, excluding 'url'."""
+    params = {k: v for k, v in request.args.items() if k != "url"}
+    return "&".join(f"{k}={v}" for k, v in params.items())
+
+
+def _render_no_results(current_mode, title="", search_query="",
+                       current_cat="", category_counts=None, no_results_cat=""):
+    """Render the index template with no results."""
+    return render_template(
+        "index.html",
+        url="",
+        short_url="",
+        query_string="",
+        title=title,
+        author="",
+        domain="",
+        prefix=prefix + "/",
+        videoid="",
+        current_mode=current_mode,
+        favorites_count=0,
+        notes_count=0,
+        notes_list=[],
+        flag_content_count=0,
+        search_query=search_query,
+        no_results=True,
+        no_results_cat=no_results_cat,
+        reactions_dict=OrderedDict(),
+        reactions_list=[],
+        favorites_total=0,
+        next_link="",
+        next_doc_url="",
+        next_host="",
+        categories=CATEGORIES,
+        category_groups=CATEGORY_GROUPS,
+        current_cat=current_cat,
+        category_counts=category_counts or {},
+        post_categories=[],
+    )
+
+
 def update_all():
     global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, urls_flagged_cache, master_feed, favorites_dict, appreciated_feed
 
-    #url = "http://127.0.0.1:4000"  # testing with local feed
     url = "https://kagi.com/api/v1/smallweb/feed/"
 
     try:
-        print("begin update_all")
-        check_feed = feedparser.parse(url)
-        if check_feed and check_feed.entries and len(check_feed.entries):
-            master_feed = check_feed
+        logger.info("begin update_all")
+
+        try:
+            resp = requests.get(url, timeout=30)
+            resp.raise_for_status()
+            check_feed = fastfeedparser.parse(resp.content)
+            if check_feed.entries:
+                master_feed = check_feed
+        except requests.RequestException as e:
+            logger.error("Failed to fetch master feed: %s", e)
 
         new_entries = update_entries(url + "?nso")  # no same origin sites feed
 
-        if not bool(urls_cache) or bool(new_entries):
+        if not urls_cache or new_entries:
             # Filter out YouTube URLs from main feed
             urls_cache = [entry for entry in new_entries
-                         if "youtube.com" not in entry[0] and "youtu.be" not in entry[0]]
+                         if "youtube.com" not in entry.link and "youtu.be" not in entry.link]
 
         new_entries = update_entries(url + "?yt")  # youtube sites
 
-        if not bool(urls_yt_cache) or bool(new_entries):
+        if not urls_yt_cache or new_entries:
             # Filter out YouTube Shorts links
-            urls_yt_cache = [entry for entry in new_entries if "/shorts/" not in entry[0]]
+            urls_yt_cache = [entry for entry in new_entries if "/shorts/" not in entry.link]
 
         new_entries = update_entries(url + "?gh")  # github sites
 
-        if not bool(urls_gh_cache) or bool(new_entries):
+        if not urls_gh_cache or new_entries:
             urls_gh_cache = new_entries
 
         new_entries = update_entries(url + "?comic")  # comic sites
 
-        if not bool(urls_comic_cache) or bool(new_entries):
+        if not urls_comic_cache or new_entries:
             # Filter entries that have images in content
             urls_comic_cache = [
                 entry for entry in new_entries
-                if entry[3] and ('<img' in entry[3] or '.png' in entry[3] or '.jpg' in entry[3] or '.jpeg' in entry[3])
+                if entry.description and ('<img' in entry.description or '.png' in entry.description or '.jpg' in entry.description or '.jpeg' in entry.description)
             ]
 
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
-        current_urls = set(entry[0] for entry in urls_cache + urls_yt_cache)
-        favorites_dict = {url: count for url, count in favorites_dict.items() if url in current_urls}
+        current_urls = set(entry.link for entry in urls_cache + urls_yt_cache)
+        favorites_dict = {u: count for u, count in favorites_dict.items() if u in current_urls}
 
         # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
         urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
-                          if e[0] in favorites_dict]
+                          if e.link in favorites_dict]
 
         # Build urls_flagged_cache from flagged entries in all caches
         urls_flagged_cache = [e for e in (urls_cache + urls_yt_cache + urls_gh_cache + urls_comic_cache)
-                              if e[0] in flagged_content_dict]
+                              if e.link in flagged_content_dict]
 
         # Generate the appreciated feed
         generate_appreciated_feed()
 
-        # ---- NEW: update cached OPML ----
+        # Update cached OPML
         global opml_cache
         opml_cache = generate_opml_feed()
 
-
-    except:
-        print("something went wrong during update_all")
+    except Exception as e:
+        logger.error("Error during update_all: %s", e)
     finally:
-        print("end update_all")
+        logger.info("end update_all")
 
 
 def update_entries(url):
-    feed = feedparser.parse(url)
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logger.error("Failed to fetch %s: %s", url, e)
+        return []
+
+    feed = fastfeedparser.parse(response.content)
     entries = feed.entries
 
-    if len(entries):
+    if entries:
         formatted_entries = []
         for entry in entries:
-            domain = entry.link.split("//")[-1].split("/")[0]
-            domain = domain.replace("www.", "")
-            updated = datetime.utcnow()
-            updated_time = entry.get("updated_parsed", entry.get("published_parsed"))
-            if updated_time:
+            link = entry.get('link', '')
+            updated = datetime.now(timezone.utc).replace(tzinfo=None)
+            updated_str = entry.get("updated") or entry.get("published")
+            if updated_str:
                 try:
-                    updated = datetime.fromtimestamp(time.mktime(updated_time))
-                except Exception:
+                    updated = datetime.fromisoformat(
+                        updated_str.replace("Z", "+00:00")
+                    ).replace(tzinfo=None)
+                except (ValueError, TypeError):
                     pass
 
             # Parse category tags from Atom <category> elements
             categories = []
             for tag in entry.get('tags', []):
                 term = tag.get('term', '')
-                scheme = tag.get('scheme', '')
-                if scheme == CATEGORY_SCHEME and term in CATEGORIES:
+                if term in CATEGORIES:
                     categories.append(term)
 
             formatted_entries.append(
-                {
-                    "domain": domain,
-                    "title": entry.title,
-                    "link": entry.link,
-                    "author": entry.author,
-                    "description": entry.get('description', ''),
-                    "updated": updated,
-                    "categories": categories,
-                }
+                FeedEntry(
+                    link=link,
+                    title=entry.get('title', ''),
+                    author=entry.get('author', ''),
+                    description=entry.get('description', ''),
+                    updated=updated,
+                    categories=categories,
+                )
             )
 
-        cache = [
-            (entry["link"], entry["title"], entry["author"], entry["description"], entry["updated"], entry["categories"])
-            for entry in formatted_entries
-            if entry["link"].startswith("https://")  # Only allow https:// URLs for iframe embedding
-        ]
-        print(len(cache), "entries")
+        cache = [e for e in formatted_entries if e.link.startswith("https://")]
+        logger.info("%d entries from %s", len(cache), url)
         return cache
     else:
-        return False
+        return []
 
 
 def load_public_suffix_list(file_path):
@@ -465,106 +518,58 @@ def index():
     if search_query.strip():  # Only perform search if query is not empty or just whitespace
         cache = [
             entry for entry in cache
-            if (search_query in entry[0].lower() or  # url
-                any(search_query.lower() == word.lower() for word in entry[1].split()) or  # title
-                any(search_query.lower() == word.lower() for word in entry[2].split()) or  # author
-                any(search_query.lower() == word.lower() for word in entry[3].split()))  # description
+            if (search_query in entry.link.lower() or  # url
+                any(search_query.lower() == word.lower() for word in entry.title.split()) or  # title
+                any(search_query.lower() == word.lower() for word in entry.author.split()) or  # author
+                any(search_query.lower() == word.lower() for word in entry.description.split()))  # description
         ]
         if not cache:
-            return render_template(
-                "index.html",
-                url="",
-                short_url="",
-                query_string="",
+            return _render_no_results(
+                current_mode,
                 title="No results found",
-                author="",
-                domain="",
-                prefix=prefix + "/",
-                videoid="",
-                current_mode=current_mode,
-                favorites_count=0,
-                notes_count=0,
-                notes_list=[],
-                flag_content_count=0,
                 search_query=search_query,
-                no_results=True,
-                # --- NEW: satisfy template ---
-                reactions_dict=OrderedDict(),
-                reactions_list=[],
-                favorites_total=0,
-                next_link="",
-                next_doc_url="",
-                next_host="",
-                categories=CATEGORIES,
-                category_groups=CATEGORY_GROUPS,
-                current_cat="",
-                category_counts={},
-                post_categories=[],
             )
 
     # Category counts (before filtering, so user sees totals)
     category_counts = {}
     if current_mode == 0:
         for entry in cache:
-            for cat_slug in entry[5]:
+            for cat_slug in entry.categories:
                 category_counts[cat_slug] = category_counts.get(cat_slug, 0) + 1
-            if not entry[5]:
+            if not entry.categories:
                 category_counts["uncategorized"] = category_counts.get("uncategorized", 0) + 1
 
     # Category filtering
     current_cat = request.args.get("cat", "")
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
-            cache = [entry for entry in cache if not entry[5] or "uncategorized" in entry[5]]
+            cache = [entry for entry in cache if not entry.categories or "uncategorized" in entry.categories]
         else:
-            cache = [entry for entry in cache if current_cat in entry[5]]
+            cache = [entry for entry in cache if current_cat in entry.categories]
 
         if not cache:
-            return render_template(
-                "index.html",
-                url="",
-                short_url="",
-                query_string="",
-                title="",
-                author="",
-                domain="",
-                prefix=prefix + "/",
-                videoid="",
-                current_mode=current_mode,
-                favorites_count=0,
-                notes_count=0,
-                notes_list=[],
-                flag_content_count=0,
-                search_query="",
-                no_results=True,
-                no_results_cat=current_cat,
-                reactions_dict=OrderedDict(),
-                reactions_list=[],
-                favorites_total=0,
-                next_link="",
-                next_doc_url="",
-                next_host="",
-                categories=CATEGORIES,
-                category_groups=CATEGORY_GROUPS,
+            return _render_no_results(
+                current_mode,
                 current_cat=current_cat,
                 category_counts=category_counts,
-                post_categories=[],
+                no_results_cat=current_cat,
             )
 
     if url is not None:
         http_url = url.replace("https://", "http://")
         title, author, description, post_cats = next(
             (
-                (url_tuple[1], url_tuple[2], url_tuple[3], url_tuple[5])
-                for url_tuple in cache
-                if url_tuple[0] == url or url_tuple[0] == http_url
+                (e.title, e.author, e.description, e.categories)
+                for e in cache
+                if e.link == url or e.link == http_url
             ),
             (None, None, None, []),
         )
 
     if title is None:
-        if cache and len(cache):
-            url, title, author, _description, _date, post_cats = random.choice(cache)
+        if cache:
+            chosen = random.choice(cache)
+            url, title, author, post_cats = chosen.link, chosen.title, chosen.author, chosen.categories
         else:
             url, title, author = (
                 "https://blog.kagi.com/small-web",
@@ -573,21 +578,20 @@ def index():
             )
 
     # -------------------------------------------------
-    # Build deterministic “next post” link and pre-load it
+    # Build deterministic "next post" link and pre-load it
     # -------------------------------------------------
     next_link = None
-    next_doc_url = None        # add this line (default)
-    next_host    = None
-    if cache:                                     # we have something to show next
-        # try to pick a different entry from the same cache
-        next_candidates = [e for e in cache if e[0] != url] or cache
-        next_entry     = random.choice(next_candidates)
-        next_params    = request.args.to_dict(flat=True)
-        next_params["url"] = next_entry[0]        # set the url of the next post
+    next_doc_url = None
+    next_host = None
+    if cache:
+        next_candidates = [e for e in cache if e.link != url] or cache
+        next_entry = random.choice(next_candidates)
+        next_params = request.args.to_dict(flat=True)
+        next_params["url"] = next_entry.link
         next_link = prefix + "/?" + urlencode(next_params)
-        next_doc_url = next_entry[0]                       # remote URL itself
-        host_parts   = urlparse(next_doc_url)
-        next_host    = f"{host_parts.scheme}://{host_parts.netloc}"
+        next_doc_url = next_entry.link
+        host_parts = urlparse(next_doc_url)
+        next_host = f"{host_parts.scheme}://{host_parts.netloc}"
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
@@ -609,9 +613,7 @@ def index():
     favorites_total = sum(reactions_dict.values())
 
     # Preserve all query parameters except 'url'
-    query_params = request.args.copy()
-    query_params.pop("url", None)
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
+    query_string = _build_redirect_params()
     if query_string:
         query_string = "?" + query_string
 
@@ -678,8 +680,8 @@ def index():
         code_count=code_count,
         comics_count=comics_count,
         next_link=next_link,
-        next_doc_url=next_doc_url,      #  ← add
-        next_host=next_host,            #  ← add
+        next_doc_url=next_doc_url,
+        next_host=next_host,
         reactions_list=reactions_list,
         favorites_total=favorites_total,
         favorite_emoji_list=favorite_emoji_list,
@@ -716,8 +718,8 @@ def favorite():
 
         # Update urls_app_cache with the new favorite from both regular and YouTube feeds
         urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
-                          if e[0] in favorites_dict]
-        
+                          if e.link in favorites_dict]
+
         # Regenerate the appreciated feed
         generate_appreciated_feed()
 
@@ -725,16 +727,11 @@ def favorite():
         time_saved_favorites = datetime.now()
         try:
             with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
-                json.dump({url: dict(emojis) for url, emojis in favorites_dict.items()}, file)
-        except:
-            print("can not write fav file")
+                json.dump({u: dict(emojis) for u, emojis in favorites_dict.items()}, file)
+        except OSError as e:
+            logger.error("Cannot write favorites file: %s", e)
 
-        # Preserve all query parameters except 'url'
-        query_params = request.args.copy()
-        if "url" in query_params:
-            del query_params["url"]
-        query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
-
+        query_string = _build_redirect_params()
         redirect_path = f"{prefix}/?url={url}"
         if query_string:
             redirect_path += f"&{query_string}"
@@ -764,14 +761,10 @@ def note():
             try:
                 with open(PATH_NOTES, "w", encoding="utf-8") as file:
                     json.dump(serialize_notes(notes_dict), file)
-            except:
-                print("can not write notes file")
-    # Preserve all query parameters except 'url' and 'note_content'
-    query_params = request.args.copy()
-    if "url" in query_params:
-        del query_params["url"]
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
+            except OSError as e:
+                logger.error("Cannot write notes file: %s", e)
 
+    query_string = _build_redirect_params()
     redirect_path = f"{prefix}/?url={url}"
     if query_string:
         redirect_path += f"&{query_string}"
@@ -802,22 +795,20 @@ def flag_content():
             try:
                 with open(PATH_FLAGGED, "w", encoding="utf-8") as file:
                     json.dump(flagged_content_dict, file)
-            except:
-                print("can not write flagged content file")
+            except OSError as e:
+                logger.error("Cannot write flagged content file: %s", e)
 
-    # Preserve all query parameters except 'url'
-    query_params = request.args.copy()
-    if "url" in query_params:
-        del query_params["url"]
-
-    query_string = "&".join(f"{key}={value}" for key, value in query_params.items())
+    query_string = _build_redirect_params()
 
     # Create response with updated cookie
     response = make_response(redirect(f"{prefix}/?{query_string}"))
 
     # Store flagged URLs in cookie (max 100 URLs to prevent cookie size issues)
     flagged_urls_list = list(flagged_urls)[-100:]
-    response.set_cookie("flagged_urls", "|".join(flagged_urls_list), max_age=31536000)  # 1 year
+    response.set_cookie(
+        "flagged_urls", "|".join(flagged_urls_list),
+        max_age=31536000, httponly=True, secure=True, samesite="Lax",
+    )
 
     return response
 
@@ -845,21 +836,21 @@ def feed():
             title += f" - {CATEGORIES[cat][0]}"
             feed_url = f"https://kagi.com/smallweb/feed?cat={cat}"
             if cat == "uncategorized":
-                cache = [e for e in cache if not e[5] or "uncategorized" in e[5]]
+                cache = [e for e in cache if not e.categories or "uncategorized" in e.categories]
             else:
-                cache = [e for e in cache if cat in e[5]]
+                cache = [e for e in cache if cat in e.categories]
         else:
             feed_url = "https://kagi.com/smallweb/feed"
 
     atom = AtomFeed(title, feed_url=feed_url)
-    for url_item, entry_title, author, description, updated, *_ in cache:
+    for entry in cache:
         atom.add(
-            title=entry_title,
-            content=description,
+            title=entry.title,
+            content=entry.description,
             content_type="html",
-            url=url_item,
-            updated=updated,
-            author=author,
+            url=entry.link,
+            updated=entry.updated,
+            author=entry.author,
         )
     return Response(atom.to_string(), mimetype="application/atom+xml")
 
@@ -873,10 +864,10 @@ def appreciated():
 @app.route("/smallweb/appreciated.json")
 def appreciated_json():
     """Full appreciated feed as JSON for client-side random selection.
-    
+
     Returns the complete list of appreciated URLs with version info.
     Supports ETag for conditional requests (304 Not Modified).
-    
+
     Response:
     {
         "version": "abc123...",
@@ -887,11 +878,11 @@ def appreciated_json():
     }
     """
     global appreciated_version, appreciated_json_cache, appreciated_json_gzip
-    
+
     # Ensure cache exists
     if appreciated_json_cache is None:
         generate_appreciated_json()
-    
+
     # Check for conditional request (ETag)
     etag = f'"{appreciated_version}"'
     if_none_match = request.headers.get("If-None-Match")
@@ -900,7 +891,7 @@ def appreciated_json():
         response.headers["ETag"] = etag
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
-    
+
     # Check if client accepts gzip
     accept_encoding = request.headers.get("Accept-Encoding", "")
     if "gzip" in accept_encoding and appreciated_json_gzip:
@@ -908,7 +899,7 @@ def appreciated_json():
         response.headers["Content-Encoding"] = "gzip"
     else:
         response = make_response(appreciated_json_cache)
-    
+
     response.headers["Content-Type"] = "application/json"
     response.headers["ETag"] = etag
     response.headers["Cache-Control"] = "public, max-age=300"  # cache for 5 min
@@ -926,8 +917,6 @@ def opml():
     return Response(opml_cache, mimetype="text/x-opml+xml")
 
 
-
-
 time_saved_favorites = datetime.now()
 time_saved_notes = datetime.now()
 time_saved_flagged_content = datetime.now()
@@ -939,116 +928,16 @@ urls_gh_cache = []
 urls_comic_cache = []
 urls_flagged_cache = []
 
-favorites_dict = {}  # Dictionary to store favorites count
-
-def load_favorites():
-    """Load favorites from JSON, falling back to legacy format for migration."""
-    global favorites_dict
-    # Try JSON first
-    if os.path.exists(PATH_FAVORITES):
-        try:
-            with open(PATH_FAVORITES, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                favorites_dict = {url: OrderedDict(emojis) for url, emojis in data.items()}
-                print("Loaded favorites from JSON", len(favorites_dict))
-                return
-        except Exception as e:
-            print(f"Error loading favorites JSON: {e}")
-
-    # Fall back to legacy format for migration
-    if os.path.exists(PATH_FAVORITES_LEGACY):
-        try:
-            import pickle as pkl_migrate
-            with open(PATH_FAVORITES_LEGACY, "rb") as f:
-                favorites_dict = pkl_migrate.load(f)
-                print("Migrating favorites from legacy format", len(favorites_dict))
-                # Migrate old int-only data to emoji dict
-                for u, v in list(favorites_dict.items()):
-                    if isinstance(v, int):
-                        favorites_dict[u] = OrderedDict({"👍": v})
-                # Save as JSON immediately
-                with open(PATH_FAVORITES, "w", encoding="utf-8") as jf:
-                    json.dump({url: dict(emojis) for url, emojis in favorites_dict.items()}, jf)
-                print("Migrated favorites to JSON format")
-                return
-        except Exception as e:
-            print(f"Error migrating favorites: {e}")
-
-    print("No favorites data found.")
-
-load_favorites()
+favorites_dict = _load_json(
+    PATH_FAVORITES,
+    lambda d: {url: OrderedDict(emojis) for url, emojis in d.items()},
+) or {}
 urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
 generate_appreciated_feed()  # Initialize the appreciated feed
 
+notes_dict = _load_json(PATH_NOTES, deserialize_notes) or {}
 
-notes_dict = {}  # Dictionary to store notes
-
-def load_notes():
-    """Load notes from JSON, falling back to legacy format for migration."""
-    global notes_dict
-    # Try JSON first
-    if os.path.exists(PATH_NOTES):
-        try:
-            with open(PATH_NOTES, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                notes_dict = deserialize_notes(data)
-                print("Loaded notes from JSON", len(notes_dict))
-                return
-        except Exception as e:
-            print(f"Error loading notes JSON: {e}")
-
-    # Fall back to legacy format for migration
-    if os.path.exists(PATH_NOTES_LEGACY):
-        try:
-            import pickle as pkl_migrate
-            with open(PATH_NOTES_LEGACY, "rb") as f:
-                notes_dict = pkl_migrate.load(f)
-                print("Migrating notes from legacy format", len(notes_dict))
-                # Save as JSON immediately
-                with open(PATH_NOTES, "w", encoding="utf-8") as jf:
-                    json.dump(serialize_notes(notes_dict), jf)
-                print("Migrated notes to JSON format")
-                return
-        except Exception as e:
-            print(f"Error migrating notes: {e}")
-
-    print("No notes data found.")
-
-load_notes()
-
-flagged_content_dict = {}  # Dictionary to store flagged content count
-
-def load_flagged():
-    """Load flagged content from JSON, falling back to legacy format for migration."""
-    global flagged_content_dict
-    # Try JSON first
-    if os.path.exists(PATH_FLAGGED):
-        try:
-            with open(PATH_FLAGGED, "r", encoding="utf-8") as f:
-                flagged_content_dict = json.load(f)
-                print("Loaded flagged content from JSON", len(flagged_content_dict))
-                return
-        except Exception as e:
-            print(f"Error loading flagged content JSON: {e}")
-
-    # Fall back to legacy format for migration
-    if os.path.exists(PATH_FLAGGED_LEGACY):
-        try:
-            import pickle as pkl_migrate
-            with open(PATH_FLAGGED_LEGACY, "rb") as f:
-                flagged_content_dict = pkl_migrate.load(f)
-                print("Migrating flagged content from legacy format", len(flagged_content_dict))
-                # Save as JSON immediately
-                with open(PATH_FLAGGED, "w", encoding="utf-8") as jf:
-                    json.dump(flagged_content_dict, jf)
-                print("Migrated flagged content to JSON format")
-                return
-        except Exception as e:
-            print(f"Error migrating flagged content: {e}")
-
-    print("No flagged content data found.")
-
-load_flagged()
+flagged_content_dict = _load_json(PATH_FLAGGED) or {}
 
 
 # get feeds
@@ -1056,36 +945,36 @@ update_all()
 
 opml_cache = generate_opml_feed()
 
-# Update feeds every 1 hour
+# Update feeds every 5 minutes
 scheduler = BackgroundScheduler()
 scheduler.start()
 scheduler.add_job(update_all, "interval", minutes=5)
 
 
 def save_all_data():
-    """Save all data before shutdown"""
-    print("[DEBUG] Saving all data before shutdown...")
+    """Save all data before shutdown."""
+    logger.info("Saving all data before shutdown...")
     try:
         with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
-            json.dump({url: dict(emojis) for url, emojis in favorites_dict.items()}, file)
-            print(f"[DEBUG] Saved {len(favorites_dict)} favorites")
+            json.dump({u: dict(emojis) for u, emojis in favorites_dict.items()}, file)
+            logger.info("Saved %d favorites", len(favorites_dict))
     except Exception as e:
-        print(f"Error saving favorites: {e}")
+        logger.error("Error saving favorites: %s", e)
 
     try:
         with open(PATH_NOTES, "w", encoding="utf-8") as file:
             json.dump(serialize_notes(notes_dict), file)
-            print(f"[DEBUG] Saved {len(notes_dict)} notes")
+            logger.info("Saved %d notes", len(notes_dict))
     except Exception as e:
-        print(f"Error saving notes: {e}")
+        logger.error("Error saving notes: %s", e)
 
     try:
         with open(PATH_FLAGGED, "w", encoding="utf-8") as file:
             json.dump(flagged_content_dict, file)
-            print(f"[DEBUG] Saved {len(flagged_content_dict)} flagged items")
+            logger.info("Saved %d flagged items", len(flagged_content_dict))
     except Exception as e:
-        print(f"Error saving flagged content: {e}")
-    
+        logger.error("Error saving flagged content: %s", e)
+
 
 atexit.register(save_all_data)
 atexit.register(lambda: scheduler.shutdown())
