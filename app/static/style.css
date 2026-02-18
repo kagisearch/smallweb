@@ -36,6 +36,7 @@ body {
 }
 
 #search-form {
+  margin-left: auto;
   display: flex;
   margin-right: 10px;
 }
@@ -140,7 +141,7 @@ body {
 .next-button, .ok-button {
   background-color: #3498db;
   border: none;
-  padding: 8px !important;
+  padding: 4px 8px !important;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -149,6 +150,7 @@ body {
   font-size:22px;
   font-family:pixel,Arial;
   min-width: 100px;
+  white-space: nowrap;
 }
 
 
@@ -381,10 +383,14 @@ body {
 
 .right-popup {
   position: fixed;
-  left: auto;
+  left: 16px;
   right: 16px;
   top: 50px;
-  max-width: calc(100vw - 32px);
+  width: auto !important;
+  max-width: 420px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  word-wrap: break-word;
 }
 
 #header .container-link {
@@ -419,6 +425,12 @@ svg {
 }
 
 
+
+@media (min-width: 1331px) {
+  #controls {
+    width: 48%;
+  }
+}
 
 @media (max-width: 1450px) {
   #search-input {
@@ -537,26 +549,32 @@ svg {
   #url-display, #url-display-phone {
     display: none !important;
   }
-  .post-cats { display: none !important; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .middle {
     display: none;
   }
 
-  .right-popup {
-    right: 8px;
-  }
+  #switch { display: none; }
 
   .popup-container:has(label[for="spread-love"]),
   .flag-link {
     display: none !important;
   }
 
-  #search-input {
-    width: 100%;
-    font-size: 16px;
+  #search-form {
+    display: none !important;
+  }
+
+  .next-btn-suffix {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .right-popup {
+    right: 8px;
   }
 
   .right-popup-container.about {
@@ -566,20 +584,11 @@ svg {
   }
 
   .next-button {
-    min-width: 60px;
-    font-size: 14px;
+    min-width: 80px;
+    font-size: 20px;
     margin-right: 5px;
+    padding: 6px 12px !important;
   }
-}
-
-@media (max-width: 400px) {
-  #search-form {
-    display: none !important;
-  }
-}
-
-@media (max-width: 700px) {
-  #switch { display: none; }
 }
 
 @media (max-width: 500px) {
@@ -816,6 +825,18 @@ body.dark .emoji-badge,
 @media (max-width: 960px) {
   .category-dropdown { width: 320px; }
   .cat-columns { grid-template-columns: 1fr; }
+  .cat-desc { display: none; }
+  .cat-item { min-height: 36px; padding: 6px 14px; }
+}
+
+@media (max-width: 500px) {
+  .category-dropdown {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    top: 50px;
+    width: auto;
+  }
 }
 
 /* Post category chips */
@@ -847,7 +868,4 @@ body.dark .emoji-badge,
   background: rgba(52, 152, 219, 0.35);
 }
 
-@media (max-width: 700px) {
-  .category-wrapper { display: none; }
-}
 

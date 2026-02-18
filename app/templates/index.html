@@ -40,12 +40,12 @@
       {% if current_mode == 2 %}
       {# Appreciated mode: use client-side random selection #}
       <a href="{{ next_link }}" class="stumble-link" id="appreciated-next-link" rel="prefetch">
-        <button class="next-button" id="appreciated-next-btn" title="Show next appreciated post">Next Post</button>
+        <button class="next-button" id="appreciated-next-btn" title="Show next appreciated post">Next<span class="next-btn-suffix"> Post</span></button>
       </a>
       {% elif next_link %}
       {# Other modes: use server-side random selection #}
       <a href="{{ next_link }}" class="stumble-link" rel="prefetch">
-        <button class="next-button" title="Show next post">Next Post</button>
+        <button class="next-button" title="Show next post">Next<span class="next-btn-suffix"> Post</span></button>
       </a>
       {% endif %}
       <div id="reactions">
