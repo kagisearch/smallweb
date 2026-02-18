@@ -73,26 +73,8 @@
 </form>
 {% endfor %}
 
-        <!-- add-emoji picker -->
-        <div class="popup-container">
-            <label for="emoji-popup" class="emoji-add-btn" title="More reactions">
-              <!-- smile-plus icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M15 5v4"/><path d="M17 7h-4"/></svg>
-            </label>
-            <input type="radio" id="emoji-popup" name="popup" class="popup-radio">
-            <div class="popup emoji-popup">
-              {% for e in favorite_emoji_list %}
-              <form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}" method="post" style="display:inline;">
-                  <input type="hidden" name="url" value="{{ url }}">
-                  <input type="hidden" name="emoji" value="{{ e }}">
-                  <button type="submit" class="emoji-option">{{ e }}</button>
-              </form>
-              {% endfor %}
-              <label for="close-popup" class="sbutton cancel-button">Cancel</label>
-            </div>
-        </div>
-
       </div>
+
 
       <div id="url-display">
       {% if author and author != '' and author !=" " %}
@@ -108,8 +90,8 @@
       </div>
       {% if current_mode == 0 and post_categories %}
       <div class="post-cats">
-        {% for slug, label in post_categories %}
-        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip">{{ label }}</a>
+        {% for slug, label, emoji in post_categories %}
+        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="{{ label }}">{{ emoji }}</a>
         {% endfor %}
       </div>
       {% endif %}
@@ -151,6 +133,7 @@
         </div>
       </div>
       {% endif %}
+
 
       <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
@@ -229,20 +212,20 @@
 
       {% if current_mode==1 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
-        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
-        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
+        <a id="switch"  href="{{ prefix }}?app">Liked</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comic</a>
       {% elif current_mode==2 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
-        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
-        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
+        <a id="switch"  href="{{ prefix }}?yt">Video</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comic</a>
       {% elif current_mode==4 %}
         <a id="switch"  href="{{ prefix }}">Web</a>
-        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
-        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
+        <a id="switch"  href="{{ prefix }}?app">Liked</a>
+        <a id="switch"  href="{{ prefix }}?yt">Video</a>
       {% else %}
-        <a id="switch"  href="{{ prefix }}?app">Appreciated</a>
-        <a id="switch"  href="{{ prefix }}?yt">Videos</a>
-        <a id="switch"  href="{{ prefix }}?comic">Comics</a>
+        <a id="switch"  href="{{ prefix }}?app">Liked</a>
+        <a id="switch"  href="{{ prefix }}?yt">Video</a>
+        <a id="switch"  href="{{ prefix }}?comic">Comic</a>
       {% endif %}
     </div>
     <div class="right">

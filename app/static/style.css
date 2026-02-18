@@ -24,13 +24,13 @@ body {
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  min-height: 50px;
+  height: 50px;
 }
 
 #controls {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   flex-shrink: 1;
   min-width: 0;
 }
@@ -51,7 +51,7 @@ body {
   padding: 4px 22px 4px 8px;
   border: none;
   border-radius: 5px;
-  width: 140px;
+  width: 100px;
   height: 32px;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.85);
@@ -59,7 +59,7 @@ body {
 }
 
 #search-input:focus {
-  width: 200px;
+  width: 180px;
   background: #fff;
   outline: 2px solid #3498db;
   outline-offset: -1px;
@@ -170,7 +170,7 @@ body {
   border-radius: 5px;
   padding: 5px 10px;
   min-width:180px;
-  margin: 0 10px;
+  margin: 0 2px;
 }
 
 /* --- always show the compact “phone” url label --- */
@@ -422,10 +422,10 @@ svg {
 
 @media (max-width: 1450px) {
   #search-input {
-    width: 120px;
+    width: 90px;
   }
   #search-input:focus {
-    width: 160px;
+    width: 150px;
   }
 
   #header {
@@ -578,11 +578,7 @@ svg {
   }
 }
 
-@media (min-width: 1331px) {
-  /* .right is visible above 1330px and takes the space #switch needs */
-  #switch { display: none; }
-}
-@media (max-width: 960px) {
+@media (max-width: 700px) {
   #switch { display: none; }
 }
 
@@ -655,6 +651,7 @@ body.dark .emoji-badge,
   position: relative;
   display: inline-flex;
   align-items: center;
+  margin-left: 4px;
 }
 
 .category-toggle {
@@ -673,12 +670,21 @@ body.dark .emoji-badge,
   transition: all 0.15s ease;
   white-space: nowrap;
   height: 32px;
+  max-width: 180px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 .category-toggle svg {
   margin-top: 1px;
+  flex-shrink: 0;
+}
+.category-toggle #catLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .category-toggle .cat-inline-clear {
   margin-top: 1px;
+  flex-shrink: 0;
 }
 .category-toggle:hover,
 .category-toggle.active {
@@ -819,25 +825,26 @@ body.dark .emoji-badge,
   gap: 4px;
   flex-shrink: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .cat-chip {
-  display: inline-block;
-  padding: 3px 10px;
-  background: rgba(52, 152, 219, 0.15);
-  border: 1px solid rgba(52, 152, 219, 0.35);
-  border-radius: 12px;
-  color: #b0d4f1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 6px;
   text-decoration: none;
-  font-size: 13px;
-  white-space: nowrap;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.15s ease;
 }
 
 .cat-chip:hover {
   background: rgba(52, 152, 219, 0.35);
-  border-color: rgba(52, 152, 219, 0.6);
-  color: #ecf0f1;
 }
 
 @media (max-width: 700px) {

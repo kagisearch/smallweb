@@ -27,31 +27,31 @@ from collections import OrderedDict
 import uuid
 import json
 
-# Category definitions — slug → label · description
+# Category definitions — slug → label · description · emoji
 CATEGORIES = OrderedDict([
-    ("ai",           ("AI",                "LLMs · machine learning · AI tools · ethics · agents")),
-    ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases")),
-    ("tech",         ("Technology",         "Tech news · apps · networking · social media")),
-    ("sysadmin",     ("Sysadmin",           "Deployment · cloud · containers · CI/CD · networking · self-hosting")),
-    ("hardware",     ("Hardware",           "Electronics · PCB design · gadgets · home lab")),
-    ("diy",          ("DIY & Making",       "Woodworking · metalworking · 3D printing · home renovation · maker projects")),
-    ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software")),
-    ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities")),
-    ("science",      ("Science",            "Physics · biology · climate · math · space · medicine")),
-    ("humanities",   ("Humanities",         "History · philosophy · language · linguistics · literature")),
-    ("essays",       ("Essays",             "Long-form pieces · original arguments · in-depth analysis")),
-    ("art",          ("Art & Design",       "Visual art · illustration · architecture · graphic design")),
-    ("photography",  ("Photography",        "Cameras · photo essays · visual storytelling")),
-    ("culture",      ("Pop Culture",        "Film · TV · music · books · fandom · comics")),
-    ("gaming",       ("Gaming",             "Video games · tabletop RPGs · game dev · interactive fiction")),
-    ("politics",     ("Politics",           "Government · policy · elections · law · political commentary")),
-    ("economy",      ("Economy",            "Economics · finance · markets · business · labor · trade")),
-    ("society",      ("Society",            "Social issues · civil rights · current events · community")),
-    ("life",         ("Life & Personal",    "Health · parenting · pets · personal growth · relationships")),
-    ("food",         ("Food & Drink",       "Recipes · cooking · restaurants · coffee · wine · baking")),
-    ("nature",       ("Nature & Outdoors",  "Hiking · travel · adventure · wildlife · gardening")),
-    ("uncategorized",("Uncategorized",      "Posts that don\u2019t fit neatly into any topic")),
-    ("spam",         ("Spam",              "Suspected spam or low-quality content")),
+    ("ai",           ("AI",                "LLMs · machine learning · AI tools · ethics · agents",              "\U0001F916")),
+    ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases",     "\U0001F4BB")),
+    ("tech",         ("Technology",         "Tech news · apps · networking · social media",                     "\u2699\uFE0F")),
+    ("sysadmin",     ("Sysadmin",           "Deployment · cloud · containers · CI/CD · networking · self-hosting", "\U0001F5A5\uFE0F")),
+    ("hardware",     ("Hardware",           "Electronics · PCB design · gadgets · home lab",                    "\U0001F527")),
+    ("diy",          ("DIY & Making",       "Woodworking · metalworking · 3D printing · home renovation · maker projects", "\U0001F6E0\uFE0F")),
+    ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software",        "\U0001F4BE")),
+    ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities",        "\U0001F510")),
+    ("science",      ("Science",            "Physics · biology · climate · math · space · medicine",            "\U0001F52C")),
+    ("humanities",   ("Humanities",         "History · philosophy · language · linguistics · literature",       "\U0001F4DA")),
+    ("essays",       ("Essays",             "Long-form pieces · original arguments · in-depth analysis",       "\u270D\uFE0F")),
+    ("art",          ("Art & Design",       "Visual art · illustration · architecture · graphic design",       "\U0001F3A8")),
+    ("photography",  ("Photography",        "Cameras · photo essays · visual storytelling",                    "\U0001F4F7")),
+    ("culture",      ("Pop Culture",        "Film · TV · music · books · fandom · comics",                     "\U0001F3AC")),
+    ("gaming",       ("Gaming",             "Video games · tabletop RPGs · game dev · interactive fiction",     "\U0001F3AE")),
+    ("politics",     ("Politics",           "Government · policy · elections · law · political commentary",     "\U0001F3DB\uFE0F")),
+    ("economy",      ("Economy",            "Economics · finance · markets · business · labor · trade",         "\U0001F4C8")),
+    ("society",      ("Society",            "Social issues · civil rights · current events · community",       "\U0001F465")),
+    ("life",         ("Life & Personal",    "Health · parenting · pets · personal growth · relationships",      "\U0001F331")),
+    ("food",         ("Food & Drink",       "Recipes · cooking · restaurants · coffee · wine · baking",        "\U0001F372")),
+    ("nature",       ("Nature & Outdoors",  "Hiking · travel · adventure · wildlife · gardening",              "\U0001F333")),
+    ("uncategorized",("Uncategorized",      "Posts that don\u2019t fit neatly into any topic",                 "\U0001F4C2")),
+    ("spam",         ("Spam",              "Suspected spam or low-quality content",                            "\U0001F6AB")),
 ])
 
 # Groups for dropdown display
@@ -622,8 +622,8 @@ def index():
     # get flagged content
     flag_content_count = flagged_content_dict.get(url, 0)
 
-    # Build (slug, label) tuples for the current post's categories
-    post_categories = [(s, CATEGORIES[s][0]) for s in post_cats if s in CATEGORIES]
+    # Build (slug, label, emoji) tuples for the current post's categories
+    post_categories = [(s, CATEGORIES[s][0], CATEGORIES[s][2]) for s in post_cats if s in CATEGORIES]
 
     if url.startswith("http://"):
         url = url.replace(
