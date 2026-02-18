@@ -541,6 +541,15 @@ svg {
   flex-shrink: 0;
 }
 
+.category-toggle:focus {
+  outline: none;
+}
+
+.category-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -1px;
+}
+
 .category-toggle:hover,
 .category-toggle.active {
   background: rgba(255, 255, 255, 0.12);
@@ -556,12 +565,13 @@ svg {
   display: none;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
   cursor: pointer;
-  padding: 0 0 0 4px;
+  padding: 0 0 0 6px;
   line-height: 1;
   align-self: center;
+  outline: none;
 }
 
 .cat-inline-clear:hover {
