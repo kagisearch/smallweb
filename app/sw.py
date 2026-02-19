@@ -63,26 +63,26 @@ CATEGORIES = OrderedDict(
             (
                 "Technology",
                 "Tech news · apps · networking · social media",
-                "\u2699\ufe0f",
+                "\U0001f4f1",
             ),
         ),
         (
             "sysadmin",
             (
                 "Sysadmin",
-                "Deployment · cloud · containers · CI/CD · networking · self-hosting",
-                "\U0001f5a5\ufe0f",
+                "Deployment · cloud · containers · CI/CD · networking · hosting",
+                "\u2601\ufe0f",
             ),
         ),
         (
             "hardware",
-            ("Hardware", "Electronics · PCB design · gadgets · home lab", "\U0001f527"),
+            ("Hardware", "Electronics · PCB design · gadgets · home lab", "\U0001f50c"),
         ),
         (
             "diy",
             (
                 "DIY & Making",
-                "Woodworking · metalworking · 3D printing · home renovation · maker projects",
+                "Woodworking · metalworking · 3D printing · home · maker",
                 "\U0001f6e0\ufe0f",
             ),
         ),
@@ -123,7 +123,7 @@ CATEGORIES = OrderedDict(
             (
                 "Essays",
                 "Long-form pieces · original arguments · in-depth analysis",
-                "\u270d\ufe0f",
+                "\U0001f4dd",
             ),
         ),
         (
@@ -147,7 +147,7 @@ CATEGORIES = OrderedDict(
             (
                 "Pop Culture",
                 "Film · TV · music · books · fandom · comics",
-                "\U0001f3ac",
+                "\U0001f37f",
             ),
         ),
         (
@@ -187,7 +187,7 @@ CATEGORIES = OrderedDict(
             (
                 "Life & Personal",
                 "Health · parenting · pets · personal growth · relationships",
-                "\U0001f331",
+                "\U0001f49b",
             ),
         ),
         (
@@ -209,8 +209,8 @@ CATEGORIES = OrderedDict(
         (
             "indieweb",
             (
-                "IndieWeb",
-                "Personal publishing · blogging · RSS · federation · Fediverse · digital gardens",
+                "Indie web",
+                "Personal publishing · blogs · digital gardens · federation",
                 "\U0001f310",
             ),
         ),
