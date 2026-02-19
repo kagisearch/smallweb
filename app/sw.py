@@ -908,6 +908,49 @@ def appreciated_json():
     return response
 
 
+@app.route("/api/random")
+@app.route(f"{prefix}/api/random")
+def api_random():
+    if "yt" in request.args:
+        cache = urls_yt_cache
+    elif "app" in request.args:
+        cache = urls_app_cache
+    elif "gh" in request.args:
+        cache = urls_gh_cache
+    elif "comic" in request.args:
+        cache = urls_comic_cache
+    else:
+        cache = urls_cache
+
+    # Category filtering (blog mode only)
+    cat = request.args.get("cat", "")
+    if cat and cat in CATEGORIES and cache is urls_cache:
+        if cat == "uncategorized":
+            cache = [e for e in cache if not e.categories or "uncategorized" in e.categories]
+        else:
+            cache = [e for e in cache if cat in e.categories]
+
+    if not cache:
+        return jsonify({"error": "no posts available"}), 404
+
+    entry = random.choice(cache)
+    domain = get_registered_domain(entry.link)
+    domain = re.sub(r"^(www\.)?", "", domain)
+
+    response = jsonify({
+        "url": entry.link,
+        "title": entry.title,
+        "author": entry.author,
+        "domain": domain,
+        "categories": [
+            [s, CATEGORIES[s][0], CATEGORIES[s][2]]
+            for s in entry.categories if s in CATEGORIES
+        ],
+    })
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
 @app.route("/opml")
 @app.route(f"{prefix}/opml")
 def opml():
