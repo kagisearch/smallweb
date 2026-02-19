@@ -509,6 +509,22 @@ svg {
   margin-left: 4px;
 }
 
+.category-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  border-radius: 50%;
+  transition: color 0.15s;
+}
+
+.category-nav:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .category-toggle {
   display: inline-flex;
   align-items: center;

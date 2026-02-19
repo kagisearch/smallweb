@@ -86,7 +86,21 @@
 
       {% if current_mode == 0 %}
       <!-- Categories dropdown -->
+      {%- if current_cat %}
+        {%- set all_slugs = [] %}
+        {%- for g_name, g_slugs in category_groups.items() %}
+          {%- for s in g_slugs %}{%- if all_slugs.append(s) %}{%- endif %}{%- endfor %}
+        {%- endfor %}
+        {%- set cat_idx = all_slugs.index(current_cat) if current_cat in all_slugs else -1 %}
+        {%- set prev_cat = all_slugs[cat_idx - 1] if cat_idx > 0 else '' %}
+        {%- set next_cat = all_slugs[cat_idx + 1] if cat_idx >= 0 and cat_idx < all_slugs|length - 1 else '' %}
+      {%- endif %}
       <div class="category-wrapper">
+        {% if current_cat and prev_cat %}
+        <a class="category-nav" href="{{ prefix }}?cat={{ prev_cat }}" title="{{ categories[prev_cat][0] }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        {% endif %}
         <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
             <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -97,6 +111,11 @@
             <button class="cat-inline-clear" onclick="window.location='{{ prefix }}';return false;" title="Clear filter">&times;</button>
           {% endif %}
         </button>
+        {% if current_cat and next_cat %}
+        <a class="category-nav" href="{{ prefix }}?cat={{ next_cat }}" title="{{ categories[next_cat][0] }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        {% endif %}
         <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
           <div class="cat-columns">
           {% for group_name, slugs in category_groups.items() %}

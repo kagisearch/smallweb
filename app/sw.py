@@ -1,30 +1,30 @@
-import re
-import hashlib
+import atexit
 import gzip
+import hashlib
+import json
 import logging
-from typing import NamedTuple
-
-from flask import (
-    Flask,
-    request,
-    redirect,
-    render_template,
-    Response,
-    jsonify,
-    make_response,
-)
+import os
+import random
+import re
+from collections import OrderedDict
+from datetime import datetime, timedelta, timezone
 from html import escape
+from typing import NamedTuple
+from urllib.parse import parse_qs, urlencode, urlparse
+
 import fastfeedparser
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-import random
-from datetime import datetime, timedelta, timezone
-from urllib.parse import urlparse, parse_qs, urlencode
-import atexit
-import os
-import json
 from feedwerk.atom import AtomFeed
-from collections import OrderedDict
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,42 +40,238 @@ class FeedEntry(NamedTuple):
 
 
 # Category definitions — slug → label · description · emoji
-CATEGORIES = OrderedDict([
-    ("ai",           ("AI",                "LLMs · machine learning · AI tools · ethics · agents",              "\U0001F916")),
-    ("programming",  ("Programming",       "Coding · languages · frameworks · devtools · APIs · databases",     "\U0001F4BB")),
-    ("tech",         ("Technology",         "Tech news · apps · networking · social media",                     "\u2699\uFE0F")),
-    ("sysadmin",     ("Sysadmin",           "Deployment · cloud · containers · CI/CD · networking · self-hosting", "\U0001F5A5\uFE0F")),
-    ("hardware",     ("Hardware",           "Electronics · PCB design · gadgets · home lab",                    "\U0001F527")),
-    ("diy",          ("DIY & Making",       "Woodworking · metalworking · 3D printing · home renovation · maker projects", "\U0001F6E0\uFE0F")),
-    ("retro",        ("Retro",              "Vintage computers · DOS · BBS · demoscene · old software",        "\U0001F4BE")),
-    ("security",     ("Security",           "Infosec · privacy · OSINT · encryption · vulnerabilities",        "\U0001F510")),
-    ("science",      ("Science",            "Physics · biology · climate · math · space · medicine",            "\U0001F52C")),
-    ("humanities",   ("Humanities",         "History · philosophy · language · linguistics · literature",       "\U0001F4DA")),
-    ("essays",       ("Essays",             "Long-form pieces · original arguments · in-depth analysis",       "\u270D\uFE0F")),
-    ("art",          ("Art & Design",       "Visual art · illustration · architecture · graphic design",       "\U0001F3A8")),
-    ("photography",  ("Photography",        "Cameras · photo essays · visual storytelling",                    "\U0001F4F7")),
-    ("culture",      ("Pop Culture",        "Film · TV · music · books · fandom · comics",                     "\U0001F3AC")),
-    ("gaming",       ("Gaming",             "Video games · tabletop RPGs · game dev · interactive fiction",     "\U0001F3AE")),
-    ("politics",     ("Politics",           "Government · policy · elections · law · political commentary",     "\U0001F3DB\uFE0F")),
-    ("economy",      ("Economy",            "Economics · finance · markets · business · labor · trade",         "\U0001F4C8")),
-    ("society",      ("Society",            "Social issues · civil rights · current events · community",       "\U0001F465")),
-    ("life",         ("Life & Personal",    "Health · parenting · pets · personal growth · relationships",      "\U0001F331")),
-    ("food",         ("Food & Drink",       "Recipes · cooking · restaurants · coffee · wine · baking",        "\U0001F372")),
-    ("nature",       ("Nature & Outdoors",  "Hiking · travel · adventure · wildlife · gardening",              "\U0001F333")),
-    ("uncategorized",("Uncategorized",      "Posts that don\u2019t fit neatly into any topic",                 "\U0001F4C2")),
-    ("spam",         ("Spam",              "Suspected spam or low-quality content",                            "\U0001F6AB")),
-])
+CATEGORIES = OrderedDict(
+    [
+        (
+            "ai",
+            (
+                "AI",
+                "LLMs · machine learning · AI tools · ethics · agents",
+                "\U0001f916",
+            ),
+        ),
+        (
+            "programming",
+            (
+                "Programming",
+                "Coding · languages · frameworks · devtools · APIs · databases",
+                "\U0001f4bb",
+            ),
+        ),
+        (
+            "tech",
+            (
+                "Technology",
+                "Tech news · apps · networking · social media",
+                "\u2699\ufe0f",
+            ),
+        ),
+        (
+            "sysadmin",
+            (
+                "Sysadmin",
+                "Deployment · cloud · containers · CI/CD · networking · self-hosting",
+                "\U0001f5a5\ufe0f",
+            ),
+        ),
+        (
+            "hardware",
+            ("Hardware", "Electronics · PCB design · gadgets · home lab", "\U0001f527"),
+        ),
+        (
+            "diy",
+            (
+                "DIY & Making",
+                "Woodworking · metalworking · 3D printing · home renovation · maker projects",
+                "\U0001f6e0\ufe0f",
+            ),
+        ),
+        (
+            "retro",
+            (
+                "Retro",
+                "Vintage computers · DOS · BBS · demoscene · old software",
+                "\U0001f4be",
+            ),
+        ),
+        (
+            "security",
+            (
+                "Security",
+                "Infosec · privacy · OSINT · encryption · vulnerabilities",
+                "\U0001f510",
+            ),
+        ),
+        (
+            "science",
+            (
+                "Science",
+                "Physics · biology · climate · math · space · medicine",
+                "\U0001f52c",
+            ),
+        ),
+        (
+            "humanities",
+            (
+                "Humanities",
+                "History · philosophy · language · linguistics · literature",
+                "\U0001f4da",
+            ),
+        ),
+        (
+            "essays",
+            (
+                "Essays",
+                "Long-form pieces · original arguments · in-depth analysis",
+                "\u270d\ufe0f",
+            ),
+        ),
+        (
+            "art",
+            (
+                "Art & Design",
+                "Visual art · illustration · architecture · graphic design",
+                "\U0001f3a8",
+            ),
+        ),
+        (
+            "photography",
+            (
+                "Photography",
+                "Cameras · photo essays · visual storytelling",
+                "\U0001f4f7",
+            ),
+        ),
+        (
+            "culture",
+            (
+                "Pop Culture",
+                "Film · TV · music · books · fandom · comics",
+                "\U0001f3ac",
+            ),
+        ),
+        (
+            "gaming",
+            (
+                "Gaming",
+                "Video games · tabletop RPGs · game dev · interactive fiction",
+                "\U0001f3ae",
+            ),
+        ),
+        (
+            "politics",
+            (
+                "Politics",
+                "Government · policy · elections · law · political commentary",
+                "\U0001f3db\ufe0f",
+            ),
+        ),
+        (
+            "economy",
+            (
+                "Economy",
+                "Economics · finance · markets · business · labor · trade",
+                "\U0001f4c8",
+            ),
+        ),
+        (
+            "society",
+            (
+                "Society",
+                "Social issues · civil rights · current events · community",
+                "\U0001f465",
+            ),
+        ),
+        (
+            "life",
+            (
+                "Life & Personal",
+                "Health · parenting · pets · personal growth · relationships",
+                "\U0001f331",
+            ),
+        ),
+        (
+            "food",
+            (
+                "Food & Drink",
+                "Recipes · cooking · restaurants · coffee · wine · baking",
+                "\U0001f372",
+            ),
+        ),
+        (
+            "nature",
+            (
+                "Nature & Outdoors",
+                "Hiking · travel · adventure · wildlife · gardening",
+                "\U0001f333",
+            ),
+        ),
+        (
+            "indieweb",
+            (
+                "IndieWeb",
+                "Personal publishing · blogging · RSS · federation · Fediverse · digital gardens",
+                "\U0001f310",
+            ),
+        ),
+        (
+            "uncategorized",
+            (
+                "Uncategorized",
+                "Posts that don\u2019t fit neatly into any topic",
+                "\U0001f4c2",
+            ),
+        ),
+        ("spam", ("Spam", "Suspected spam or low-quality content", "\U0001f6ab")),
+    ]
+)
 
 # Groups for dropdown display
-CATEGORY_GROUPS = OrderedDict([
-    ("Tech & Science",    ["ai", "programming", "tech", "sysadmin", "hardware", "diy", "retro", "security", "science"]),
-    ("Culture & Creative",["humanities", "essays", "art", "photography", "culture", "gaming"]),
-    ("Life & World",      ["politics", "economy", "society", "life", "food", "nature"]),
-    ("Other",             ["uncategorized"]),
-])
+CATEGORY_GROUPS = OrderedDict(
+    [
+        (
+            "Tech & Science",
+            [
+                "ai",
+                "science",
+                "programming",
+                "diy",
+                "tech",
+                "hardware",
+                "sysadmin",
+                "security",
+            ],
+        ),
+        (
+            "Culture & Creative",
+            [
+                "indieweb",
+                "art",
+                "essays",
+                "humanities",
+                "retro",
+                "photography",
+                "culture",
+                "gaming",
+            ],
+        ),
+        (
+            "Life & World",
+            [
+                "society",
+                "life",
+                "food",
+                "nature",
+                "politics",
+                "economy",
+            ],
+        ),
+        ("Other", ["uncategorized"]),
+    ]
+)
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
-opml_cache = None          # will hold generated OPML xml
+opml_cache = None  # will hold generated OPML xml
 
 # Version tracking for appreciated feed (client-side random selection support)
 appreciated_version = None  # sha1 hash of sorted URLs
@@ -84,7 +280,23 @@ appreciated_json_gzip = None  # gzipped version of JSON response
 
 # NOTE(z64): List of emotes that can be used for favoriting.
 # Used to build the list in the template, and perform validation on the server.
-favorite_emoji_list = ["👍","😍","😀","😘","😆","😜","🫶","😂","😱","🤔","👏","🚀","🥳","🔥"]
+favorite_emoji_list = [
+    "👍",
+    "😍",
+    "😀",
+    "😘",
+    "😆",
+    "😜",
+    "🫶",
+    "😂",
+    "😱",
+    "🤔",
+    "👏",
+    "🚀",
+    "🥳",
+    "🔥",
+]
+
 
 def compute_appreciated_version(urls_list):
     """Compute sha1 hash of sorted URLs for version tracking.
@@ -119,12 +331,14 @@ def generate_appreciated_json():
     for entry in urls_app_cache:
         # Generate stable ID from URL hash (consistent across restarts)
         item_id = hashlib.sha1(entry.link.encode("utf-8")).hexdigest()[:12]
-        urls_array.append({
-            "id": item_id,
-            "url": entry.link,
-            "title": entry.title or "",
-            "author": entry.author or "",
-        })
+        urls_array.append(
+            {
+                "id": item_id,
+                "url": entry.link,
+                "title": entry.title or "",
+                "author": entry.author or "",
+            }
+        )
 
     # Build response object
     response_data = {
@@ -143,8 +357,7 @@ def generate_appreciated_feed():
     """Generate Atom feed for appreciated posts"""
     global appreciated_feed
     appreciated_feed = AtomFeed(
-        "Kagi Small Web Appreciated",
-        feed_url="https://kagi.com/smallweb/appreciated"
+        "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
     )
     for entry in urls_app_cache:
         appreciated_feed.add(
@@ -158,6 +371,7 @@ def generate_appreciated_feed():
 
     # Also regenerate JSON cache when feed changes
     generate_appreciated_json()
+
 
 def _find_feed_file(name):
     """Locate a feed list file (check CWD first, then parent for local dev)."""
@@ -237,11 +451,12 @@ def generate_opml_feed() -> str:
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<opml version="1.0">\n'
-        '  <head>\n'
-        '    <title>Kagi Small Web OPML</title>\n'
-        '  </head>\n'
-        '  <body>\n' + "\n".join(outlines) + '\n  </body>\n</opml>'
+        "  <head>\n"
+        "    <title>Kagi Small Web OPML</title>\n"
+        "  </head>\n"
+        "  <body>\n" + "\n".join(outlines) + "\n  </body>\n</opml>"
     )
+
 
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
@@ -310,8 +525,14 @@ def _build_redirect_params():
     return "&".join(f"{k}={v}" for k, v in params.items())
 
 
-def _render_no_results(current_mode, title="", search_query="",
-                       current_cat="", category_counts=None, no_results_cat=""):
+def _render_no_results(
+    current_mode,
+    title="",
+    search_query="",
+    current_cat="",
+    category_counts=None,
+    no_results_cat="",
+):
     """Render the index template with no results."""
     return render_template(
         "index.html",
@@ -346,7 +567,16 @@ def _render_no_results(current_mode, title="", search_query="",
 
 
 def update_all():
-    global urls_cache, urls_app_cache, urls_yt_cache, urls_gh_cache, urls_comic_cache, urls_flagged_cache, master_feed, favorites_dict, appreciated_feed
+    global \
+        urls_cache, \
+        urls_app_cache, \
+        urls_yt_cache, \
+        urls_gh_cache, \
+        urls_comic_cache, \
+        urls_flagged_cache, \
+        master_feed, \
+        favorites_dict, \
+        appreciated_feed
 
     url = "https://kagi.com/api/v1/smallweb/feed/"
 
@@ -366,14 +596,19 @@ def update_all():
 
         if not urls_cache or new_entries:
             # Filter out YouTube URLs from main feed
-            urls_cache = [entry for entry in new_entries
-                         if "youtube.com" not in entry.link and "youtu.be" not in entry.link]
+            urls_cache = [
+                entry
+                for entry in new_entries
+                if "youtube.com" not in entry.link and "youtu.be" not in entry.link
+            ]
 
         new_entries = update_entries(url + "?yt")  # youtube sites
 
         if not urls_yt_cache or new_entries:
             # Filter out YouTube Shorts links
-            urls_yt_cache = [entry for entry in new_entries if "/shorts/" not in entry.link]
+            urls_yt_cache = [
+                entry for entry in new_entries if "/shorts/" not in entry.link
+            ]
 
         new_entries = update_entries(url + "?gh")  # github sites
 
@@ -385,21 +620,34 @@ def update_all():
         if not urls_comic_cache or new_entries:
             # Filter entries that have images in content
             urls_comic_cache = [
-                entry for entry in new_entries
-                if entry.description and ('<img' in entry.description or '.png' in entry.description or '.jpg' in entry.description or '.jpeg' in entry.description)
+                entry
+                for entry in new_entries
+                if entry.description
+                and (
+                    "<img" in entry.description
+                    or ".png" in entry.description
+                    or ".jpg" in entry.description
+                    or ".jpeg" in entry.description
+                )
             ]
 
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry.link for entry in urls_cache + urls_yt_cache)
-        favorites_dict = {u: count for u, count in favorites_dict.items() if u in current_urls}
+        favorites_dict = {
+            u: count for u, count in favorites_dict.items() if u in current_urls
+        }
 
         # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
-        urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
-                          if e.link in favorites_dict]
+        urls_app_cache = [
+            e for e in (urls_cache + urls_yt_cache) if e.link in favorites_dict
+        ]
 
         # Build urls_flagged_cache from flagged entries in all caches
-        urls_flagged_cache = [e for e in (urls_cache + urls_yt_cache + urls_gh_cache + urls_comic_cache)
-                              if e.link in flagged_content_dict]
+        urls_flagged_cache = [
+            e
+            for e in (urls_cache + urls_yt_cache + urls_gh_cache + urls_comic_cache)
+            if e.link in flagged_content_dict
+        ]
 
         # Generate the appreciated feed
         generate_appreciated_feed()
@@ -428,7 +676,7 @@ def update_entries(url):
     if entries:
         formatted_entries = []
         for entry in entries:
-            link = entry.get('link', '')
+            link = entry.get("link", "")
             updated = datetime.now(timezone.utc).replace(tzinfo=None)
             updated_str = entry.get("updated") or entry.get("published")
             if updated_str:
@@ -441,17 +689,17 @@ def update_entries(url):
 
             # Parse category tags from Atom <category> elements
             categories = []
-            for tag in entry.get('tags', []):
-                term = tag.get('term', '')
+            for tag in entry.get("tags", []):
+                term = tag.get("term", "")
                 if term in CATEGORIES:
                     categories.append(term)
 
             formatted_entries.append(
                 FeedEntry(
                     link=link,
-                    title=entry.get('title', ''),
-                    author=entry.get('author', ''),
-                    description=entry.get('description', ''),
+                    title=entry.get("title", ""),
+                    author=entry.get("author", ""),
+                    description=entry.get("description", ""),
                     updated=updated,
                     categories=categories,
                 )
@@ -515,13 +763,26 @@ def index():
     else:
         cache = urls_cache
 
-    if search_query.strip():  # Only perform search if query is not empty or just whitespace
+    if (
+        search_query.strip()
+    ):  # Only perform search if query is not empty or just whitespace
         cache = [
-            entry for entry in cache
-            if (search_query in entry.link.lower() or  # url
-                any(search_query.lower() == word.lower() for word in entry.title.split()) or  # title
-                any(search_query.lower() == word.lower() for word in entry.author.split()) or  # author
-                any(search_query.lower() == word.lower() for word in entry.description.split()))  # description
+            entry
+            for entry in cache
+            if (
+                search_query in entry.link.lower()  # url
+                or any(
+                    search_query.lower() == word.lower() for word in entry.title.split()
+                )  # title
+                or any(
+                    search_query.lower() == word.lower()
+                    for word in entry.author.split()
+                )  # author
+                or any(
+                    search_query.lower() == word.lower()
+                    for word in entry.description.split()
+                )
+            )  # description
         ]
         if not cache:
             return _render_no_results(
@@ -537,13 +798,19 @@ def index():
             for cat_slug in entry.categories:
                 category_counts[cat_slug] = category_counts.get(cat_slug, 0) + 1
             if not entry.categories:
-                category_counts["uncategorized"] = category_counts.get("uncategorized", 0) + 1
+                category_counts["uncategorized"] = (
+                    category_counts.get("uncategorized", 0) + 1
+                )
 
     # Category filtering
     current_cat = request.args.get("cat", "")
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
-            cache = [entry for entry in cache if not entry.categories or "uncategorized" in entry.categories]
+            cache = [
+                entry
+                for entry in cache
+                if not entry.categories or "uncategorized" in entry.categories
+            ]
         else:
             cache = [entry for entry in cache if current_cat in entry.categories]
 
@@ -569,12 +836,17 @@ def index():
     if title is None:
         if cache:
             chosen = random.choice(cache)
-            url, title, author, post_cats = chosen.link, chosen.title, chosen.author, chosen.categories
+            url, title, author, post_cats = (
+                chosen.link,
+                chosen.title,
+                chosen.author,
+                chosen.categories,
+            )
         else:
             url, title, author = (
                 "https://blog.kagi.com/small-web",
                 "Nothing to see",
-                "Feed not active, try later"
+                "Feed not active, try later",
             )
 
     # -------------------------------------------------
@@ -625,7 +897,9 @@ def index():
     flag_content_count = flagged_content_dict.get(url, 0)
 
     # Build (slug, label, emoji) tuples for the current post's categories
-    post_categories = [(s, CATEGORIES[s][0], CATEGORIES[s][2]) for s in post_cats if s in CATEGORIES]
+    post_categories = [
+        (s, CATEGORIES[s][0], CATEGORIES[s][2]) for s in post_cats if s in CATEGORIES
+    ]
 
     if url.startswith("http://"):
         url = url.replace(
@@ -709,7 +983,7 @@ def favorite():
     if url:
         entry = favorites_dict.get(url)
         if not isinstance(entry, OrderedDict):
-            entry = OrderedDict()                      # initialise
+            entry = OrderedDict()  # initialise
         # enforce max 3 distinct emojis (drop oldest)
         if emoji not in entry and len(entry) >= 3:
             entry.popitem(last=False)
@@ -717,8 +991,9 @@ def favorite():
         favorites_dict[url] = entry
 
         # Update urls_app_cache with the new favorite from both regular and YouTube feeds
-        urls_app_cache = [e for e in (urls_cache + urls_yt_cache)
-                          if e.link in favorites_dict]
+        urls_app_cache = [
+            e for e in (urls_cache + urls_yt_cache) if e.link in favorites_dict
+        ]
 
         # Regenerate the appreciated feed
         generate_appreciated_feed()
@@ -727,7 +1002,9 @@ def favorite():
         time_saved_favorites = datetime.now()
         try:
             with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
-                json.dump({u: dict(emojis) for u, emojis in favorites_dict.items()}, file)
+                json.dump(
+                    {u: dict(emojis) for u, emojis in favorites_dict.items()}, file
+                )
         except OSError as e:
             logger.error("Cannot write favorites file: %s", e)
 
@@ -806,8 +1083,12 @@ def flag_content():
     # Store flagged URLs in cookie (max 100 URLs to prevent cookie size issues)
     flagged_urls_list = list(flagged_urls)[-100:]
     response.set_cookie(
-        "flagged_urls", "|".join(flagged_urls_list),
-        max_age=31536000, httponly=True, secure=True, samesite="Lax",
+        "flagged_urls",
+        "|".join(flagged_urls_list),
+        max_age=31536000,
+        httponly=True,
+        secure=True,
+        samesite="Lax",
     )
 
     return response
@@ -836,7 +1117,11 @@ def feed():
             title += f" - {CATEGORIES[cat][0]}"
             feed_url = f"https://kagi.com/smallweb/feed?cat={cat}"
             if cat == "uncategorized":
-                cache = [e for e in cache if not e.categories or "uncategorized" in e.categories]
+                cache = [
+                    e
+                    for e in cache
+                    if not e.categories or "uncategorized" in e.categories
+                ]
             else:
                 cache = [e for e in cache if cat in e.categories]
         else:
@@ -912,7 +1197,7 @@ def appreciated_json():
 @app.route(f"{prefix}/opml")
 def opml():
     global opml_cache
-    if opml_cache is None:          # first call before update_all ran?
+    if opml_cache is None:  # first call before update_all ran?
         opml_cache = generate_opml_feed()
     return Response(opml_cache, mimetype="text/x-opml+xml")
 
@@ -928,10 +1213,13 @@ urls_gh_cache = []
 urls_comic_cache = []
 urls_flagged_cache = []
 
-favorites_dict = _load_json(
-    PATH_FAVORITES,
-    lambda d: {url: OrderedDict(emojis) for url, emojis in d.items()},
-) or {}
+favorites_dict = (
+    _load_json(
+        PATH_FAVORITES,
+        lambda d: {url: OrderedDict(emojis) for url, emojis in d.items()},
+    )
+    or {}
+)
 urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
 generate_appreciated_feed()  # Initialize the appreciated feed
 

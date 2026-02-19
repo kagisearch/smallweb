@@ -1,8 +1,8 @@
 // Kagi Small Web - Background Service Worker / Script
 // Works with both Chrome (Manifest V3) and Firefox (Manifest V2)
 
-const IS_FIREFOX = typeof browser !== 'undefined' && browser.runtime?.getBrowserInfo;
 const api = typeof browser !== 'undefined' ? browser : chrome;
+const IS_FIREFOX = api.runtime?.getManifest?.()?.manifest_version === 2;
 
 const API_BASE = 'https://kagi.com/api/v1/smallweb/feed/';
 const SMALLWEB_BASE = 'https://kagi.com/smallweb';
