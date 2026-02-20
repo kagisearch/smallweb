@@ -29,8 +29,19 @@
   <link rel="prefetch"  href="{{ next_doc_url }}" as="document" crossorigin>
   {% endif %}
   {% endif %}
+  {% if current_mode == 0 %}
+  <script defer src="{{ url_for('static', filename='header-category-dropdown.js') }}"></script>
+  {% endif %}
+  {% if not no_results %}
+  <script defer src="{{ url_for('static', filename='header-flag-confirm.js') }}"></script>
+  {% endif %}
+  <script defer src="{{ url_for('static', filename='header-dark-mode.js') }}"></script>
+  {% if current_mode == 2 %}
   {# SmallWeb Queue module for client-side random selection (appreciated mode) #}
-  <script src="{{ url_for('static', filename='smallweb-queue.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='smallweb-queue.js') }}"></script>
+  {# SmallWeb Queue click behavior for appreciated mode #}
+  <script defer src="{{ url_for('static', filename='header-appreciated-next.js') }}"></script>
+  {% endif %}
 </head>
 
 <body>
@@ -39,7 +50,15 @@
       {% if not no_results %}
       {% if current_mode == 2 %}
       {# Appreciated mode: use client-side random selection #}
-      <a href="{{ next_link }}" class="stumble-link btn next-button" id="appreciated-next-link" rel="prefetch" title="Show next appreciated post"><span id="appreciated-next-text">Next<span class="next-btn-suffix"> Post</span></span></a>
+      <a href="{{ next_link }}" class="stumble-link btn next-button" id="appreciated-next-link" rel="prefetch" title="Show next appreciated post"
+         data-full-list-url="{{ prefix }}/appreciated.json"
+         data-enable-periodic-reset-queue="true"
+         data-periodic-reset-queue-minutes="720"
+         data-check-on-exhaustion="true"
+         data-persist-key="kagi_smallweb_queue_v2"
+         data-enable-debug="false"
+         data-current-url="{{ url }}"
+         data-fallback-url="{{ prefix }}?app"><span id="appreciated-next-text">Next<span class="next-btn-suffix"> Post</span></span></a>
       {% elif next_link %}
       {# Other modes: use server-side random selection #}
       <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix"> Post</span></a>
@@ -178,8 +197,7 @@
         <input type="hidden" name="url" value="{{ url }}">
         <button title="Flag this post"
                 type="submit"
-                class="flag-link"
-                onclick="return confirm('Are you sure you want to flag this post?');">
+                class="flag-link">
                 Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
       </form>
       {% endif %}
@@ -295,243 +313,6 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
   {% if next_doc_url %}
   <iframe src="{{ next_doc_url }}" loading="lazy" sandbox referrerpolicy="no-referrer" class="prefetch-iframe"></iframe>
   {% endif %}
-
-<script>
-// ── Categories dropdown ──
-(() => {
-  const toggle   = document.getElementById('catToggle');
-  const dropdown = document.getElementById('catDropdown');
-  const backdrop = document.getElementById('catBackdrop');
-  if (!toggle || !dropdown) return;
-
-  const allItems = [...dropdown.querySelectorAll('.cat-item')];
-  let focusIndex = -1;
-
-  function openDropdown() {
-    dropdown.classList.add('open');
-    backdrop.classList.add('open');
-    toggle.classList.add('active');
-    toggle.setAttribute('aria-expanded', 'true');
-    focusIndex = -1;
-  }
-
-  function closeDropdown() {
-    dropdown.classList.remove('open');
-    backdrop.classList.remove('open');
-    toggle.classList.remove('active');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.focus();
-  }
-
-  toggle.addEventListener('click', (e) => {
-    if (e.target.closest('.cat-inline-clear')) return;
-    dropdown.classList.contains('open') ? closeDropdown() : openDropdown();
-  });
-
-  backdrop.addEventListener('click', closeDropdown);
-
-  document.addEventListener('keydown', (e) => {
-    const isOpen = dropdown.classList.contains('open');
-    if (e.key === 'Escape' && isOpen) { closeDropdown(); return; }
-    if (!isOpen) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      focusIndex = Math.min(focusIndex + 1, allItems.length - 1);
-      updateFocus();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      focusIndex = Math.max(focusIndex - 1, 0);
-      updateFocus();
-    } else if (e.key === 'Enter' && focusIndex >= 0) {
-      e.preventDefault();
-      window.location.href = allItems[focusIndex].href;
-    } else if (e.key.length === 1 && /[a-z]/i.test(e.key)) {
-      const char = e.key.toLowerCase();
-      const idx = allItems.findIndex(i =>
-        i.querySelector('.cat-name').textContent.toLowerCase().startsWith(char));
-      if (idx >= 0) { focusIndex = idx; updateFocus(); }
-    }
-  });
-
-  function updateFocus() {
-    allItems.forEach((item, i) => {
-      if (i === focusIndex) {
-        item.style.background = 'rgba(52,152,219,0.3)';
-        item.scrollIntoView({ block: 'nearest' });
-      } else if (!item.classList.contains('selected')) {
-        item.style.background = '';
-      }
-    });
-  }
-})();
-</script>
-
-<script>
-(() => {                 // IIFE – keeps global scope clean
-  const CSS_ID  = "global-dark-mode-style";
-  const DARK_CSS = `
-    /* apply dark filter ONLY to the embedded pages */
-    #content iframe,
-    #content-yt iframe {
-      filter: invert(90%) hue-rotate(180deg);
-      background:#fff;          /* keeps blank areas white pre-inversion */
-    }
-  `;
-
-  const IFRAME_REINVERT_CSS = `
-    /* runs *inside* the iframe document */
-    html { background:#fff !important; }
-
-    img,
-    video,
-    svg,
-    [style*="background-image"]:not([data-no-dark-invert]) {
-      filter: invert(100%) hue-rotate(180deg) brightness(105%) contrast(105%);
-    }
-  `;
-
-  /* simpler icons */
-  const moonSVG = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2a10 10 0 000 20 9.93 9.93 0 006.77-2.67A10 10 0 0112 2z"/></svg>';
-  const sunSVG  = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2"><line x1="12" y1="1"  x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1"  y1="12" x2="3"  y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22"  x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/></g></svg>';
-
-  const btn = document.getElementById('dark-mode-toggle');
-
-  function updateIframeStyles(enable) {
-    document.querySelectorAll('#content iframe, #content-yt iframe').forEach(ifr => {
-      try {
-        const doc = ifr.contentDocument || ifr.contentWindow?.document;
-        if (!doc) return;                        // cannot access (probably x-origin)
-        const STYLE_ID = 'iframe-dark-mode-style';
-        let   s        = doc.getElementById(STYLE_ID);
-
-        if (enable) {
-          if (!s) {
-            s = doc.createElement('style');
-            s.id          = STYLE_ID;
-            s.textContent = IFRAME_REINVERT_CSS;
-            doc.head.appendChild(s);
-          }
-        } else {
-          if (s) s.remove();
-        }
-      } catch (_) { /* cross-origin – ignore */ }
-    });
-  }
-
-  function applyDark() {
-    if (document.getElementById(CSS_ID)) return;          // already on
-
-    const style = document.createElement('style');
-    style.id          = CSS_ID;
-    style.textContent = DARK_CSS;
-    document.head.appendChild(style);
-
-    btn.innerHTML = sunSVG;
-    localStorage.setItem('darkMode', 'on');
-
-    updateIframeStyles(true);                       // NEW: inject into current frames
-    document.querySelectorAll('#content iframe, #content-yt iframe')
-            .forEach(ifr => ifr.addEventListener('load', () => updateIframeStyles(true)));
-  }
-
-  function removeDark() {
-    const style = document.getElementById(CSS_ID);
-    if (style) style.remove();
-
-    btn.innerHTML = moonSVG;
-    localStorage.setItem('darkMode', 'off');
-
-    updateIframeStyles(false);                      // NEW: remove from reachable frames
-  }
-
-  // Initialise state from localStorage
-  (localStorage.getItem('darkMode') === 'on') ? applyDark() : removeDark();
-
-  // Toggle on click
-  btn.addEventListener('click', () =>
-    document.getElementById(CSS_ID) ? removeDark() : applyDark()
-  );
-})();
-</script>
-
-{% if current_mode == 2 %}
-{# SmallWeb Queue - client-side random selection for appreciated mode #}
-<script>
-(() => {
-  'use strict';
-
-  // Configuration (overrides defaults in smallweb-queue.js)
-  const SMALLWEB_QUEUE_CONFIG = {
-    fullListUrl: '{{ prefix }}/appreciated.json',
-    enablePeriodicResetQueue: true,  // periodic reset queue checks
-    periodicResetQueueMinutes: 720,     // check interval (minutes)
-    checkOnExhaustion: true,      // check when all items visited
-    persistKey: 'kagi_smallweb_queue_v2',
-    enableDebug: false,            // console logging
-  };
-
-  const nextLink = document.getElementById('appreciated-next-link');
-  const nextText = document.getElementById('appreciated-next-text');
-
-  if (!nextLink || !nextText || typeof SmallWebQueue === 'undefined') return;
-
-  SmallWebQueue.init(SMALLWEB_QUEUE_CONFIG, '{{ url }}').then(() => {
-    preloadNextItem();
-  }).catch(err => console.error('[SmallWebQueue] Init failed:', err));
-
-  let isNavigating = false;
-
-  nextLink.addEventListener('click', async (e) => {
-    e.preventDefault();
-    if (isNavigating) return;
-    isNavigating = true;
-
-    nextText.textContent = 'Loading...';
-    nextLink.style.pointerEvents = 'none';
-
-    try {
-      const item = await SmallWebQueue.getNext();
-      if (item && item.url) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('url', item.url);
-        window.location.href = url.toString();
-      } else {
-        window.location.href = nextLink.getAttribute('href') || '{{ prefix }}?app';
-      }
-    } catch (err) {
-      console.error('[SmallWebQueue] Error:', err);
-      window.location.href = nextLink.getAttribute('href') || '{{ prefix }}?app';
-    }
-  });
-
-  async function preloadNextItem() {
-    try {
-      const debugInfo = SmallWebQueue.getDebugInfo();
-      if (!debugInfo.initialized || debugInfo.totalItems === 0) return;
-
-      const allItems = SmallWebQueue.getAllItems();
-      const visitedSet = new Set(debugInfo.visitedFifo);
-
-      for (const item of allItems) {
-        if (!visitedSet.has(item.id)) {
-          const prefetchLink = document.createElement('link');
-          prefetchLink.rel = 'prefetch';
-          prefetchLink.href = item.url;
-          prefetchLink.as = 'document';
-          document.head.appendChild(prefetchLink);
-
-          const url = new URL(window.location.href);
-          url.searchParams.set('url', item.url);
-          nextLink.setAttribute('href', url.toString());
-          break;
-        }
-      }
-    } catch (err) {}
-  }
-})();
-</script>
-{% endif %}
 
 </body>
 </html>
