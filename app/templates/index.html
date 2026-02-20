@@ -70,9 +70,9 @@
          data-persist-key="kagi_smallweb_queue_v2"
          data-enable-debug="false"
          data-current-url="{{ url }}"
-         data-fallback-url="{{ prefix }}?app"><span id="appreciated-next-text" class="next-button-label">Next<span class="next-btn-suffix">Post</span></span></a>
+         data-fallback-url="{{ prefix }}?app"><span id="appreciated-next-text">Next<span class="next-btn-suffix">Post</span></span></a>
       {% elif next_link %}
-      <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post"><span class="next-button-label">Next<span class="next-btn-suffix">Post</span></span></a>
+      <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix">Post</span></a>
       {% endif %}
 
       <div id="reactions" role="group" aria-label="Reactions">
@@ -290,7 +290,7 @@
         </svg>
       </a>
       <div class="dropdown-container">
-        <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="rss-dropdown"><span class="dropdown-link-label">RSS</span></button>
+        <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="rss-dropdown">RSS</button>
         <div class="dropdown-panel spread-love rss-dropdown" id="rss-dropdown">
           <p>Grab the RSS feed you like.</p>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({% if all_count is defined %}{{ all_count }}{% else %}0{% endif %})</a>
@@ -302,7 +302,7 @@
         </div>
       </div>
       <div class="dropdown-container right-dropdown-container about">
-          <button type="button" class="dropdown-link" title="About Small Web" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="about-dropdown"><span class="dropdown-link-label">About</span></button>
+          <button type="button" class="dropdown-link" title="About Small Web" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="about-dropdown">About</button>
           <div class="dropdown-panel right-dropdown" id="about-dropdown">
 <p>Hey there, welcome to Kagi Small Web!</p>
 <p>Imagine the internet like a huge neighborhood. There's a lot of folks around, but we rarely bump into each other, right? Kagi's all about
