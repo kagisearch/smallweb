@@ -317,11 +317,21 @@ svg {
 
 #url-display-phone .phone {
   color: var(--color-text);
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   max-width: 100%;
+  min-width: 0;
+}
+
+#url-display-phone .phone-domain {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+#url-display-phone .phone .external-link-icon {
+  flex: 0 0 auto;
 }
 
 #url-display-phone .phone:focus-visible {
