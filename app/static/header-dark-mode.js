@@ -6,6 +6,9 @@
       filter: invert(90%) hue-rotate(180deg);
       background:#fff;
     }
+    #content-gh {
+      filter: invert(90%) hue-rotate(180deg);
+    }
   `;
 
   const IFRAME_REINVERT_CSS = `

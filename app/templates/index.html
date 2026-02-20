@@ -46,6 +46,7 @@
       ("Websites", prefix, 0),
       ("Liked", prefix ~ "?app", 2),
       ("Videos", prefix ~ "?yt", 1),
+      ("Code", prefix ~ "?gh", 3),
       ("Comics", prefix ~ "?comic", 4)
     ] -%}
     {%- set mode_ns = namespace(index=-1) -%}
@@ -115,6 +116,7 @@
             <span class="mode-toggle-label">{{ mode_button_label }}</span>
           </button>
           <div class="dropdown-panel modes-dropdown" id="modes-dropdown">
+            <p>Discover the web you like.</p>
             {%- for label, href, mode_value in mode_entries if mode_value != current_mode -%}
             <a class="share-option" href="{{ href }}" title="Open {{ label }} mode">{{ label }}</a>
             {%- endfor -%}
@@ -355,6 +357,41 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
           srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
         {% endif %}
       ></iframe>
+    </div>
+  {% elif current_mode == 3 %}
+    <div id="content-gh">
+      <div class="gh-card">
+        {% if gh_meta %}
+        <div class="gh-layout">
+          {% if gh_meta.avatar_url %}
+          <img class="gh-avatar" src="{{gh_meta.avatar_url}}&s=128" alt="{{gh_meta.owner}}" width="96" height="96">
+          {% endif %}
+          <div class="gh-body">
+            <h1 class="gh-name"><a href="{{url}}" target="_blank" rel="noopener noreferrer"><span class="gh-owner-prefix">{{gh_meta.owner}}</span> / {{gh_meta.repo}}</a></h1>
+            {% if gh_meta.description %}
+            <p class="gh-desc">{{gh_meta.description}}</p>
+            {% endif %}
+            {% if gh_meta.homepage %}
+            <p class="gh-homepage"><a href="{{gh_meta.homepage}}" target="_blank" rel="noopener noreferrer">{{gh_meta.homepage|replace("https://","")|replace("http://","")}}</a></p>
+            {% endif %}
+            <div class="gh-stats">
+              {% if gh_meta.stargazers_count %}<span class="gh-stat"><strong>{{"{:,}".format(gh_meta.stargazers_count)}}</strong> stars</span>{% endif %}
+              {% if gh_meta.forks_count %}<span class="gh-stat"><strong>{{"{:,}".format(gh_meta.forks_count)}}</strong> forks</span>{% endif %}
+              {% if gh_meta.language %}<span class="gh-stat gh-lang">{{gh_meta.language}}</span>{% endif %}
+              {% if gh_meta.open_issues_count %}<span class="gh-stat"><strong>{{"{:,}".format(gh_meta.open_issues_count)}}</strong> issues</span>{% endif %}
+            </div>
+            {% if gh_meta.topics %}
+            <div class="gh-topics">
+              {% for topic in gh_meta.topics %}<span class="gh-topic">{{topic}}</span>{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <h1 class="gh-name"><a href="{{url}}" target="_blank" rel="noopener noreferrer">{{title}}</a></h1>
+        <p class="gh-desc">{{domain}}</p>
+        {% endif %}
+      </div>
     </div>
   {% else %}
     <div id="content">

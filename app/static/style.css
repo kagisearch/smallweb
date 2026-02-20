@@ -555,6 +555,129 @@ svg {
   border: none;
 }
 
+/* ── GitHub card ── */
+#content-gh {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  box-sizing: border-box;
+  background: #1a2533;
+}
+
+.gh-card {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 2px solid var(--color-text);
+  padding: 40px 48px;
+  max-width: 640px;
+  width: 90vw;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.gh-card:hover {
+  border-color: var(--color-accent);
+}
+
+.gh-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.gh-avatar {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-text);
+  image-rendering: auto;
+}
+
+.gh-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gh-name {
+  margin: 0 0 16px;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.gh-owner-prefix {
+  color: var(--color-cat-desc);
+}
+
+.gh-name a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.gh-name a:hover {
+  text-decoration: underline;
+}
+
+.gh-desc {
+  margin: 0 0 12px;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.gh-homepage {
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+
+.gh-homepage a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.gh-homepage a:hover {
+  text-decoration: underline;
+}
+
+.gh-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 17px;
+  color: var(--color-cat-desc);
+}
+
+.gh-stat {
+  white-space: nowrap;
+}
+
+.gh-stat strong {
+  color: var(--color-text);
+}
+
+.gh-lang {
+  color: var(--color-accent);
+}
+
+.gh-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gh-topic {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 15px;
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
 /* ── No-results state ── */
 .no-results-content {
   display: flex;
@@ -1322,6 +1445,17 @@ svg {
 }
 
 @media (max-width: 700px) {
+  .gh-layout {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .gh-stats,
+  .gh-topics {
+    justify-content: center;
+  }
+
   .about {
     padding: 0;
     min-width: fit-content;

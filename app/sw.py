@@ -903,6 +903,36 @@ def index():
             "http://", "https://"
         )  # force https as http will not work inside https iframe anyway
 
+    # GitHub API enrichment for Code mode
+    gh_meta = None
+    if current_mode == 3:
+        gh_match = re.match(r"https?://github\.com/([^/]+)/([^/]+)", url)
+        if gh_match:
+            owner, repo = gh_match.group(1), gh_match.group(2)
+            try:
+                gh_resp = requests.get(
+                    f"https://api.github.com/repos/{owner}/{repo}",
+                    timeout=5,
+                    headers={"Accept": "application/vnd.github.v3+json"},
+                )
+                if gh_resp.status_code == 200:
+                    data = gh_resp.json()
+                    owner_data = data.get("owner") or {}
+                    gh_meta = {
+                        "description": data.get("description") or "",
+                        "stargazers_count": data.get("stargazers_count", 0),
+                        "language": data.get("language") or "",
+                        "forks_count": data.get("forks_count", 0),
+                        "topics": data.get("topics", []),
+                        "open_issues_count": data.get("open_issues_count", 0),
+                        "homepage": data.get("homepage") or "",
+                        "avatar_url": owner_data.get("avatar_url") or "",
+                        "owner": owner,
+                        "repo": repo,
+                    }
+            except requests.RequestException:
+                pass
+
     # Build feed URL for <link rel="alternate">
     if current_mode == 1:
         feed_url = prefix + "/feed?yt"
@@ -963,6 +993,7 @@ def index():
         category_counts=category_counts,
         post_categories=post_categories,
         feed_url=feed_url,
+        gh_meta=gh_meta,
     )
 
 
