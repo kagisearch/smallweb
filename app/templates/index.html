@@ -43,10 +43,10 @@
 <body>
   <header id="header">
     {%- set mode_entries = [
-      ("Web", prefix, 0),
+      ("Websites", prefix, 0),
       ("Liked", prefix ~ "?app", 2),
-      ("Video", prefix ~ "?yt", 1),
-      ("Comic", prefix ~ "?comic", 4)
+      ("Videos", prefix ~ "?yt", 1),
+      ("Comics", prefix ~ "?comic", 4)
     ] -%}
     {%- set mode_ns = namespace(index=-1) -%}
     {%- for label, href, mode_value in mode_entries -%}
@@ -57,7 +57,7 @@
     {%- set mode_has_selection = mode_ns.index >= 0 and current_mode != 0 -%}
     {%- set mode_prev = mode_entries[mode_ns.index - 1] if mode_has_selection and mode_ns.index > 0 else None -%}
     {%- set mode_next = mode_entries[mode_ns.index + 1] if mode_has_selection and mode_ns.index < mode_entries|length - 1 else None -%}
-    {%- set mode_button_label = mode_entries[mode_ns.index][0] ~ " Mode" if mode_ns.index >= 0 else "Mode" -%}
+    {%- set mode_button_label = mode_entries[mode_ns.index][0] if mode_ns.index >= 0 else "Mode" -%}
     <div class="left">
       {% if not no_results %}
       {% if current_mode == 2 %}
@@ -135,81 +135,6 @@
         {% endif %}
       </div>
 
-      {% if current_mode == 0 %}
-      {%- if current_cat %}
-        {%- set all_slugs = [] %}
-        {%- for g_name, g_slugs in category_groups.items() %}
-          {%- for s in g_slugs %}{%- if all_slugs.append(s) %}{%- endif %}{%- endfor %}
-        {%- endfor %}
-        {%- set cat_idx = all_slugs.index(current_cat) if current_cat in all_slugs else -1 %}
-        {%- set prev_cat = all_slugs[cat_idx - 1] if cat_idx > 0 else '' %}
-        {%- set next_cat = all_slugs[cat_idx + 1] if cat_idx >= 0 and cat_idx < all_slugs|length - 1 else '' %}
-      {%- endif %}
-      <div class="category-wrapper{% if current_cat %} has-filter{% endif %}">
-        {% if current_cat and prev_cat %}
-        <a class="category-nav" href="{{ prefix }}?cat={{ prev_cat }}" title="{{ categories[prev_cat][0] }}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </a>
-        {% endif %}
-        <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic" aria-label="Filter by topic">
-          <svg class="category-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-          </svg>
-          <span class="category-toggle-label">
-            {% if current_cat and current_cat in categories %}
-              {{ categories[current_cat][0] }}
-            {% else %}
-              Categories
-            {% endif %}
-          </span>
-        </button>
-        {% if current_cat and current_cat in categories %}
-        <a class="cat-inline-clear" href="{{ prefix }}" title="Clear filter" aria-label="Clear filter">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </a>
-        {% endif %}
-        {% if current_cat and next_cat %}
-        <a class="category-nav" href="{{ prefix }}?cat={{ next_cat }}" title="{{ categories[next_cat][0] }}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-        {% endif %}
-        <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
-          <div class="cat-columns">
-          {% for group_name, slugs in category_groups.items() %}
-            {% if slugs != ['uncategorized'] or category_counts.get('uncategorized', 0) %}
-            <div class="cat-group-label">{{ group_name }}</div>
-            {% endif %}
-            {% for slug in slugs %}
-              {% if slug != 'uncategorized' or category_counts.get('uncategorized', 0) %}
-              {% set cat = categories[slug] %}
-              <a href="{{ prefix }}?cat={{ slug }}"
-                 class="cat-item{% if current_cat == slug %} selected{% endif %}"
-                 data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
-                <div class="cat-name">{{ cat[2] }} {{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
-                <div class="cat-desc">{{ cat[1] }}</div>
-              </a>
-              {% endif %}
-            {% endfor %}
-          {% endfor %}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if not no_results and current_mode == 0 and post_categories %}
-      <div class="post-cats">
-        {% for slug, label, emoji in post_categories %}
-        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
-        {% endfor %}
-      </div>
-      {% endif %}
-
       <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
@@ -227,9 +152,84 @@
     </div>
     <div class="middle">
       {% if not no_results %}
+        {% if current_mode == 0 %}
+        {%- if current_cat %}
+          {%- set all_slugs = [] %}
+          {%- for g_name, g_slugs in category_groups.items() %}
+            {%- for s in g_slugs %}{%- if all_slugs.append(s) %}{%- endif %}{%- endfor %}
+          {%- endfor %}
+          {%- set cat_idx = all_slugs.index(current_cat) if current_cat in all_slugs else -1 %}
+          {%- set prev_cat = all_slugs[cat_idx - 1] if cat_idx > 0 else '' %}
+          {%- set next_cat = all_slugs[cat_idx + 1] if cat_idx >= 0 and cat_idx < all_slugs|length - 1 else '' %}
+        {%- endif %}
+        <div class="category-wrapper{% if current_cat %} has-filter{% endif %}">
+          {% if current_cat and prev_cat %}
+          <a class="category-nav" href="{{ prefix }}?cat={{ prev_cat }}" title="{{ categories[prev_cat][0] }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
+          {% endif %}
+          <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic" aria-label="Filter by topic">
+            <svg class="category-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+            </svg>
+            <span class="category-toggle-label">
+              {% if current_cat and current_cat in categories %}
+                {{ categories[current_cat][0] }}
+              {% else %}
+                Categories
+              {% endif %}
+            </span>
+          </button>
+          {% if current_cat and current_cat in categories %}
+          <a class="cat-inline-clear" href="{{ prefix }}" title="Clear filter" aria-label="Clear filter">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </a>
+          {% endif %}
+          {% if current_cat and next_cat %}
+          <a class="category-nav" href="{{ prefix }}?cat={{ next_cat }}" title="{{ categories[next_cat][0] }}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          {% endif %}
+          <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
+            <div class="cat-columns">
+            {% for group_name, slugs in category_groups.items() %}
+              {% if slugs != ['uncategorized'] or category_counts.get('uncategorized', 0) %}
+              <div class="cat-group-label">{{ group_name }}</div>
+              {% endif %}
+              {% for slug in slugs %}
+                {% if slug != 'uncategorized' or category_counts.get('uncategorized', 0) %}
+                {% set cat = categories[slug] %}
+                <a href="{{ prefix }}?cat={{ slug }}"
+                   class="cat-item{% if current_cat == slug %} selected{% endif %}"
+                   data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
+                  <div class="cat-name">{{ cat[2] }} {{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
+                  <div class="cat-desc">{{ cat[1] }}</div>
+                </a>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if current_mode == 0 and post_categories %}
+        <div class="post-cats">
+          {% for slug, label, emoji in post_categories %}
+          <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
+          {% endfor %}
+        </div>
+        {% endif %}
+
         <div id="url-display-phone">
-          <a class="phone" href="{{url}}" title="Go to the original post" target="_blank" rel="noopener noreferrer">
-            <span class="phone-domain">{{domain}}</span>
+          <span class="phone-domain">{{domain}}</span>
+          <a class="phone-link" href="{{url}}" title="Go to the original post" target="_blank" rel="noopener noreferrer">
             <svg class="external-link-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
               <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
             </svg>

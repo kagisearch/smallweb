@@ -284,6 +284,7 @@ svg {
 #url-display-phone {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   height: var(--header-control-height);
   min-height: var(--header-control-height);
   font-size: var(--header-control-font-size);
@@ -315,26 +316,22 @@ svg {
   border-left-color: var(--color-text);
 }
 
-#url-display-phone .phone {
-  color: var(--color-text);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  max-width: 100%;
-  min-width: 0;
-}
-
 #url-display-phone .phone-domain {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  user-select: text;
+  cursor: text;
 }
 
-#url-display-phone .phone .external-link-icon {
+#url-display-phone .phone-link {
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
   flex: 0 0 auto;
 }
 
-#url-display-phone .phone:focus-visible {
+#url-display-phone .phone-link:focus-visible {
   outline: none;
 }
 
@@ -1268,7 +1265,8 @@ svg {
   #url-display-phone,
   .mode-wrapper,
   #search-form,
-  #header > .middle > *,
+  .middle > .dropdown-container,
+  .middle > .post-cats,
   .right > :not(.about),
   .category-wrapper .category-nav,
   .category-wrapper .cat-inline-clear,
