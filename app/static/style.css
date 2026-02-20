@@ -109,32 +109,26 @@ svg {
 /* ── Search ── */
 #search-form {
   display: flex;
+  align-items: center;
+  gap: 4px;
   margin: 0;
-  position: relative;
-  width: clamp(80px, 8vw, 100px);
-  height: var(--header-control-height);
   flex: 0 0 auto;
-  overflow: visible;
 }
 
 .search-container {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  z-index: 10;
+  position: relative;
+  width: clamp(80px, 8vw, 100px);
+  height: var(--header-control-height);
   transition: width 0.12s ease;
 }
 
-#search-form:focus-within .search-container {
+.search-container:focus-within {
   width: clamp(120px, 12vw, 180px);
 }
 
 #search-input {
   font-size: 16px;
-  padding: 0 28px 0 8px;
+  padding: 0 8px;
   border: 2px solid var(--color-bg);
   border-right-color: var(--color-text);
   border-bottom-color: var(--color-text);
@@ -156,31 +150,50 @@ svg {
 }
 
 .clear-search {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #666;
-  font-size: 20px;
-  font-weight: bold;
-  text-decoration: none;
-  line-height: 1;
-  padding: 6px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--header-control-height);
+  height: var(--header-control-height);
+  box-sizing: border-box;
+  border: 2px solid transparent;
   border-radius: 0;
-  z-index: 2;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--header-control-font-size);
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+
+.clear-search svg {
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 
 .clear-search:hover {
-  color: #fff;
-  background-color: var(--color-danger);
+  background: var(--panel-light);
+  border-color: var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
 }
 
 .clear-search:focus-visible {
-  color: #fff;
-  background-color: var(--color-danger);
-  outline: 2px solid var(--color-text);
-  outline-offset: -2px;
+  outline: none;
+  background: var(--panel-light);
+  border-color: var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
+}
+
+.clear-search:active {
+  border-top-color: var(--color-bg);
+  border-left-color: var(--color-bg);
+  border-right-color: var(--color-text);
+  border-bottom-color: var(--color-text);
+  transform: translate(1px, 1px);
 }
 
 .clear-search-button {

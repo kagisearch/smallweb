@@ -181,10 +181,15 @@
       <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
-          {% if search_query %}
-          <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
-          {% endif %}
         </div>
+        {% if search_query %}
+        <a href="{{ prefix }}" class="clear-search" title="Clear search" aria-label="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </a>
+        {% endif %}
         <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
       </form>
     </div>
