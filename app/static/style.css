@@ -257,9 +257,11 @@ svg {
   font-size: 20px;
 }
 
-#appreciated-next-text {
+#appreciated-next-text,
+.next-button-label {
   display: inline-flex;
   align-items: center;
+  line-height: 1;
   gap: 6px;
 }
 
@@ -390,6 +392,13 @@ svg {
   letter-spacing: 0;
   text-transform: none;
   transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+
+.dropdown-link-label,
+.category-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .mode-toggle-icon {
@@ -1486,6 +1495,6 @@ svg {
     min-width: fit-content;
     font-size: var(--header-control-font-size);
     margin-right: 0;
-    padding: 6px 12px;
+    padding: 0 12px;
   }
 }
