@@ -51,7 +51,7 @@
       {% if current_mode == 2 %}
       {# Appreciated mode: use client-side random selection #}
       <a href="{{ next_link }}" class="stumble-link btn next-button" id="appreciated-next-link" rel="prefetch" title="Show next appreciated post"
-         data-full-list-url="{{ prefix }}/appreciated.json"
+         data-full-list-url="{{ url_for('appreciated_json') }}"
          data-enable-periodic-reset-queue="true"
          data-periodic-reset-queue-minutes="720"
          data-check-on-exhaustion="true"
