@@ -114,7 +114,7 @@
         {%- set prev_cat = all_slugs[cat_idx - 1] if cat_idx > 0 else '' %}
         {%- set next_cat = all_slugs[cat_idx + 1] if cat_idx >= 0 and cat_idx < all_slugs|length - 1 else '' %}
       {%- endif %}
-      <div class="category-wrapper">
+      <div class="category-wrapper{% if current_cat %} has-filter{% endif %}">
         {% if current_cat and prev_cat %}
         <a class="category-nav" href="{{ prefix }}?cat={{ prev_cat }}" title="{{ categories[prev_cat][0] }}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -127,9 +127,11 @@
           </svg>
           {% if current_cat and current_cat in categories %}
             <span id="catLabel">{{ categories[current_cat][0] }}</span>
-            <button class="cat-inline-clear" onclick="window.location='{{ prefix }}';return false;" title="Clear filter">&times;</button>
           {% endif %}
         </button>
+        {% if current_cat and current_cat in categories %}
+        <a class="cat-inline-clear" href="{{ prefix }}" title="Clear filter" aria-label="Clear filter">&times;</a>
+        {% endif %}
         {% if current_cat and next_cat %}
         <a class="category-nav" href="{{ prefix }}?cat={{ next_cat }}" title="{{ categories[next_cat][0] }}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -268,7 +270,9 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
         </div>
   </div>
 
+  {% if current_mode == 0 %}
   <div class="cat-backdrop" id="catBackdrop"></div>
+  {% endif %}
 
   {% if no_results %}
     <div id="content" class="no-results no-results-content">

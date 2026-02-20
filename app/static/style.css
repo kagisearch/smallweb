@@ -498,11 +498,6 @@ svg {
   text-overflow: ellipsis;
 }
 
-.category-toggle .cat-inline-clear {
-  margin-top: 1px;
-  flex-shrink: 0;
-}
-
 .category-toggle:focus {
   outline: none;
 }
@@ -534,13 +529,15 @@ svg {
   line-height: 1;
   align-self: center;
   outline: none;
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
 .cat-inline-clear:hover {
   color: var(--color-danger);
 }
 
-.category-toggle.has-filter .cat-inline-clear {
+.category-wrapper.has-filter .cat-inline-clear {
   display: inline-flex;
 }
 
