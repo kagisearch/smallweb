@@ -1145,14 +1145,16 @@ svg {
   margin-top: 1px;
 }
 
-.cat-backdrop {
+.cat-backdrop,
+.dropdown-backdrop {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 99;
 }
 
-.cat-backdrop.open {
+.cat-backdrop.open,
+.dropdown-backdrop.open {
   display: block;
 }
 

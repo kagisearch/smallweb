@@ -15,6 +15,7 @@
 
   if (!entries.length) return;
   const header = document.getElementById('header');
+  const backdrop = document.getElementById('dropdownBackdrop');
 
   function getPanelTop() {
     if (!header) return 50;
@@ -47,10 +48,20 @@
     });
   }
 
+  function anyEntryOpen() {
+    return entries.some((entry) => entry.panel.classList.contains('open'));
+  }
+
+  function syncBackdrop() {
+    if (!backdrop) return;
+    backdrop.classList.toggle('open', anyEntryOpen());
+  }
+
   function closeEntry(entry, restoreFocus = false) {
     entry.panel.classList.remove('open');
     entry.panel.setAttribute('aria-hidden', 'true');
     entry.trigger.setAttribute('aria-expanded', 'false');
+    syncBackdrop();
     if (restoreFocus) {
       entry.trigger.focus();
     }
@@ -63,6 +74,7 @@
     entry.panel.classList.add('open');
     entry.panel.setAttribute('aria-hidden', 'false');
     entry.trigger.setAttribute('aria-expanded', 'true');
+    syncBackdrop();
     positionEntry(entry);
     const autofocusTarget = entry.panel.querySelector('[data-dropdown-autofocus]');
     if (autofocusTarget instanceof HTMLElement) {
@@ -109,6 +121,12 @@
       entries.forEach((entry) => closeEntry(entry));
     }
   });
+
+  if (backdrop) {
+    backdrop.addEventListener('click', () => {
+      entries.forEach((entry) => closeEntry(entry));
+    });
+  }
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
