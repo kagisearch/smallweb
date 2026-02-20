@@ -20,7 +20,7 @@
   <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
   {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  {% if current_mode != 2 %}
+  {% if current_mode != 2 and next_link %}
   {# Prefetch next link for non-appreciated modes (appreciated uses client-side queue) #}
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
