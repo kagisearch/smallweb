@@ -206,23 +206,18 @@
     <div class="middle">
       <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
 
-      {% if current_mode==1 %}
-        <a class="switch header-link" href="{{ prefix }}">Web</a>
-        <a class="switch header-link" href="{{ prefix }}?app">Liked</a>
-        <a class="switch header-link" href="{{ prefix }}?comic">Comic</a>
-      {% elif current_mode==2 %}
-        <a class="switch header-link" href="{{ prefix }}">Web</a>
-        <a class="switch header-link" href="{{ prefix }}?yt">Video</a>
-        <a class="switch header-link" href="{{ prefix }}?comic">Comic</a>
-      {% elif current_mode==4 %}
-        <a class="switch header-link" href="{{ prefix }}">Web</a>
-        <a class="switch header-link" href="{{ prefix }}?app">Liked</a>
-        <a class="switch header-link" href="{{ prefix }}?yt">Video</a>
-      {% else %}
-        <a class="switch header-link" href="{{ prefix }}?app">Liked</a>
-        <a class="switch header-link" href="{{ prefix }}?yt">Video</a>
-        <a class="switch header-link" href="{{ prefix }}?comic">Comic</a>
-      {% endif %}
+      {%- if current_mode == 1 -%}
+        {%- set mode_switch_links = [("Web", prefix), ("Liked", prefix ~ "?app"), ("Comic", prefix ~ "?comic")] -%}
+      {%- elif current_mode == 2 -%}
+        {%- set mode_switch_links = [("Web", prefix), ("Video", prefix ~ "?yt"), ("Comic", prefix ~ "?comic")] -%}
+      {%- elif current_mode == 4 -%}
+        {%- set mode_switch_links = [("Web", prefix), ("Liked", prefix ~ "?app"), ("Video", prefix ~ "?yt")] -%}
+      {%- else -%}
+        {%- set mode_switch_links = [("Liked", prefix ~ "?app"), ("Video", prefix ~ "?yt"), ("Comic", prefix ~ "?comic")] -%}
+      {%- endif -%}
+      {%- for label, href in mode_switch_links -%}
+        <a class="switch header-link" href="{{ href }}">{{ label }}</a>
+      {%- endfor -%}
     </div>
     <div class="right">
       <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
