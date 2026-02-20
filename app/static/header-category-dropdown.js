@@ -3,7 +3,7 @@
   const toggle = document.getElementById('catToggle');
   const dropdown = document.getElementById('catDropdown');
   const backdrop = document.getElementById('catBackdrop');
-  if (!toggle || !dropdown) return;
+  if (!toggle || !dropdown || !backdrop) return;
 
   const allItems = [...dropdown.querySelectorAll('.cat-item')];
   let focusIndex = -1;
@@ -64,10 +64,10 @@
   function updateFocus() {
     allItems.forEach((item, i) => {
       if (i === focusIndex) {
-        item.style.background = 'rgba(52,152,219,0.3)';
+        item.classList.add('cat-kb-focus');
         item.scrollIntoView({block: 'nearest'});
-      } else if (!item.classList.contains('selected')) {
-        item.style.background = '';
+      } else {
+        item.classList.remove('cat-kb-focus');
       }
     });
   }

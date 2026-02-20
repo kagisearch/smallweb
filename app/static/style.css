@@ -620,6 +620,10 @@ svg {
   background: var(--color-accent-light);
 }
 
+.cat-item.cat-kb-focus {
+  background: var(--color-accent-mid);
+}
+
 .cat-name {
   font-size: 18px;
   font-weight: 700;
