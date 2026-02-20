@@ -177,19 +177,19 @@
         <label for="spread-love" class="popup-link" title="Share this post">Share</label>
         <input type="radio" id="spread-love" name="popup" class="popup-radio">
         <div class="popup spread-love">
-          <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank">Hacker News</a>
-          <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Reddit</a>
-          <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank">Twitter</a>
-          <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank">Mastodon</a>
-          <a href="https://lemmy.world/create_post?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lemmy</a>
-          <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank">Lobsters</a>
-          <a href="https://cohost.org" class="share-option" target="_blank">Cohost</a>
-          <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank">Email</a>
+          <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Hacker News</a>
+          <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Reddit</a>
+          <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Twitter</a>
+          <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Mastodon</a>
+          <a href="https://lemmy.world/create_post?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lemmy</a>
+          <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lobsters</a>
+          <a href="https://cohost.org" class="share-option" target="_blank" rel="noopener noreferrer">Cohost</a>
+          <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Email</a>
           <hr class="share-separator">
-          <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option" target="_blank">Summarize</a>
-          <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option" target="_blank">Translate</a>
+          <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Summarize</a>
+          <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Translate</a>
           <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
-             class="share-option" target="_blank">Link here</a>
+             class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
           <label for="close-popup" class="cancel-button">Cancel</label>
         </div>
       </div>
@@ -235,12 +235,12 @@
         <input type="radio" id="rss-popup" name="popup" class="popup-radio">
         <div class="popup spread-love rss-popup">
           <p>Grab the RSS feed you like.</p>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({% if all_count is defined %}{{ all_count }}{% else %}0{% endif %})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/smallweb/appreciated">Appreciated ({% if appreciated_count is defined %}{{ appreciated_count }}{% else %}0{% endif %})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos ({% if videos_count is defined %}{{ videos_count }}{% else %}0{% endif %})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code ({% if code_count is defined %}{{ code_count }}{% else %}0{% endif %})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/api/v1/smallweb/feed/?comic">Comics ({% if comics_count is defined %}{{ comics_count }}{% else %}0{% endif %})</a>
-         <a class="share-option" target="_blank" href="https://kagi.com/smallweb/opml">OPML</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({% if all_count is defined %}{{ all_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/appreciated">Appreciated ({% if appreciated_count is defined %}{{ appreciated_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos ({% if videos_count is defined %}{{ videos_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code ({% if code_count is defined %}{{ code_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?comic">Comics ({% if comics_count is defined %}{{ comics_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/opml">OPML</a>
           <label for="close-popup" class="cancel-button">Cancel</label>
         </div>
       </div>
@@ -294,7 +294,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
         {% if flag_content_count and flag_content_count >= 5 %}
-          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target=_blank href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
+          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
         {% endif %}
       ></iframe>
     </div>
@@ -303,7 +303,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
       <iframe
         src="{{url}}"
         {% if flag_content_count and flag_content_count >= 5 %}
-          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target=_blank>View Flagged Content</a>'
+          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target="_blank" rel="noopener noreferrer">View Flagged Content</a>'
         {% endif %}
       ></iframe>
     </div>
