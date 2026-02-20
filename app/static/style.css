@@ -1,6 +1,7 @@
 @font-face {
   font-family: 'pixel';
-  src: url('vt323-regular-webfont.woff2');
+  src: url('vt323-regular-webfont.woff2') format('woff2');
+  font-display: block;
 }
 
 :root {
@@ -24,7 +25,7 @@
 
 body {
   margin: 0;
-  font-family: pixel, Arial, sans-serif;
+  font-family: pixel, monospace;
 }
 
 input, button, select, textarea {

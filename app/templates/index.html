@@ -19,6 +19,7 @@
   {% if feed_url is defined and feed_url %}
   <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
   {% endif %}
+  <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if current_mode != 2 and next_link %}
   <link rel="prefetch"  href="{{ next_link }}">
