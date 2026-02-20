@@ -111,7 +111,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 0;
+  margin: 0 0 0 4px;
   flex: 0 0 auto;
 }
 
@@ -779,18 +779,6 @@ svg {
 .kagi-gif {
   height: 30px;
   vertical-align: middle;
-  margin: 0 5px;
-}
-
-.about-badges {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 12px;
-}
-
-.about-badges .kagi-gif {
   margin: 0;
 }
 
@@ -1244,6 +1232,11 @@ svg {
 }
 
 @media (max-width: 1100px) {
+  .right > .badge-link,
+  .right > #dark-mode-toggle {
+    display: none;
+  }
+
   .mode-container > .dropdown-link,
   .category-toggle {
     width: var(--header-control-height);
@@ -1275,7 +1268,7 @@ svg {
   #url-display-phone,
   .mode-wrapper,
   #search-form,
-  #header > .middle > :not(.post-cats):not(#reactions),
+  #header > .middle > *,
   .right > :not(.about),
   .category-wrapper .category-nav,
   .category-wrapper .cat-inline-clear,

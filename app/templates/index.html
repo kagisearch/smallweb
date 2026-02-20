@@ -73,6 +73,30 @@
       {% elif next_link %}
       <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix">Post</span></a>
       {% endif %}
+
+      <div id="reactions" role="group" aria-label="Reactions">
+{% set thumb_cnt = reactions_dict.get('👍', 0) %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="👍">
+  <button type="submit" class="emoji-badge" title="Like this post">
+      <span>👍</span>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
+  </button>
+</form>
+
+{% for emoji, cnt in reactions_list if emoji != '👍' %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="{{ emoji }}">
+  <button type="submit" class="emoji-badge" title="Like this post">
+      <span>{{ emoji }}</span><span>{{ cnt }}</span>
+  </button>
+</form>
+{% endfor %}
+
+      </div>
       {% endif %}
 
       <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
@@ -178,6 +202,14 @@
       </div>
       {% endif %}
 
+      {% if not no_results and current_mode == 0 and post_categories %}
+      <div class="post-cats">
+        {% for slug, label, emoji in post_categories %}
+        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
@@ -195,14 +227,6 @@
     </div>
     <div class="middle">
       {% if not no_results %}
-        {% if current_mode == 0 and post_categories %}
-        <div class="post-cats">
-          {% for slug, label, emoji in post_categories %}
-          <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
-          {% endfor %}
-        </div>
-        {% endif %}
-
         <div id="url-display-phone">
           <a class="phone" href="{{url}}" title="Go to the original post" target="_blank" rel="noopener noreferrer">
             <span class="phone-domain">{{domain}}</span>
@@ -210,30 +234,6 @@
               <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
             </svg>
           </a>
-        </div>
-
-        <div id="reactions" role="group" aria-label="Reactions">
-{% set thumb_cnt = reactions_dict.get('👍', 0) %}
-<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
-      method="post" class="emoji-form">
-  <input type="hidden" name="url" value="{{ url }}">
-  <input type="hidden" name="emoji" value="👍">
-  <button type="submit" class="emoji-badge" title="Like this post">
-      <span>👍</span>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
-  </button>
-</form>
-
-{% for emoji, cnt in reactions_list if emoji != '👍' %}
-<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
-      method="post" class="emoji-form">
-  <input type="hidden" name="url" value="{{ url }}">
-  <input type="hidden" name="emoji" value="{{ emoji }}">
-  <button type="submit" class="emoji-badge" title="Like this post">
-      <span>{{ emoji }}</span><span>{{ cnt }}</span>
-  </button>
-</form>
-{% endfor %}
-
         </div>
 
         <div class="dropdown-container">
@@ -275,6 +275,12 @@
       {% endif %}
     </div>
     <div class="right">
+      <a href="https://kagi.com" title="Visit Kagi" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
+        <img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif">
+      </a>
+      <a href="https://github.com/kagisearch/smallweb#the-small-web-seal-badge-of-authentic-creation" title="Small Web badges" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
+        <img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif">
+      </a>
       <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link contribute-link" target="_blank" rel="noopener noreferrer">
         Contribute
         <svg class="external-link-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
@@ -310,15 +316,6 @@ seven days or so to keep it fresh.</p>
 <p>And yep, this whole thing is <a class="container-link"
 href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener noreferrer">open-source</a>.</p>
 <p>So, what do you say? Ready to meet some neighbors?</p>
-<div class="about-badges">
-  <a href="https://kagi.com" title="Visit Kagi" target="_blank" rel="noopener noreferrer">
-    <img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif">
-  </a>
-  <a href="https://github.com/kagisearch/smallweb#the-small-web-seal-badge-of-authentic-creation" title="Small Web badges" target="_blank" rel="noopener noreferrer">
-    <img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif">
-  </a>
-</div>
-
           </div>
       </div>
       <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
