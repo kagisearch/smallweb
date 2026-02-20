@@ -21,7 +21,6 @@
   {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if current_mode != 2 and next_link %}
-  {# Prefetch next link for non-appreciated modes (appreciated uses client-side queue) #}
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
   {% if next_doc_url %}
@@ -32,24 +31,35 @@
   {% if current_mode == 0 %}
   <script defer src="{{ url_for('static', filename='header-category-dropdown.js') }}"></script>
   {% endif %}
-  {% if not no_results %}
-  <script defer src="{{ url_for('static', filename='header-flag-confirm.js') }}"></script>
-  {% endif %}
   <script defer src="{{ url_for('static', filename='header-dark-mode.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='header-dropdowns.js') }}"></script>
   {% if current_mode == 2 %}
-  {# SmallWeb Queue module for client-side random selection (appreciated mode) #}
   <script defer src="{{ url_for('static', filename='smallweb-queue.js') }}"></script>
-  {# SmallWeb Queue click behavior for appreciated mode #}
   <script defer src="{{ url_for('static', filename='header-appreciated-next.js') }}"></script>
   {% endif %}
 </head>
 
 <body>
-  <div id="header">
-    <div id="controls">
+  <header id="header">
+    {%- set mode_entries = [
+      ("Web", prefix, 0),
+      ("Liked", prefix ~ "?app", 2),
+      ("Video", prefix ~ "?yt", 1),
+      ("Comic", prefix ~ "?comic", 4)
+    ] -%}
+    {%- set mode_ns = namespace(index=-1) -%}
+    {%- for label, href, mode_value in mode_entries -%}
+      {%- if mode_value == current_mode -%}
+        {%- set mode_ns.index = loop.index0 -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- set mode_has_selection = mode_ns.index >= 0 and current_mode != 0 -%}
+    {%- set mode_prev = mode_entries[mode_ns.index - 1] if mode_has_selection and mode_ns.index > 0 else None -%}
+    {%- set mode_next = mode_entries[mode_ns.index + 1] if mode_has_selection and mode_ns.index < mode_entries|length - 1 else None -%}
+    {%- set mode_button_label = mode_entries[mode_ns.index][0] ~ " Mode" if mode_ns.index >= 0 else "Mode" -%}
+    <div class="left">
       {% if not no_results %}
       {% if current_mode == 2 %}
-      {# Appreciated mode: use client-side random selection #}
       <a href="{{ next_link }}" class="stumble-link btn next-button" id="appreciated-next-link" rel="prefetch" title="Show next appreciated post"
          data-full-list-url="{{ url_for('appreciated_json') }}"
          data-enable-periodic-reset-queue="true"
@@ -58,53 +68,49 @@
          data-persist-key="kagi_smallweb_queue_v2"
          data-enable-debug="false"
          data-current-url="{{ url }}"
-         data-fallback-url="{{ prefix }}?app"><span id="appreciated-next-text">Next<span class="next-btn-suffix"> Post</span></span></a>
+         data-fallback-url="{{ prefix }}?app"><span id="appreciated-next-text">Next<span class="next-btn-suffix">Post</span></span></a>
       {% elif next_link %}
-      {# Other modes: use server-side random selection #}
-      <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix"> Post</span></a>
+      <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix">Post</span></a>
       {% endif %}
-      <div id="reactions">
-
-{# --- always show the default 👍 button --- #}
-{% set thumb_cnt = reactions_dict.get('👍', 0) %}
-<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
-      method="post" class="emoji-form">
-  <input type="hidden" name="url" value="{{ url }}">
-  <input type="hidden" name="emoji" value="👍">
-  <button type="submit" class="emoji-badge" title="Add one more 👍">
-      <span>👍</span>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
-  </button>
-</form>
-
-{# --- show the other (max-3) stored emojis, excluding 👍 --- #}
-{% for emoji, cnt in reactions_list if emoji != '👍' %}
-<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
-      method="post" class="emoji-form">
-  <input type="hidden" name="url" value="{{ url }}">
-  <input type="hidden" name="emoji" value="{{ emoji }}">
-  <button type="submit" class="emoji-badge" title="Add one more {{ emoji }}">
-      <span>{{ emoji }}</span><span>{{ cnt }}</span>
-  </button>
-</form>
-{% endfor %}
-
-      </div>
-
-      <div id="url-display-phone">
-        <a class="phone" href="{{url}}">{{domain}}</a>
-      </div>
-      {% if current_mode == 0 and post_categories %}
-      <div class="post-cats">
-        {% for slug, label, emoji in post_categories %}
-        <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="{{ label }}">{{ emoji }}</a>
-        {% endfor %}
-      </div>
       {% endif %}
 
-      {% endif %}
+      <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
+        {% if mode_prev %}
+        <a class="mode-nav" href="{{ mode_prev[1] }}" title="{{ mode_prev[0] }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </a>
+        {% endif %}
+        <div class="dropdown-container mode-container">
+          <button type="button" class="dropdown-link{% if mode_has_selection %} has-filter{% endif %}" title="Filter by mode" aria-label="Filter by mode" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="modes-dropdown">
+            <svg class="mode-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+            <span class="mode-toggle-label">{{ mode_button_label }}</span>
+          </button>
+          <div class="dropdown-panel modes-dropdown" id="modes-dropdown">
+            {%- for label, href, mode_value in mode_entries if mode_value != current_mode -%}
+            <a class="share-option" href="{{ href }}" title="Open {{ label }} mode">{{ label }}</a>
+            {%- endfor -%}
+          </div>
+        </div>
+        {% if mode_has_selection %}
+        <a class="mode-inline-clear" href="{{ prefix }}" title="Clear mode filter" aria-label="Clear mode filter">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </a>
+        {% endif %}
+        {% if mode_next %}
+        <a class="mode-nav" href="{{ mode_next[1] }}" title="{{ mode_next[0] }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        {% endif %}
+      </div>
 
       {% if current_mode == 0 %}
-      <!-- Categories dropdown -->
       {%- if current_cat %}
         {%- set all_slugs = [] %}
         {%- for g_name, g_slugs in category_groups.items() %}
@@ -120,17 +126,28 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </a>
         {% endif %}
-        <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic" aria-label="Filter by topic">
+          <svg class="category-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
           </svg>
-          {% if current_cat and current_cat in categories %}
-            <span id="catLabel">{{ categories[current_cat][0] }}</span>
-          {% endif %}
+          <span class="category-toggle-label">
+            {% if current_cat and current_cat in categories %}
+              {{ categories[current_cat][0] }}
+            {% else %}
+              Categories
+            {% endif %}
+          </span>
         </button>
         {% if current_cat and current_cat in categories %}
-        <a class="cat-inline-clear" href="{{ prefix }}" title="Clear filter" aria-label="Clear filter">&times;</a>
+        <a class="cat-inline-clear" href="{{ prefix }}" title="Clear filter" aria-label="Clear filter">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </a>
         {% endif %}
         {% if current_cat and next_cat %}
         <a class="category-nav" href="{{ prefix }}?cat={{ next_cat }}" title="{{ categories[next_cat][0] }}">
@@ -160,80 +177,102 @@
       </div>
       {% endif %}
 
-
       <form action="{{ prefix }}" method="get" id="search-form">
         <div class="search-container">
-          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input">
+          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
           {% if search_query %}
           <a href="{{ prefix }}" class="clear-search" title="Clear search">&times;</a>
           {% endif %}
         </div>
         <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
       </form>
-
-      {% if not no_results %}
-      <!-- Share Popup -->
-      <div class="popup-container share-container">
-        <label for="spread-love" class="popup-link" title="Share this post">Share</label>
-        <input type="radio" id="spread-love" name="popup" class="popup-radio">
-        <div class="popup spread-love">
-          <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Hacker News</a>
-          <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Reddit</a>
-          <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Twitter</a>
-          <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Mastodon</a>
-          <a href="https://lemmy.world/create_post?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lemmy</a>
-          <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lobsters</a>
-          <a href="https://cohost.org" class="share-option" target="_blank" rel="noopener noreferrer">Cohost</a>
-          <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Email</a>
-          <hr class="share-separator">
-          <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Summarize</a>
-          <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Translate</a>
-          <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
-             class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
-          <label for="close-popup" class="cancel-button">Cancel</label>
-        </div>
-      </div>
-
-      <!-- Flag -->
-      <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post">
-        <input type="hidden" name="url" value="{{ url }}">
-        <button title="Flag this post"
-                type="submit"
-                class="flag-link">
-                Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
-      </form>
-      {% endif %}
-
     </div>
     <div class="middle">
-      <input type="radio" id="close-popup" name="popup" class="popup-radio" checked>
+      {% if not no_results %}
+        {% if current_mode == 0 and post_categories %}
+        <div class="post-cats">
+          {% for slug, label, emoji in post_categories %}
+          <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
+          {% endfor %}
+        </div>
+        {% endif %}
 
-      {%- if current_mode == 1 -%}
-        {%- set mode_switch_links = [("Web", prefix), ("Liked", prefix ~ "?app"), ("Comic", prefix ~ "?comic")] -%}
-      {%- elif current_mode == 2 -%}
-        {%- set mode_switch_links = [("Web", prefix), ("Video", prefix ~ "?yt"), ("Comic", prefix ~ "?comic")] -%}
-      {%- elif current_mode == 4 -%}
-        {%- set mode_switch_links = [("Web", prefix), ("Liked", prefix ~ "?app"), ("Video", prefix ~ "?yt")] -%}
-      {%- else -%}
-        {%- set mode_switch_links = [("Liked", prefix ~ "?app"), ("Video", prefix ~ "?yt"), ("Comic", prefix ~ "?comic")] -%}
-      {%- endif -%}
-      {%- for label, href in mode_switch_links -%}
-        <a class="switch header-link" href="{{ href }}">{{ label }}</a>
-      {%- endfor -%}
+        <div id="url-display-phone">
+          <a class="phone" href="{{url}}" title="Go to the original post" target="_blank" rel="noopener noreferrer">{{domain}}</a>
+        </div>
+
+        <div id="reactions" role="group" aria-label="Reactions">
+{% set thumb_cnt = reactions_dict.get('👍', 0) %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="👍">
+  <button type="submit" class="emoji-badge" title="Like this post">
+      <span>👍</span>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
+  </button>
+</form>
+
+{% for emoji, cnt in reactions_list if emoji != '👍' %}
+<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+      method="post" class="emoji-form">
+  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="emoji" value="{{ emoji }}">
+  <button type="submit" class="emoji-badge" title="Like this post">
+      <span>{{ emoji }}</span><span>{{ cnt }}</span>
+  </button>
+</form>
+{% endfor %}
+
+        </div>
+
+        <div class="dropdown-container">
+          <button type="button" class="dropdown-link" title="Share this post" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="share-dropdown">Share</button>
+          <div class="dropdown-panel spread-love" id="share-dropdown">
+            <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Hacker News</a>
+            <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Reddit</a>
+            <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Twitter</a>
+            <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Mastodon</a>
+            <a href="https://lemmy.world/create_post?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lemmy</a>
+            <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lobsters</a>
+            <a href="https://cohost.org" class="share-option" target="_blank" rel="noopener noreferrer">Cohost</a>
+            <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Email</a>
+            <hr class="share-separator">
+            <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Summarize</a>
+            <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Translate</a>
+            <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
+               class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
+          </div>
+        </div>
+
+        <div class="dropdown-container">
+          <button type="button"
+                  class="dropdown-link flag-link"
+                  title="Flag this post"
+                  data-dropdown-trigger
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="flag-dropdown">
+                  Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
+          <div class="dropdown-panel flag-dropdown" id="flag-dropdown" role="alertdialog" aria-modal="false" aria-label="Flag confirmation" aria-describedby="flag-dropdown-text">
+            <p class="flag-dropdown-text" id="flag-dropdown-text">Flag this post as inappropriate?</p>
+            <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post" class="flag-dropdown-form">
+              <input type="hidden" name="url" value="{{ url }}">
+              <button type="submit" class="dropdown-action" data-dropdown-autofocus>Confirm</button>
+            </form>
+          </div>
+        </div>
+      {% endif %}
     </div>
     <div class="right">
-      <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-          <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0121 12.79z"/>
+      <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link contribute-link" target="_blank" rel="noopener noreferrer">
+        Contribute
+        <svg class="external-link-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
         </svg>
-      </button>
-       <a href="https://kagi.com" title="Visit Kagi" class="header-link"><img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif"></a>
-       <a href="https://kagi.com/smallweb" title="Kagi Small Web" class="header-link"><img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif"></a>
-       <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link">Contribute</a>
-       <div class="popup-container">
-        <label for="rss-popup" class="popup-link" title="Subscribe to RSS">RSS</label>
-        <input type="radio" id="rss-popup" name="popup" class="popup-radio">
-        <div class="popup spread-love rss-popup">
+      </a>
+      <div class="dropdown-container">
+        <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="rss-dropdown">RSS</button>
+        <div class="dropdown-panel spread-love rss-dropdown" id="rss-dropdown">
           <p>Grab the RSS feed you like.</p>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({% if all_count is defined %}{{ all_count }}{% else %}0{% endif %})</a>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/appreciated">Appreciated ({% if appreciated_count is defined %}{{ appreciated_count }}{% else %}0{% endif %})</a>
@@ -241,39 +280,49 @@
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code ({% if code_count is defined %}{{ code_count }}{% else %}0{% endif %})</a>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?comic">Comics ({% if comics_count is defined %}{{ comics_count }}{% else %}0{% endif %})</a>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/opml">OPML</a>
-          <label for="close-popup" class="cancel-button">Cancel</label>
         </div>
       </div>
-    </div>
-      <div class="popup-container right-popup-container about">
-          <label for="about-popup" class="popup-link">About</label>
-          <input type="radio" id="about-popup" name="popup" class="popup-radio">
-          <div class="popup right-popup">
-<label class="close-popup-button" for="close-popup">X</label>
-
+      <div class="dropdown-container right-dropdown-container about">
+          <button type="button" class="dropdown-link" title="About Small Web" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="about-dropdown">About</button>
+          <div class="dropdown-panel right-dropdown" id="about-dropdown">
 <p>Hey there, welcome to Kagi Small Web!</p>
 <p>Imagine the internet like a huge neighborhood. There's a lot of folks around, but we rarely bump into each other, right? Kagi's all about
 humanizing the web and we want to help surface the people behind the posts and stories that zip
 by. This less known corner of the web is also known as the "small web". Read
-more in our <a class="container-link" href="https://blog.kagi.com/small-web">blog post</a>.</p>
+more in our <a class="container-link" href="https://blog.kagi.com/small-web" target="_blank" rel="noopener noreferrer">blog post</a>.</p>
 <p>We want to amplify the voices of genuine humans on the web - see <a class="container-link"
-href="https://github.com/kagisearch/smallweb#small-web">our sources</a>
-or check if your blog is in the <a class="container-link" href="https://github.com/kagisearch/smallweb/blob/main/smallweb.txt">list</a>. You'll also
-encounter these pages now in <a class="container-link" href="https://kagi.com">Kagi search</a> when you're looking for something relevant.</p>
+href="https://github.com/kagisearch/smallweb#small-web" target="_blank" rel="noopener noreferrer">our sources</a>
+or check if your blog is in the <a class="container-link" href="https://github.com/kagisearch/smallweb/blob/main/smallweb.txt" target="_blank" rel="noopener noreferrer">list</a>. You'll also
+encounter these pages now in <a class="container-link" href="https://kagi.com" target="_blank" rel="noopener noreferrer">Kagi search</a> when you're looking for something relevant.</p>
 <p>Hit 'Next Post' to read something new. We only show posts from the last
 seven days or so to keep it fresh.</p>
 <p>And yep, this whole thing is <a class="container-link"
-href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
+href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener noreferrer">open-source</a>.</p>
 <p>So, what do you say? Ready to meet some neighbors?</p>
+<div class="about-badges">
+  <a href="https://kagi.com" title="Visit Kagi" target="_blank" rel="noopener noreferrer">
+    <img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif">
+  </a>
+  <a href="https://github.com/kagisearch/smallweb#the-small-web-seal-badge-of-authentic-creation" title="Small Web badges" target="_blank" rel="noopener noreferrer">
+    <img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif">
+  </a>
+</div>
 
           </div>
-        </div>
-  </div>
+      </div>
+      <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0121 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
 
   {% if current_mode == 0 %}
   <div class="cat-backdrop" id="catBackdrop"></div>
   {% endif %}
 
+  <main>
   {% if no_results %}
     <div id="content" class="no-results no-results-content">
       {% if no_results_cat is defined and no_results_cat %}
@@ -308,6 +357,7 @@ href="https://github.com/kagisearch/smallweb">open-source</a>.</p>
       ></iframe>
     </div>
   {% endif %}
+  </main>
 
   {% if next_doc_url %}
   <iframe src="{{ next_doc_url }}" loading="lazy" sandbox referrerpolicy="no-referrer" class="prefetch-iframe"></iframe>

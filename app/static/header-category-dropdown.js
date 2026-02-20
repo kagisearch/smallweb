@@ -1,34 +1,62 @@
-// Categories dropdown
 (() => {
+  const CLOSE_ALL_EVENT = 'smallweb:close-all-dropdowns';
   const toggle = document.getElementById('catToggle');
   const dropdown = document.getElementById('catDropdown');
   const backdrop = document.getElementById('catBackdrop');
+  const header = document.getElementById('header');
   if (!toggle || !dropdown || !backdrop) return;
 
   const allItems = [...dropdown.querySelectorAll('.cat-item')];
   let focusIndex = -1;
 
+  function getDropdownTop() {
+    if (!header) return 50;
+    return Math.round(header.getBoundingClientRect().bottom);
+  }
+
+  function positionDropdown() {
+    dropdown.style.top = `${getDropdownTop()}px`;
+
+    const dropdownWidth = dropdown.getBoundingClientRect().width;
+    const toggleRect = toggle.getBoundingClientRect();
+    const maxLeft = Math.max(0, window.innerWidth - dropdownWidth);
+    const panelLeft = Math.min(Math.max(toggleRect.left, 0), maxLeft);
+
+    dropdown.style.left = `${Math.round(panelLeft)}px`;
+  }
+
   function openDropdown() {
+    document.dispatchEvent(
+      new CustomEvent(CLOSE_ALL_EVENT, {detail: {except: 'category'}})
+    );
     dropdown.classList.add('open');
     backdrop.classList.add('open');
     toggle.classList.add('active');
     toggle.setAttribute('aria-expanded', 'true');
     focusIndex = -1;
+    positionDropdown();
   }
 
-  function closeDropdown() {
+  function closeDropdown(restoreFocus = true) {
     dropdown.classList.remove('open');
     backdrop.classList.remove('open');
     toggle.classList.remove('active');
     toggle.setAttribute('aria-expanded', 'false');
-    toggle.focus();
+    if (restoreFocus) toggle.focus();
   }
 
   toggle.addEventListener('click', () => {
     dropdown.classList.contains('open') ? closeDropdown() : openDropdown();
   });
 
-  backdrop.addEventListener('click', closeDropdown);
+  backdrop.addEventListener('click', () => closeDropdown());
+
+  document.addEventListener(CLOSE_ALL_EVENT, (event) => {
+    const exceptId = event.detail?.except;
+    if (exceptId !== 'category' && dropdown.classList.contains('open')) {
+      closeDropdown(false);
+    }
+  });
 
   document.addEventListener('keydown', (e) => {
     const isOpen = dropdown.classList.contains('open');
@@ -58,6 +86,12 @@
         focusIndex = idx;
         updateFocus();
       }
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (dropdown.classList.contains('open')) {
+      positionDropdown();
     }
   });
 
