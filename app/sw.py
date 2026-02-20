@@ -618,18 +618,7 @@ def update_all():
         new_entries = update_entries(url + "?comic")  # comic sites
 
         if not urls_comic_cache or new_entries:
-            # Filter entries that have images in content
-            urls_comic_cache = [
-                entry
-                for entry in new_entries
-                if entry.description
-                and (
-                    "<img" in entry.description
-                    or ".png" in entry.description
-                    or ".jpg" in entry.description
-                    or ".jpeg" in entry.description
-                )
-            ]
+            urls_comic_cache = new_entries
 
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry.link for entry in urls_cache + urls_yt_cache)
@@ -660,6 +649,14 @@ def update_all():
         logger.error("Error during update_all: %s", e)
     finally:
         logger.info("end update_all")
+
+
+def _extract_content(entry):
+    """Extract HTML from fastfeedparser's content list-of-dicts."""
+    content = entry.get("content")
+    if isinstance(content, list) and content:
+        return content[0].get("value", "")
+    return ""
 
 
 def update_entries(url):
@@ -699,7 +696,7 @@ def update_entries(url):
                     link=link,
                     title=entry.get("title", ""),
                     author=entry.get("author", ""),
-                    description=entry.get("description", "") or entry.get("content", ""),
+                    description=entry.get("description", "") or _extract_content(entry),
                     updated=updated,
                     categories=categories,
                 )
