@@ -699,7 +699,7 @@ def update_entries(url):
                     link=link,
                     title=entry.get("title", ""),
                     author=entry.get("author", ""),
-                    description=entry.get("description", ""),
+                    description=entry.get("description", "") or entry.get("content", ""),
                     updated=updated,
                     categories=categories,
                 )
