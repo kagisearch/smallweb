@@ -32,6 +32,11 @@ input, button, select, textarea {
   font-family: inherit;
 }
 
+button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 svg {
   vertical-align: middle;
 }
@@ -111,7 +116,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 0 0 0 4px;
+  margin: 0;
   flex: 0 0 auto;
 }
 
@@ -437,7 +442,9 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  height: var(--header-control-height);
+  min-height: var(--header-control-height);
+  padding: 0 6px;
   box-sizing: border-box;
   border: 2px solid transparent;
   border-radius: 0;
@@ -1409,9 +1416,9 @@ svg {
   }
 
   .category-toggle {
-    width: var(--header-control-height);
-    min-width: var(--header-control-height);
-    padding: 0;
+    width: auto;
+    min-width: fit-content;
+    padding: 0 var(--header-control-pad-x);
   }
 
   .category-toggle,
@@ -1423,11 +1430,11 @@ svg {
   }
 
   .category-toggle .category-toggle-label {
-    display: none;
+    display: inline;
   }
 
   .category-toggle-icon {
-    display: block;
+    display: none;
   }
 
   .dropdown-panel,
