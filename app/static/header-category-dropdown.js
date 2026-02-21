@@ -20,7 +20,7 @@
     const dropdownWidth = dropdown.getBoundingClientRect().width;
     const toggleRect = toggle.getBoundingClientRect();
     const maxLeft = Math.max(0, window.innerWidth - dropdownWidth);
-    const panelLeft = Math.min(Math.max(toggleRect.left, 0), maxLeft);
+    const panelLeft = Math.min(Math.max(toggleRect.left + toggleRect.width / 2 - dropdownWidth / 2, 0), maxLeft);
 
     dropdown.style.left = `${Math.round(panelLeft)}px`;
   }
@@ -49,7 +49,7 @@
     dropdown.classList.contains('open') ? closeDropdown() : openDropdown();
   });
 
-  backdrop.addEventListener('click', () => closeDropdown());
+  backdrop.addEventListener('click', () => closeDropdown(false));
 
   document.addEventListener(CLOSE_ALL_EVENT, (event) => {
     const exceptId = event.detail?.except;
@@ -62,6 +62,7 @@
     const isOpen = dropdown.classList.contains('open');
     if (e.key === 'Escape' && isOpen) {
       closeDropdown();
+      document.dispatchEvent(new CustomEvent(CLOSE_ALL_EVENT, {detail: {except: null}}));
       return;
     }
     if (!isOpen) return;

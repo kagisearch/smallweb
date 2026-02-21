@@ -7,7 +7,6 @@
 :root {
   --header-height: 50px;
   --header-control-height: 32px;
-  --header-control-pad-x: 8px;
   --header-control-font-size: 18px;
   --header-dropdown-gap: 0px;
   --header-section-gap: 4px;
@@ -17,6 +16,7 @@
   --color-accent-hover: #2980b9;
   --panel-light: #556472;
   --color-danger: #e74c3c;
+  --color-focus: #ffb319;
   --color-subtle: rgba(255, 255, 255, 0.1);
   --color-accent-light: rgba(52, 152, 219, 0.2);
   --color-cat-desc: #b0bec5;
@@ -98,12 +98,12 @@ svg {
   flex: 0 0 auto;
   width: fit-content;
   justify-content: flex-start;
-  gap: 4px;
 }
 
 #header > .right {
   flex: 0 0 auto;
   justify-content: flex-end;
+  gap: 4px;
 }
 
 /* ── Search ── */
@@ -111,7 +111,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 0 0 0 4px;
+  margin: 0;
   flex: 0 0 auto;
 }
 
@@ -119,11 +119,6 @@ svg {
   position: relative;
   width: clamp(80px, 8vw, 100px);
   height: var(--header-control-height);
-  transition: width 0.12s ease;
-}
-
-.search-container:focus-within {
-  width: clamp(120px, 12vw, 180px);
 }
 
 #search-input {
@@ -133,19 +128,23 @@ svg {
   border-right-color: var(--color-text);
   border-bottom-color: var(--color-text);
   border-radius: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
-  height: 100%;
+  height: var(--header-control-height);
   box-sizing: border-box;
   background: #fff;
   color: var(--color-bg);
-  position: relative;
   z-index: 1;
-  transition: border-color 0.12s ease;
+  transition: width 0.12s ease;
+}
+
+.search-container:focus-within #search-input {
+  width: clamp(120px, 12vw, 180px);
 }
 
 #search-input:focus {
-  border-right-color: var(--color-accent);
-  border-bottom-color: var(--color-accent);
   outline: none;
 }
 
@@ -153,6 +152,8 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 2;
   width: var(--header-control-height);
   height: var(--header-control-height);
   box-sizing: border-box;
@@ -229,7 +230,7 @@ svg {
   justify-content: center;
   height: var(--header-control-height);
   min-height: var(--header-control-height);
-  padding: 0 var(--header-control-pad-x);
+  padding: 6px;
   font-size: var(--header-control-font-size);
   min-width: clamp(70px, 7vw, 100px);
   margin: 0;
@@ -247,7 +248,7 @@ svg {
 
 .next-button {
   min-width: fit-content;
-  padding: 0 12px;
+  padding: 6px 12px;
   gap: 6px;
   font-size: 20px;
 }
@@ -298,22 +299,10 @@ svg {
   border-right-color: var(--color-text);
   border-bottom-color: var(--color-text);
   border-radius: 0;
-  padding: 0 var(--header-control-pad-x);
+  padding: 6px;
   min-width: 10px;
   margin: 0;
   box-sizing: border-box;
-  transition: background-color 0.12s ease;
-}
-
-#url-display-phone:hover {
-  background: var(--panel-light);
-}
-
-#url-display-phone:focus-within {
-  background: var(--panel-light);
-  border-color: var(--color-bg);
-  border-top-color: var(--color-text);
-  border-left-color: var(--color-text);
 }
 
 #url-display-phone .phone-domain {
@@ -329,10 +318,16 @@ svg {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
+  transition: color 0.12s ease;
+}
+
+#url-display-phone .phone-link:hover {
+  color: var(--color-focus);
 }
 
 #url-display-phone .phone-link:focus-visible {
   outline: none;
+  color: var(--color-focus);
 }
 
 /* ── Flag links ── */
@@ -351,13 +346,6 @@ svg {
 /* ── Mode switch ── */
 .middle {
   margin: 0;
-}
-
-#header > .middle {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
 }
 
 .mode-wrapper {
@@ -405,10 +393,10 @@ svg {
 .mode-container > .dropdown-link:focus-visible,
 .middle .dropdown-link:focus-visible {
   outline: none;
+  background: var(--panel-light);
   border-color: var(--color-bg);
   border-top-color: var(--color-text);
   border-left-color: var(--color-text);
-  background: var(--panel-light);
 }
 
 .mode-container > .dropdown-link:active,
@@ -427,16 +415,14 @@ svg {
   border-left-color: var(--color-text);
 }
 
-#header > .right {
-  gap: 4px;
-}
-
 .right > .header-link,
 .right > .dropdown-container > .dropdown-link,
 .right > #dark-mode-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: var(--header-control-height);
+  min-height: var(--header-control-height);
   padding: 6px;
   box-sizing: border-box;
   border: 2px solid transparent;
@@ -461,17 +447,21 @@ svg {
 
 .right > .badge-link {
   padding: 0;
+  border: none;
+  height: 30px;
+  min-height: 30px;
 }
+
+.right > .badge-link + .badge-link {
+  margin-left: 2px;
+}
+
 
 .external-link-icon {
   width: 12px;
   height: 12px;
   display: block;
   shape-rendering: crispEdges;
-}
-
-.right > #dark-mode-toggle {
-  padding: 6px;
 }
 
 .right > #dark-mode-toggle svg {
@@ -493,10 +483,10 @@ svg {
 .right > .dropdown-container > .dropdown-link:focus-visible,
 .right > #dark-mode-toggle:focus-visible {
   outline: none;
+  background: var(--panel-light);
   border-color: var(--color-bg);
   border-top-color: var(--color-text);
   border-left-color: var(--color-text);
-  background: var(--panel-light);
 }
 
 .right > .header-link:active,
@@ -509,10 +499,16 @@ svg {
   transform: translate(1px, 1px);
 }
 
-.right > .header-link.badge-link:hover,
+.right > .header-link.badge-link:hover {
+  border-color: transparent;
+  background: transparent;
+}
+
 .right > .header-link.badge-link:focus-visible {
   border-color: transparent;
   background: transparent;
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .right > .header-link.badge-link:active {
@@ -923,7 +919,7 @@ svg {
 #reactions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 1;
 }
 
@@ -942,7 +938,7 @@ svg {
   color: var(--color-text);
   border: 2px solid transparent;
   border-radius: 0;
-  padding: 0 var(--header-control-pad-x);
+  padding: 6px;
   font-size: var(--header-control-font-size);
   line-height: 1;
   cursor: pointer;
@@ -979,7 +975,7 @@ svg {
   position: relative;
   display: inline-flex;
   align-items: center;
-  margin-left: 0;
+  gap: 4px;
 }
 
 .category-nav,
@@ -1051,10 +1047,6 @@ svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-}
-
-.category-toggle:focus {
-  outline: none;
 }
 
 .category-toggle:focus-visible {
@@ -1304,8 +1296,9 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--header-control-height);
   height: var(--header-control-height);
+  min-height: var(--header-control-height);
+  padding: 6px;
   background: transparent;
   border: 2px solid transparent;
   border-radius: 0;
@@ -1411,7 +1404,7 @@ svg {
   .category-toggle {
     width: auto;
     min-width: fit-content;
-    padding: 0 var(--header-control-pad-x);
+    padding: 0 8px;
   }
 
   .category-toggle,

@@ -9,7 +9,8 @@
       const alignRight =
         container.classList.contains('right-dropdown-container') ||
         container.closest('.right') !== null;
-      return {container, trigger, panel, alignRight};
+      const alignCenter = !alignRight && container.closest('.middle') !== null;
+      return {container, trigger, panel, alignRight, alignCenter};
     })
     .filter(Boolean);
 
@@ -32,6 +33,8 @@
     let panelLeft;
     if (entry.alignRight) {
       panelLeft = triggerRect.right - panelWidth;
+    } else if (entry.alignCenter) {
+      panelLeft = triggerRect.left + triggerRect.width / 2 - panelWidth / 2;
     } else {
       panelLeft = triggerRect.left;
     }
