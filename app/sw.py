@@ -199,19 +199,19 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
-            "nature",
+            "travel",
             (
-                "Nature & Outdoors",
-                "Hiking · travel · adventure · wildlife · gardening",
+                "Travel & Outdoors",
+                "Trip reports · hiking · nature · adventure · road trips",
                 "\U0001f333",
             ),
         ),
         (
-            "indieweb",
+            "health",
             (
-                "Indie web",
-                "Personal publishing · blogs · digital gardens · federation",
-                "\U0001f310",
+                "Health & Fitness",
+                "Fitness · wellness · mental health · nutrition · longevity",
+                "\U0001f3CB",
             ),
         ),
         (
@@ -245,7 +245,7 @@ CATEGORY_GROUPS = OrderedDict(
         (
             "Culture & Creative",
             [
-                "indieweb",
+                "health",
                 "art",
                 "essays",
                 "humanities",
@@ -261,7 +261,7 @@ CATEGORY_GROUPS = OrderedDict(
                 "society",
                 "life",
                 "food",
-                "nature",
+                "travel",
                 "politics",
                 "economy",
             ],
