@@ -32,11 +32,6 @@ input, button, select, textarea {
   font-family: inherit;
 }
 
-button {
-  -webkit-appearance: none;
-  appearance: none;
-}
-
 svg {
   vertical-align: middle;
 }
@@ -116,7 +111,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 0;
+  margin: 0 0 0 4px;
   flex: 0 0 auto;
 }
 
@@ -442,9 +437,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: var(--header-control-height);
-  min-height: var(--header-control-height);
-  padding: 0 6px;
+  padding: 6px;
   box-sizing: border-box;
   border: 2px solid transparent;
   border-radius: 0;
