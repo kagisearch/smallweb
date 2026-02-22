@@ -67,11 +67,19 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
-            "sysadmin",
+            "infra",
             (
-                "Sysadmin",
-                "Deployment · cloud · containers · CI/CD · networking · hosting",
+                "Infrastructure & Security",
+                "Servers · deployment · cloud · self-hosting · monitoring",
                 "\u2601\ufe0f",
+            ),
+        ),
+        (
+            "web",
+            (
+                "Web & Internet",
+                "IndieWeb · fediverse · RSS · blogging · web standards",
+                "\U0001f310",
             ),
         ),
         (
@@ -92,14 +100,6 @@ CATEGORIES = OrderedDict(
                 "Retro",
                 "Vintage computers · DOS · BBS · demoscene · old software",
                 "\U0001f4be",
-            ),
-        ),
-        (
-            "security",
-            (
-                "Security",
-                "Infosec · privacy · OSINT · encryption · vulnerabilities",
-                "\U0001f510",
             ),
         ),
         (
@@ -186,7 +186,7 @@ CATEGORIES = OrderedDict(
             "life",
             (
                 "Life & Personal",
-                "Health · parenting · pets · personal growth · relationships",
+                "Personal updates  · diary · parenting · pets",
                 "\U0001f49b",
             ),
         ),
@@ -210,7 +210,7 @@ CATEGORIES = OrderedDict(
             "health",
             (
                 "Health & Fitness",
-                "Fitness · wellness · mental health · nutrition · longevity",
+                "Fitness · exercise · healthspan · nutrition · longevity",
                 "\U0001f3CB",
             ),
         ),
@@ -238,8 +238,8 @@ CATEGORY_GROUPS = OrderedDict(
                 "diy",
                 "tech",
                 "hardware",
-                "sysadmin",
-                "security",
+                "infra",
+                "web",
             ],
         ),
         (
@@ -269,6 +269,9 @@ CATEGORY_GROUPS = OrderedDict(
         ("Other", ["uncategorized"]),
     ]
 )
+
+# Remap legacy category slugs from the feed API
+CATEGORY_REMAP = {"sysadmin": "infra", "security": "infra"}
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None  # will hold generated OPML xml
@@ -688,7 +691,8 @@ def update_entries(url):
             categories = []
             for tag in entry.get("tags", []):
                 term = tag.get("term", "")
-                if term in CATEGORIES:
+                term = CATEGORY_REMAP.get(term, term)
+                if term in CATEGORIES and term not in categories:
                     categories.append(term)
 
             formatted_entries.append(
