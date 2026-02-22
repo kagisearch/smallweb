@@ -46,15 +46,15 @@ CATEGORIES = OrderedDict(
             "ai",
             (
                 "AI",
-                "LLMs · machine learning · AI tools · ethics · agents",
-                "\U0001f916",
+                "LLMs · agents · prompts · AI ethics · AI safety",
+                "✦",
             ),
         ),
         (
             "programming",
             (
                 "Programming",
-                "Coding · languages · frameworks · devtools · APIs · databases",
+                "Code · frameworks · devtools · APIs · tutorials · open source",
                 "\U0001f4bb",
             ),
         ),
@@ -62,21 +62,29 @@ CATEGORIES = OrderedDict(
             "tech",
             (
                 "Technology",
-                "Tech news · apps · networking · social media",
+                "Tech news · gadgets · apps · platforms · social media",
                 "\U0001f4f1",
             ),
         ),
         (
-            "sysadmin",
+            "infra",
             (
-                "Sysadmin",
-                "Deployment · cloud · containers · CI/CD · networking · hosting",
-                "\u2601\ufe0f",
+                "Sysadmin & Security",
+                "Servers · cloud · containers · networking · infosec · privacy",
+                "\U0001f6e1\ufe0f",
+            ),
+        ),
+        (
+            "web",
+            (
+                "Web & Internet",
+                "The open web · RSS · blogging · IndieWeb · web standards",
+                "\U0001f578\ufe0f",
             ),
         ),
         (
             "hardware",
-            ("Hardware", "Electronics · PCB design · gadgets · home lab", "\U0001f50c"),
+            ("Hardware", "Electronics · home lab · PCB design · keyboards · audio gear", "\U0001f50c"),
         ),
         (
             "diy",
@@ -95,18 +103,10 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
-            "security",
-            (
-                "Security",
-                "Infosec · privacy · OSINT · encryption · vulnerabilities",
-                "\U0001f510",
-            ),
-        ),
-        (
             "science",
             (
                 "Science",
-                "Physics · biology · climate · math · space · medicine",
+                "Physics · biology · math · space · climate · research",
                 "\U0001f52c",
             ),
         ),
@@ -114,23 +114,23 @@ CATEGORIES = OrderedDict(
             "humanities",
             (
                 "Humanities",
-                "History · philosophy · language · linguistics · literature",
-                "\U0001f4da",
+                "History · philosophy · linguistics · archaeology · classics",
+                "\U0001f3fa",
             ),
         ),
         (
             "essays",
             (
                 "Essays",
-                "Long-form pieces · original arguments · in-depth analysis",
-                "\U0001f4dd",
+                "Long-form reflective writing that defies topic categories",
+                "\U0001fab6",
             ),
         ),
         (
             "art",
             (
                 "Art & Design",
-                "Visual art · illustration · architecture · graphic design",
+                "Visual art · illustration · typography · creative writing",
                 "\U0001f3a8",
             ),
         ),
@@ -138,15 +138,15 @@ CATEGORIES = OrderedDict(
             "photography",
             (
                 "Photography",
-                "Cameras · photo essays · visual storytelling",
-                "\U0001f4f7",
+                "Photographic craft · technique · gear · film · photo essays",
+                "\U0001f39e\ufe0f",
             ),
         ),
         (
             "culture",
             (
                 "Pop Culture",
-                "Film · TV · music · books · fandom · comics",
+                "Film · TV · music · books · comics · tabletop RPGs",
                 "\U0001f37f",
             ),
         ),
@@ -154,7 +154,7 @@ CATEGORIES = OrderedDict(
             "gaming",
             (
                 "Gaming",
-                "Video games · tabletop RPGs · game dev · interactive fiction",
+                "Video games · game dev · modding · interactive fiction",
                 "\U0001f3ae",
             ),
         ),
@@ -162,7 +162,7 @@ CATEGORIES = OrderedDict(
             "politics",
             (
                 "Politics",
-                "Government · policy · elections · law · political commentary",
+                "Government · legislation · international relations",
                 "\U0001f3db\ufe0f",
             ),
         ),
@@ -170,24 +170,24 @@ CATEGORIES = OrderedDict(
             "economy",
             (
                 "Economy",
-                "Economics · finance · markets · business · labor · trade",
-                "\U0001f4c8",
+                "Markets · finance · labor economics · trade · analysis",
+                "🎲",
             ),
         ),
         (
             "society",
             (
                 "Society",
-                "Social issues · civil rights · current events · community",
-                "\U0001f465",
+                "Discrimination · civil rights · social structure",
+                "\u2696\ufe0f",
             ),
         ),
         (
             "life",
             (
                 "Life & Personal",
-                "Health · parenting · pets · personal growth · relationships",
-                "\U0001f49b",
+                "Diary · weeknotes · parenting · pets · link roundups",
+                "☀️",
             ),
         ),
         (
@@ -195,23 +195,23 @@ CATEGORIES = OrderedDict(
             (
                 "Food & Drink",
                 "Recipes · cooking · restaurants · coffee · wine · baking",
-                "\U0001f372",
+                "\u2615",
             ),
         ),
         (
-            "nature",
+            "travel",
             (
-                "Nature & Outdoors",
-                "Hiking · travel · adventure · wildlife · gardening",
-                "\U0001f333",
+                "Travel & Outdoors",
+                "Trip reports · hiking · nature · birdwatching · gardening",
+                "\U0001f97e",
             ),
         ),
         (
-            "indieweb",
+            "health",
             (
-                "Indie web",
-                "Personal publishing · blogs · digital gardens · federation",
-                "\U0001f310",
+                "Health & Fitness",
+                "Fitness · nutrition · mental health · longevity · running",
+                "\U0001f3CB",
             ),
         ),
         (
@@ -238,14 +238,14 @@ CATEGORY_GROUPS = OrderedDict(
                 "diy",
                 "tech",
                 "hardware",
-                "sysadmin",
-                "security",
+                "infra",
+                "web",
             ],
         ),
         (
             "Culture & Creative",
             [
-                "indieweb",
+                "health",
                 "art",
                 "essays",
                 "humanities",
@@ -261,7 +261,7 @@ CATEGORY_GROUPS = OrderedDict(
                 "society",
                 "life",
                 "food",
-                "nature",
+                "travel",
                 "politics",
                 "economy",
             ],
@@ -269,6 +269,9 @@ CATEGORY_GROUPS = OrderedDict(
         ("Other", ["uncategorized"]),
     ]
 )
+
+# Remap legacy category slugs from the feed API
+CATEGORY_REMAP = {"sysadmin": "infra", "security": "infra"}
 
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None  # will hold generated OPML xml
@@ -618,18 +621,7 @@ def update_all():
         new_entries = update_entries(url + "?comic")  # comic sites
 
         if not urls_comic_cache or new_entries:
-            # Filter entries that have images in content
-            urls_comic_cache = [
-                entry
-                for entry in new_entries
-                if entry.description
-                and (
-                    "<img" in entry.description
-                    or ".png" in entry.description
-                    or ".jpg" in entry.description
-                    or ".jpeg" in entry.description
-                )
-            ]
+            urls_comic_cache = new_entries
 
         # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry.link for entry in urls_cache + urls_yt_cache)
@@ -662,6 +654,14 @@ def update_all():
         logger.info("end update_all")
 
 
+def _extract_content(entry):
+    """Extract HTML from fastfeedparser's content list-of-dicts."""
+    content = entry.get("content")
+    if isinstance(content, list) and content:
+        return content[0].get("value", "")
+    return ""
+
+
 def update_entries(url):
     try:
         response = requests.get(url, timeout=30)
@@ -691,7 +691,8 @@ def update_entries(url):
             categories = []
             for tag in entry.get("tags", []):
                 term = tag.get("term", "")
-                if term in CATEGORIES:
+                term = CATEGORY_REMAP.get(term, term)
+                if term in CATEGORIES and term not in categories:
                     categories.append(term)
 
             formatted_entries.append(
@@ -699,7 +700,7 @@ def update_entries(url):
                     link=link,
                     title=entry.get("title", ""),
                     author=entry.get("author", ""),
-                    description=entry.get("description", ""),
+                    description=entry.get("description", "") or _extract_content(entry),
                     updated=updated,
                     categories=categories,
                 )
@@ -906,6 +907,36 @@ def index():
             "http://", "https://"
         )  # force https as http will not work inside https iframe anyway
 
+    # GitHub API enrichment for Code mode
+    gh_meta = None
+    if current_mode == 3:
+        gh_match = re.match(r"https?://github\.com/([^/]+)/([^/]+)", url)
+        if gh_match:
+            owner, repo = gh_match.group(1), gh_match.group(2)
+            try:
+                gh_resp = requests.get(
+                    f"https://api.github.com/repos/{owner}/{repo}",
+                    timeout=5,
+                    headers={"Accept": "application/vnd.github.v3+json"},
+                )
+                if gh_resp.status_code == 200:
+                    data = gh_resp.json()
+                    owner_data = data.get("owner") or {}
+                    gh_meta = {
+                        "description": data.get("description") or "",
+                        "stargazers_count": data.get("stargazers_count", 0),
+                        "language": data.get("language") or "",
+                        "forks_count": data.get("forks_count", 0),
+                        "topics": data.get("topics", []),
+                        "open_issues_count": data.get("open_issues_count", 0),
+                        "homepage": data.get("homepage") or "",
+                        "avatar_url": owner_data.get("avatar_url") or "",
+                        "owner": owner,
+                        "repo": repo,
+                    }
+            except requests.RequestException:
+                pass
+
     # Build feed URL for <link rel="alternate">
     if current_mode == 1:
         feed_url = prefix + "/feed?yt"
@@ -966,6 +997,7 @@ def index():
         category_counts=category_counts,
         post_categories=post_categories,
         feed_url=feed_url,
+        gh_meta=gh_meta,
     )
 
 
