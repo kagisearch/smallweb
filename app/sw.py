@@ -47,7 +47,7 @@ CATEGORIES = OrderedDict(
             (
                 "AI",
                 "LLMs · agents · prompts · AI ethics · AI safety",
-                "\U0001f916",
+                "✦",
             ),
         ),
         (
@@ -171,7 +171,7 @@ CATEGORIES = OrderedDict(
             (
                 "Economy",
                 "Markets · finance · labor economics · trade · analysis",
-                "\U0001fa99",
+                "🎲",
             ),
         ),
         (
@@ -187,7 +187,7 @@ CATEGORIES = OrderedDict(
             (
                 "Life & Personal",
                 "Diary · weeknotes · parenting · pets · link roundups",
-                "\U0001f49b",
+                "☀️",
             ),
         ),
         (
