@@ -46,7 +46,7 @@ CATEGORIES = OrderedDict(
             "ai",
             (
                 "AI",
-                "LLMs · machine learning · AI tools · ethics · agents",
+                "LLMs · agents · prompts · AI ethics · AI safety",
                 "\U0001f916",
             ),
         ),
@@ -54,7 +54,7 @@ CATEGORIES = OrderedDict(
             "programming",
             (
                 "Programming",
-                "Coding · languages · frameworks · devtools · APIs · databases",
+                "Code · frameworks · devtools · APIs · tutorials · open source",
                 "\U0001f4bb",
             ),
         ),
@@ -62,15 +62,15 @@ CATEGORIES = OrderedDict(
             "tech",
             (
                 "Technology",
-                "Tech news · apps · networking · social media",
+                "Tech news · gadgets · apps · platforms · social media",
                 "\U0001f4f1",
             ),
         ),
         (
             "infra",
             (
-                "Infrastructure & Security",
-                "Servers · deployment · cloud · self-hosting · monitoring",
+                "Sysadmin & Security",
+                "Servers · cloud · containers · networking · infosec · privacy",
                 "\u2601\ufe0f",
             ),
         ),
@@ -78,13 +78,13 @@ CATEGORIES = OrderedDict(
             "web",
             (
                 "Web & Internet",
-                "IndieWeb · fediverse · RSS · blogging · web standards",
+                "The open web · RSS · blogging · IndieWeb · web standards",
                 "\U0001f310",
             ),
         ),
         (
             "hardware",
-            ("Hardware", "Electronics · PCB design · gadgets · home lab", "\U0001f50c"),
+            ("Hardware", "Electronics · home lab · PCB design · keyboards · audio gear", "\U0001f50c"),
         ),
         (
             "diy",
@@ -106,7 +106,7 @@ CATEGORIES = OrderedDict(
             "science",
             (
                 "Science",
-                "Physics · biology · climate · math · space · medicine",
+                "Physics · biology · math · space · climate · research",
                 "\U0001f52c",
             ),
         ),
@@ -114,7 +114,7 @@ CATEGORIES = OrderedDict(
             "humanities",
             (
                 "Humanities",
-                "History · philosophy · language · linguistics · literature",
+                "History · philosophy · linguistics · archaeology · classics",
                 "\U0001f4da",
             ),
         ),
@@ -122,7 +122,7 @@ CATEGORIES = OrderedDict(
             "essays",
             (
                 "Essays",
-                "Long-form pieces · original arguments · in-depth analysis",
+                "Long-form reflective writing that defies topic categories",
                 "\U0001f4dd",
             ),
         ),
@@ -130,7 +130,7 @@ CATEGORIES = OrderedDict(
             "art",
             (
                 "Art & Design",
-                "Visual art · illustration · architecture · graphic design",
+                "Visual art · illustration · typography · creative writing",
                 "\U0001f3a8",
             ),
         ),
@@ -138,7 +138,7 @@ CATEGORIES = OrderedDict(
             "photography",
             (
                 "Photography",
-                "Cameras · photo essays · visual storytelling",
+                "Photographic craft · technique · gear · film · photo essays",
                 "\U0001f4f7",
             ),
         ),
@@ -146,7 +146,7 @@ CATEGORIES = OrderedDict(
             "culture",
             (
                 "Pop Culture",
-                "Film · TV · music · books · fandom · comics",
+                "Film · TV · music · books · comics · tabletop RPGs",
                 "\U0001f37f",
             ),
         ),
@@ -154,7 +154,7 @@ CATEGORIES = OrderedDict(
             "gaming",
             (
                 "Gaming",
-                "Video games · tabletop RPGs · game dev · interactive fiction",
+                "Video games · game dev · modding · interactive fiction",
                 "\U0001f3ae",
             ),
         ),
@@ -162,7 +162,7 @@ CATEGORIES = OrderedDict(
             "politics",
             (
                 "Politics",
-                "Government · policy · elections · law · political commentary",
+                "Government · legislation · international relations",
                 "\U0001f3db\ufe0f",
             ),
         ),
@@ -170,7 +170,7 @@ CATEGORIES = OrderedDict(
             "economy",
             (
                 "Economy",
-                "Economics · finance · markets · business · labor · trade",
+                "Markets · finance · labor economics · trade · analysis",
                 "\U0001f4c8",
             ),
         ),
@@ -178,7 +178,7 @@ CATEGORIES = OrderedDict(
             "society",
             (
                 "Society",
-                "Social issues · civil rights · current events · community",
+                "Discrimination · civil rights · social structure",
                 "\U0001f465",
             ),
         ),
@@ -186,7 +186,7 @@ CATEGORIES = OrderedDict(
             "life",
             (
                 "Life & Personal",
-                "Personal updates  · diary · parenting · pets",
+                "Diary · weeknotes · parenting · pets · link roundups",
                 "\U0001f49b",
             ),
         ),
@@ -202,7 +202,7 @@ CATEGORIES = OrderedDict(
             "travel",
             (
                 "Travel & Outdoors",
-                "Trip reports · hiking · nature · adventure · road trips",
+                "Trip reports · hiking · nature · birdwatching · gardening",
                 "\U0001f333",
             ),
         ),
@@ -210,7 +210,7 @@ CATEGORIES = OrderedDict(
             "health",
             (
                 "Health & Fitness",
-                "Fitness · exercise · healthspan · nutrition · longevity",
+                "Fitness · nutrition · mental health · longevity · running",
                 "\U0001f3CB",
             ),
         ),
