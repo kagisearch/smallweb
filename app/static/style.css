@@ -927,6 +927,11 @@ svg {
   display: inline-block;
 }
 
+.pixel-heart {
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
 .emoji-badge {
   display: flex;
   align-items: center;

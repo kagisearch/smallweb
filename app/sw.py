@@ -71,7 +71,7 @@ CATEGORIES = OrderedDict(
             (
                 "Sysadmin & Security",
                 "Servers · cloud · containers · networking · infosec · privacy",
-                "\u2601\ufe0f",
+                "\U0001f6e1\ufe0f",
             ),
         ),
         (
@@ -79,7 +79,7 @@ CATEGORIES = OrderedDict(
             (
                 "Web & Internet",
                 "The open web · RSS · blogging · IndieWeb · web standards",
-                "\U0001f310",
+                "\U0001f578\ufe0f",
             ),
         ),
         (
@@ -115,7 +115,7 @@ CATEGORIES = OrderedDict(
             (
                 "Humanities",
                 "History · philosophy · linguistics · archaeology · classics",
-                "\U0001f4da",
+                "\U0001f3fa",
             ),
         ),
         (
@@ -123,7 +123,7 @@ CATEGORIES = OrderedDict(
             (
                 "Essays",
                 "Long-form reflective writing that defies topic categories",
-                "\U0001f4dd",
+                "\U0001fab6",
             ),
         ),
         (
@@ -139,7 +139,7 @@ CATEGORIES = OrderedDict(
             (
                 "Photography",
                 "Photographic craft · technique · gear · film · photo essays",
-                "\U0001f4f7",
+                "\U0001f39e\ufe0f",
             ),
         ),
         (
@@ -171,7 +171,7 @@ CATEGORIES = OrderedDict(
             (
                 "Economy",
                 "Markets · finance · labor economics · trade · analysis",
-                "\U0001f4c8",
+                "\U0001fa99",
             ),
         ),
         (
@@ -179,7 +179,7 @@ CATEGORIES = OrderedDict(
             (
                 "Society",
                 "Discrimination · civil rights · social structure",
-                "\U0001f465",
+                "\u2696\ufe0f",
             ),
         ),
         (
@@ -195,7 +195,7 @@ CATEGORIES = OrderedDict(
             (
                 "Food & Drink",
                 "Recipes · cooking · restaurants · coffee · wine · baking",
-                "\U0001f372",
+                "\u2615",
             ),
         ),
         (
@@ -203,7 +203,7 @@ CATEGORIES = OrderedDict(
             (
                 "Travel & Outdoors",
                 "Trip reports · hiking · nature · birdwatching · gardening",
-                "\U0001f333",
+                "\U0001f97e",
             ),
         ),
         (
