@@ -858,6 +858,14 @@ def index():
     next_host = None
     if cache:
         next_candidates = [e for e in cache if e.link != url] or cache
+        # 40% chance to stay in the same category as the current post
+        if post_cats and random.random() < 0.4:
+            same_cat = [
+                e for e in next_candidates
+                if any(c in e.categories for c in post_cats)
+            ]
+            if same_cat:
+                next_candidates = same_cat
         next_entry = random.choice(next_candidates)
         next_params = request.args.to_dict(flat=True)
         next_params["url"] = next_entry.link
