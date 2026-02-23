@@ -47,7 +47,7 @@ CATEGORIES = OrderedDict(
             (
                 "AI",
                 "LLMs · agents · prompts · AI ethics · AI safety",
-                "✦",
+                "✨",
             ),
         ),
         (
@@ -55,7 +55,7 @@ CATEGORIES = OrderedDict(
             (
                 "Programming",
                 "Code · frameworks · devtools · APIs · tutorials · open source",
-                "\U0001f4bb",
+                "🧩",
             ),
         ),
         (
@@ -84,7 +84,7 @@ CATEGORIES = OrderedDict(
         ),
         (
             "hardware",
-            ("Hardware", "Electronics · home lab · PCB design · keyboards · audio gear", "\U0001f50c"),
+            ("Hardware", "Electronics · home lab · PCB design · keyboards · audio gear", "🎛️"),
         ),
         (
             "diy",
@@ -131,7 +131,7 @@ CATEGORIES = OrderedDict(
             (
                 "Art & Design",
                 "Visual art · illustration · typography · creative writing",
-                "\U0001f3a8",
+                "🌊",
             ),
         ),
         (
@@ -146,7 +146,7 @@ CATEGORIES = OrderedDict(
             "culture",
             (
                 "Pop Culture",
-                "Film · TV · music · books · comics · tabletop RPGs",
+                "Film · TV · music · books · comics",
                 "\U0001f37f",
             ),
         ),
@@ -155,7 +155,7 @@ CATEGORIES = OrderedDict(
             (
                 "Gaming",
                 "Video games · game dev · modding · interactive fiction",
-                "\U0001f3ae",
+                "🕹️",
             ),
         ),
         (
@@ -163,7 +163,7 @@ CATEGORIES = OrderedDict(
             (
                 "Politics",
                 "Government · legislation · international relations",
-                "\U0001f3db\ufe0f",
+                "🎤",
             ),
         ),
         (
@@ -195,7 +195,7 @@ CATEGORIES = OrderedDict(
             (
                 "Food & Drink",
                 "Recipes · cooking · restaurants · coffee · wine · baking",
-                "\u2615",
+                "🧑‍🍳",
             ),
         ),
         (
@@ -203,15 +203,15 @@ CATEGORIES = OrderedDict(
             (
                 "Travel & Outdoors",
                 "Trip reports · hiking · nature · birdwatching · gardening",
-                "\U0001f97e",
+                "✈️",
             ),
         ),
         (
             "health",
             (
                 "Health & Fitness",
-                "Fitness · nutrition · mental health · longevity · running",
-                "\U0001f3CB",
+                "Fitness · nutrition · mental health · longevity",
+                "🏃",
             ),
         ),
         (
