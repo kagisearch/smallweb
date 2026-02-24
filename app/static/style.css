@@ -1481,3 +1481,91 @@ svg {
     padding: 6px 12px;
   }
 }
+
+
+/* ── Keyboard shortcuts dialogue ── */
+.shortcuts-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+}
+
+.shortcuts-backdrop.open {
+  display: block;
+}
+
+.shortcuts-dialogue {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 2px solid var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
+  border-radius: 0;
+  padding: 20px;
+  z-index: 1101;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  box-shadow: none;
+}
+
+.shortcuts-dialogue.open {
+  display: block;
+}
+
+.shortcuts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.shortcuts-close {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.shortcuts-close:hover {
+  color: var(--color-danger);
+}
+
+.shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.shortcuts-table td {
+  padding: 6px 0;
+  font-size: 16px;
+}
+
+.shortcuts-table td:first-child {
+  width: 50px;
+}
+
+.shortcuts-table kbd {
+  display: inline-block;
+  background: var(--color-subtle);
+  border: 2px solid var(--color-bg);
+  border-right-color: var(--color-text);
+  border-bottom-color: var(--color-text);
+  border-radius: 0;
+  padding: 2px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  min-width: 20px;
+  text-align: center;
+}
