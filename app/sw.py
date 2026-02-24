@@ -107,7 +107,7 @@ CATEGORIES = OrderedDict(
             (
                 "Science",
                 "Physics · biology · math · space · climate · research",
-                "\U0001f52c",
+                "⚛️",
             ),
         ),
         (
@@ -139,7 +139,7 @@ CATEGORIES = OrderedDict(
             (
                 "Photography",
                 "Photographic craft · technique · gear · film · photo essays",
-                "\U0001f39e\ufe0f",
+                "🌄",
             ),
         ),
         (
@@ -147,7 +147,7 @@ CATEGORIES = OrderedDict(
             (
                 "Pop Culture",
                 "Film · TV · music · books · comics",
-                "\U0001f37f",
+                "🎭",
             ),
         ),
         (
@@ -179,7 +179,7 @@ CATEGORIES = OrderedDict(
             (
                 "Society",
                 "Discrimination · civil rights · social structure",
-                "\u2696\ufe0f",
+                "👥",
             ),
         ),
         (
@@ -858,8 +858,8 @@ def index():
     next_host = None
     if cache:
         next_candidates = [e for e in cache if e.link != url] or cache
-        # 40% chance to stay in the same category as the current post
-        if post_cats and random.random() < 0.4:
+        # 60% chance to stay in the same category when browsing all
+        if not current_cat and post_cats and random.random() < 0.6:
             same_cat = [
                 e for e in next_candidates
                 if any(c in e.categories for c in post_cats)
