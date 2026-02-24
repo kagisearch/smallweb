@@ -81,6 +81,7 @@ async function isPostSaved(url) {
 // ═══════════════════════════════════════
 
 const CATEGORY_SCHEME = 'https://kagi.com/smallweb/categories';
+const CATEGORY_REMAP = { sysadmin: 'infra', security: 'infra' };
 
 function parseFeed(text) {
   const entries = [];
@@ -102,7 +103,7 @@ function parseFeed(text) {
       const scheme = tag.match(/scheme="([^"]*)"/)?.[1];
       const term = tag.match(/term="([^"]*)"/)?.[1];
       if (scheme === CATEGORY_SCHEME && term) {
-        categories.push(term);
+        categories.push(CATEGORY_REMAP[term] || term);
       }
     }
 
@@ -184,9 +185,6 @@ setInterval(() => {
 
 function filterByCategory(entries, category) {
   if (!category) return entries;
-  if (category === 'uncategorized') {
-    return entries.filter(e => !e.categories || e.categories.length === 0 || e.categories.includes('uncategorized'));
-  }
   return entries.filter(e => e.categories && e.categories.includes(category));
 }
 
@@ -428,9 +426,7 @@ async function handleMessage(message) {
     await ensureFeedLoaded('blogs');
     const counts = {};
     for (const entry of cache.blogs.entries) {
-      if (!entry.categories || entry.categories.length === 0) {
-        counts.uncategorized = (counts.uncategorized || 0) + 1;
-      } else {
+      if (entry.categories) {
         for (const cat of entry.categories) {
           counts[cat] = (counts[cat] || 0) + 1;
         }

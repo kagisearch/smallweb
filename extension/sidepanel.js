@@ -17,10 +17,11 @@ const CATEGORIES = {
   ai:            'AI',
   programming:   'Programming',
   tech:          'Technology',
-  sysadmin:      'Sysadmin',
+  infra:         'Sysadmin & Security',
+  web:           'Web & Internet',
   hardware:      'Hardware',
+  diy:           'DIY & Making',
   retro:         'Retro',
-  security:      'Security',
   science:       'Science',
   humanities:    'Humanities',
   essays:        'Essays',
@@ -31,18 +32,16 @@ const CATEGORIES = {
   politics:      'Politics',
   economy:       'Economy',
   society:       'Society',
-  daily:         'Daily Life',
   life:          'Life & Personal',
   food:          'Food & Drink',
-  nature:        'Nature & Outdoors',
-  uncategorized: 'Uncategorized'
+  travel:        'Travel & Outdoors',
+  health:        'Health & Fitness'
 };
 
 const CATEGORY_GROUPS = [
-  { name: 'Tech & Science',     slugs: ['ai', 'programming', 'tech', 'sysadmin', 'hardware', 'retro', 'security', 'science'] },
-  { name: 'Culture & Creative', slugs: ['humanities', 'essays', 'art', 'photography', 'culture', 'gaming'] },
-  { name: 'Life & World',       slugs: ['politics', 'economy', 'society', 'daily', 'life', 'food', 'nature'] },
-  { name: 'Other',              slugs: ['uncategorized'] }
+  { name: 'Tech & Science',     slugs: ['ai', 'science', 'programming', 'diy', 'tech', 'hardware', 'infra', 'web'] },
+  { name: 'Culture & Creative', slugs: ['health', 'art', 'essays', 'humanities', 'retro', 'photography', 'culture', 'gaming'] },
+  { name: 'Life & World',       slugs: ['society', 'life', 'food', 'travel', 'politics', 'economy'] }
 ];
 
 // DOM Elements
