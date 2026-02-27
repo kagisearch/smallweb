@@ -21,7 +21,7 @@
   {% endif %}
   <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  {% if current_mode != 2 and next_link %}
+  {% if next_link %}
   <link rel="prefetch"  href="{{ next_link }}">
   <link rel="prerender" href="{{ next_link }}">
   {% if next_doc_url %}
@@ -35,10 +35,6 @@
   <script defer src="{{ url_for('static', filename='header-dark-mode.js') }}"></script>
   <script defer src="{{ url_for('static', filename='header-dropdowns.js') }}"></script>
   <script defer src="{{ url_for('static', filename='header-keyboard-shortcuts.js') }}"></script>
-  {% if current_mode == 2 %}
-  <script defer src="{{ url_for('static', filename='smallweb-queue.js') }}"></script>
-  <script defer src="{{ url_for('static', filename='header-appreciated-next.js') }}"></script>
-  {% endif %}
 </head>
 
 <body>
@@ -62,17 +58,7 @@
     {%- set mode_button_label = mode_entries[mode_ns.index][0] if mode_ns.index >= 0 else "Mode" -%}
     <div class="left">
       {% if not no_results %}
-      {% if current_mode == 2 %}
-      <a href="{{ next_link }}" class="stumble-link btn next-button" id="appreciated-next-link" rel="prefetch" title="Show next appreciated post"
-         data-full-list-url="{{ url_for('appreciated_json') }}"
-         data-enable-periodic-reset-queue="true"
-         data-periodic-reset-queue-minutes="720"
-         data-check-on-exhaustion="true"
-         data-persist-key="kagi_smallweb_queue_v2"
-         data-enable-debug="false"
-         data-current-url="{{ url }}"
-         data-fallback-url="{{ prefix }}?app"><span id="appreciated-next-text">Next<span class="next-btn-suffix">Post</span></span></a>
-      {% elif next_link %}
+      {% if next_link %}
       <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix">Post</span></a>
       {% endif %}
 

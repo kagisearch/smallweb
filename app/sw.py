@@ -1,5 +1,4 @@
 import atexit
-import gzip
 import hashlib
 import json
 import logging
@@ -276,11 +275,6 @@ CATEGORY_REMAP = {"sysadmin": "infra", "security": "infra"}
 appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
 opml_cache = None  # will hold generated OPML xml
 
-# Version tracking for appreciated feed (client-side random selection support)
-appreciated_version = None  # sha1 hash of sorted URLs
-appreciated_json_cache = None  # cached JSON response for /appreciated.json
-appreciated_json_gzip = None  # gzipped version of JSON response
-
 # NOTE(z64): List of emotes that can be used for favoriting.
 # Used to build the list in the template, and perform validation on the server.
 favorite_emoji_list = [
@@ -300,60 +294,39 @@ favorite_emoji_list = [
     "🔥",
 ]
 
-
-def compute_appreciated_version(urls_list):
-    """Compute sha1 hash of sorted URLs for version tracking.
-
-    The version changes whenever the appreciated feed contents change
-    (add/remove URLs, or if the canonical ordering changes).
-    """
-    sorted_urls = sorted(entry.link for entry in urls_list)
-    content = "\n".join(sorted_urls).encode("utf-8")
-    return hashlib.sha1(content).hexdigest()[:16]
+# --- Backend seen-cookie dedup ------------------------------------------------
+SEEN_COOKIE = "seen"
+SEEN_MAX = 100
 
 
-def generate_appreciated_json():
-    """Generate and cache JSON representation of appreciated feed.
+def _hash_url(url):
+    """8-char hex hash for compact cookie storage."""
+    return hashlib.md5(url.encode()).hexdigest()[:8]
 
-    Response format:
-    {
-        "version": "abc123...",  # sha1 hash of sorted URLs
-        "urls": [
-            {"id": "u1", "url": "https://...", "title": "...", "author": "..."},
-            ...
-        ]
-    }
-    """
-    global appreciated_version, appreciated_json_cache, appreciated_json_gzip
 
-    # Compute version from current appreciated list
-    appreciated_version = compute_appreciated_version(urls_app_cache)
+def _get_seen(req):
+    """Read seen hashes from cookie as a set."""
+    raw = req.cookies.get(SEEN_COOKIE, "")
+    return set(raw.split(",")) if raw else set()
 
-    # Build the urls array with minimal data per item
-    urls_array = []
-    for entry in urls_app_cache:
-        # Generate stable ID from URL hash (consistent across restarts)
-        item_id = hashlib.sha1(entry.link.encode("utf-8")).hexdigest()[:12]
-        urls_array.append(
-            {
-                "id": item_id,
-                "url": entry.link,
-                "title": entry.title or "",
-                "author": entry.author or "",
-            }
-        )
 
-    # Build response object
-    response_data = {
-        "version": appreciated_version,
-        "urls": urls_array,
-    }
+def _pick_unseen(cache, seen):
+    """Pick random entry not in seen set. Falls back to random.choice if all seen."""
+    candidates = [e for e in cache if _hash_url(e.link) not in seen]
+    if not candidates:
+        candidates = cache
+    return random.choice(candidates)
 
-    # Cache JSON and gzipped version
-    appreciated_json_cache = json.dumps(response_data, separators=(",", ":"))
-    appreciated_json_gzip = gzip.compress(appreciated_json_cache.encode("utf-8"))
 
-    return appreciated_json_cache
+def _set_seen_cookie(response, seen, new_url):
+    """Append new_url hash to seen cookie, keeping last SEEN_MAX entries."""
+    h = _hash_url(new_url)
+    seen_list = [x for x in seen if x and x != h]
+    seen_list.append(h)
+    if len(seen_list) > SEEN_MAX:
+        seen_list = seen_list[-SEEN_MAX:]
+    response.set_cookie(SEEN_COOKIE, ",".join(seen_list), max_age=86400, samesite="Lax")
+    return response
 
 
 def generate_appreciated_feed():
@@ -371,9 +344,6 @@ def generate_appreciated_feed():
             updated=entry.updated,
             author=entry.author,
         )
-
-    # Also regenerate JSON cache when feed changes
-    generate_appreciated_json()
 
 
 def _find_feed_file(name):
@@ -834,9 +804,11 @@ def index():
             (None, None, None, []),
         )
 
+    seen = _get_seen(request)
+
     if title is None:
         if cache:
-            chosen = random.choice(cache)
+            chosen = _pick_unseen(cache, seen)
             url, title, author, post_cats = (
                 chosen.link,
                 chosen.title,
@@ -857,7 +829,12 @@ def index():
     next_doc_url = None
     next_host = None
     if cache:
-        next_candidates = [e for e in cache if e.link != url] or cache
+        # Exclude current URL from next candidates, then pick unseen
+        next_pool = [e for e in cache if e.link != url] or cache
+        seen_plus = seen | {_hash_url(url)}
+        next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
+        if not next_candidates:
+            next_candidates = next_pool
         # 60% chance to stay in the same category when browsing all
         if not current_cat and post_cats and random.random() < 0.6:
             same_cat = [
@@ -972,41 +949,44 @@ def index():
         if emoji in favorite_emoji_list:
             reactions_list.append((emoji, count))
 
-    return render_template(
-        "index.html",
-        url=url,
-        short_url=short_url,
-        query_string=query_string,
-        title=title,
-        author=author,
-        domain=domain,
-        prefix=prefix + "/",
-        videoid=videoid,
-        current_mode=current_mode,
-        notes_count=notes_count,
-        notes_list=notes_list,
-        flag_content_count=flag_content_count,
-        search_query=search_query,
-        all_count=all_count,
-        appreciated_count=appreciated_count,
-        videos_count=videos_count,
-        code_count=code_count,
-        comics_count=comics_count,
-        next_link=next_link,
-        next_doc_url=next_doc_url,
-        next_host=next_host,
-        reactions_list=reactions_list,
-        favorites_total=favorites_total,
-        favorite_emoji_list=favorite_emoji_list,
-        reactions_dict=reactions_dict,
-        categories=CATEGORIES,
-        category_groups=CATEGORY_GROUPS,
-        current_cat=current_cat,
-        category_counts=category_counts,
-        post_categories=post_categories,
-        feed_url=feed_url,
-        gh_meta=gh_meta,
+    resp = make_response(
+        render_template(
+            "index.html",
+            url=url,
+            short_url=short_url,
+            query_string=query_string,
+            title=title,
+            author=author,
+            domain=domain,
+            prefix=prefix + "/",
+            videoid=videoid,
+            current_mode=current_mode,
+            notes_count=notes_count,
+            notes_list=notes_list,
+            flag_content_count=flag_content_count,
+            search_query=search_query,
+            all_count=all_count,
+            appreciated_count=appreciated_count,
+            videos_count=videos_count,
+            code_count=code_count,
+            comics_count=comics_count,
+            next_link=next_link,
+            next_doc_url=next_doc_url,
+            next_host=next_host,
+            reactions_list=reactions_list,
+            favorites_total=favorites_total,
+            favorite_emoji_list=favorite_emoji_list,
+            reactions_dict=reactions_dict,
+            categories=CATEGORIES,
+            category_groups=CATEGORY_GROUPS,
+            current_cat=current_cat,
+            category_counts=category_counts,
+            post_categories=post_categories,
+            feed_url=feed_url,
+            gh_meta=gh_meta,
+        )
     )
+    return _set_seen_cookie(resp, seen, url)
 
 
 @app.post("/favorite")
@@ -1186,53 +1166,6 @@ def appreciated():
     return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
 
 
-@app.route("/smallweb/appreciated.json")
-def appreciated_json():
-    """Full appreciated feed as JSON for client-side random selection.
-
-    Returns the complete list of appreciated URLs with version info.
-    Supports ETag for conditional requests (304 Not Modified).
-
-    Response:
-    {
-        "version": "abc123...",
-        "urls": [
-            {"id": "u1", "url": "https://...", "title": "...", "author": "..."},
-            ...
-        ]
-    }
-    """
-    global appreciated_version, appreciated_json_cache, appreciated_json_gzip
-
-    # Ensure cache exists
-    if appreciated_json_cache is None:
-        generate_appreciated_json()
-
-    # Check for conditional request (ETag)
-    etag = f'"{appreciated_version}"'
-    if_none_match = request.headers.get("If-None-Match")
-    if if_none_match and if_none_match == etag:
-        response = make_response("", 304)
-        response.headers["ETag"] = etag
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        return response
-
-    # Check if client accepts gzip
-    accept_encoding = request.headers.get("Accept-Encoding", "")
-    if "gzip" in accept_encoding and appreciated_json_gzip:
-        response = make_response(appreciated_json_gzip)
-        response.headers["Content-Encoding"] = "gzip"
-    else:
-        response = make_response(appreciated_json_cache)
-
-    response.headers["Content-Type"] = "application/json"
-    response.headers["ETag"] = etag
-    response.headers["Cache-Control"] = "public, max-age=300"  # cache for 5 min
-    response.headers["Access-Control-Allow-Origin"] = "*"  # CORS
-    response.headers["Access-Control-Expose-Headers"] = "ETag"
-    return response
-
-
 @app.route("/api/random")
 @app.route(f"{prefix}/api/random")
 def api_random():
@@ -1258,7 +1191,8 @@ def api_random():
     if not cache:
         return jsonify({"error": "no posts available"}), 404
 
-    entry = random.choice(cache)
+    seen = _get_seen(request)
+    entry = _pick_unseen(cache, seen)
     domain = get_registered_domain(entry.link)
     domain = re.sub(r"^(www\.)?", "", domain)
 
@@ -1273,7 +1207,7 @@ def api_random():
         ],
     })
     response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+    return _set_seen_cookie(response, seen, entry.link)
 
 
 @app.route("/opml")
