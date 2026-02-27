@@ -1028,6 +1028,9 @@ def favorite():
         except OSError as e:
             logger.error("Cannot write favorites file: %s", e)
 
+        next_url = request.form.get("next")
+        if next_url:
+            return redirect(next_url)
         query_string = _build_redirect_params()
         redirect_path = f"{prefix}/?url={url}"
         if query_string:
