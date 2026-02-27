@@ -22,11 +22,17 @@
   <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if next_link %}
-  <link rel="prefetch"  href="{{ next_link }}">
-  <link rel="prerender" href="{{ next_link }}">
+  <script type="speculationrules">
+  {
+    "prerender": [{ "urls": ["{{ next_link }}"], "eagerness": "eager" }],
+    "prefetch":  [{ "urls": ["{{ next_doc_url }}"], "eagerness": "eager", "referrer_policy": "no-referrer" }]
+  }
+  </script>
+  <link rel="prefetch" href="{{ next_link }}">
   {% if next_doc_url %}
-  <link rel="preconnect" href="{{ next_host }}"  crossorigin>
-  <link rel="prefetch"  href="{{ next_doc_url }}" as="document" crossorigin>
+  <link rel="preconnect" href="{{ next_host }}" crossorigin>
+  <link rel="dns-prefetch" href="{{ next_host }}">
+  <link rel="prefetch" href="{{ next_doc_url }}" as="document" crossorigin>
   {% endif %}
   {% endif %}
   {% if current_mode == 0 %}
@@ -403,10 +409,6 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
     </div>
   {% endif %}
   </main>
-
-  {% if next_doc_url %}
-  <iframe src="{{ next_doc_url }}" loading="lazy" sandbox referrerpolicy="no-referrer" class="prefetch-iframe"></iframe>
-  {% endif %}
 
 </body>
 </html>

@@ -908,13 +908,6 @@ svg {
   white-space: nowrap;
 }
 
-.prefetch-iframe {
-  display: none;
-  width: 0;
-  height: 0;
-  border: 0;
-  visibility: hidden;
-}
 
 /* ── Emoji reactions ── */
 #reactions {
