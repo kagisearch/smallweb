@@ -716,7 +716,10 @@ def index():
     title = None
     post_cats = []
     current_mode = 0
-    if "yt" in request.args:
+    if "recent" in request.args:
+        cache = sorted(urls_cache, key=lambda e: e.updated, reverse=True)
+        current_mode = 6
+    elif "yt" in request.args:
         cache = urls_yt_cache
         current_mode = 1
     elif "app" in request.args:
@@ -808,7 +811,11 @@ def index():
 
     if title is None:
         if cache:
-            chosen = _pick_unseen(cache, seen)
+            if current_mode == 6:
+                # Recent mode: pick the first (newest) entry
+                chosen = cache[0]
+            else:
+                chosen = _pick_unseen(cache, seen)
             url, title, author, post_cats = (
                 chosen.link,
                 chosen.title,
@@ -829,27 +836,34 @@ def index():
     next_doc_url = None
     next_host = None
     if cache:
-        # Exclude current URL from next candidates, then pick unseen
-        next_pool = [e for e in cache if e.link != url] or cache
-        seen_plus = seen | {_hash_url(url)}
-        next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
-        if not next_candidates:
-            next_candidates = next_pool
-        # 60% chance to stay in the same category when browsing all
-        if not current_cat and post_cats and random.random() < 0.6:
-            same_cat = [
-                e for e in next_candidates
-                if any(c in e.categories for c in post_cats)
-            ]
-            if same_cat:
-                next_candidates = same_cat
-        next_entry = random.choice(next_candidates)
-        next_params = request.args.to_dict(flat=True)
-        next_params["url"] = next_entry.link
-        next_link = prefix + "/?" + urlencode(next_params)
-        next_doc_url = next_entry.link
-        host_parts = urlparse(next_doc_url)
-        next_host = f"{host_parts.scheme}://{host_parts.netloc}"
+        if current_mode == 6:
+            # Recent mode: next is the following entry in chronological order
+            cur_idx = next((i for i, e in enumerate(cache) if e.link == url), -1)
+            next_entry = cache[cur_idx + 1] if cur_idx >= 0 and cur_idx + 1 < len(cache) else None
+        else:
+            # Exclude current URL from next candidates, then pick unseen
+            next_pool = [e for e in cache if e.link != url] or cache
+            seen_plus = seen | {_hash_url(url)}
+            next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
+            if not next_candidates:
+                next_candidates = next_pool
+            # 60% chance to stay in the same category when browsing all
+            if not current_cat and post_cats and random.random() < 0.6:
+                same_cat = [
+                    e for e in next_candidates
+                    if any(c in e.categories for c in post_cats)
+                ]
+                if same_cat:
+                    next_candidates = same_cat
+            next_entry = random.choice(next_candidates)
+
+        if next_entry:
+            next_params = request.args.to_dict(flat=True)
+            next_params["url"] = next_entry.link
+            next_link = prefix + "/?" + urlencode(next_params)
+            next_doc_url = next_entry.link
+            host_parts = urlparse(next_doc_url)
+            next_host = f"{host_parts.scheme}://{host_parts.netloc}"
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
@@ -923,7 +937,9 @@ def index():
                 pass
 
     # Build feed URL for <link rel="alternate">
-    if current_mode == 1:
+    if current_mode == 6:
+        feed_url = prefix + "/feed?recent"
+    elif current_mode == 1:
         feed_url = prefix + "/feed?yt"
     elif current_mode == 2:
         feed_url = prefix + "/feed?app"
@@ -1121,7 +1137,11 @@ def flag_content():
 @app.route(f"{prefix}/feed")
 def feed():
     """Per-mode Atom feed. Accepts the same query params as the main route."""
-    if "yt" in request.args:
+    if "recent" in request.args:
+        cache = sorted(urls_cache, key=lambda e: e.updated, reverse=True)
+        title = "Kagi Small Web - Recent"
+        feed_url = "https://kagi.com/smallweb/feed?recent"
+    elif "yt" in request.args:
         cache, title = urls_yt_cache, "Kagi Small Web - Videos"
         feed_url = "https://kagi.com/smallweb/feed?yt"
     elif "app" in request.args:
