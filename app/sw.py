@@ -2,6 +2,7 @@ import atexit
 import hashlib
 import json
 import logging
+import math
 import os
 import random
 import re
@@ -37,6 +38,8 @@ class FeedEntry(NamedTuple):
     updated: datetime
     categories: list
 
+
+API_BASE = "https://kagi.com/api/v1/smallweb/feed"
 
 # Category definitions — slug → label · description · emoji
 CATEGORIES = OrderedDict(
@@ -329,6 +332,63 @@ def _set_seen_cookie(response, seen, new_url):
     return response
 
 
+# --- Embeddings for "More like this" ----------------------------------------
+embeddings_cache = {}  # url → list[float]
+
+
+def update_embeddings():
+    """Fetch pre-computed embeddings from the API."""
+    global embeddings_cache
+    try:
+        resp = requests.get(
+            API_BASE + "/embeddings", timeout=30
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        emb = data.get("embeddings", {})
+        if emb:
+            embeddings_cache = emb
+            logger.info("Loaded %d embeddings", len(emb))
+    except Exception as e:
+        logger.error("Failed to fetch embeddings: %s", e)
+
+
+def _cosine_similarity(a, b):
+    """Cosine similarity between two equal-length vectors."""
+    dot = sum(x * y for x, y in zip(a, b))
+    norm_a = math.sqrt(sum(x * x for x in a))
+    norm_b = math.sqrt(sum(x * x for x in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
+def find_similar(url, seen, cache):
+    """Find the most similar unseen entry to `url` using cached embeddings."""
+    target = embeddings_cache.get(url)
+    if not target:
+        return None
+
+    scored = []
+    for entry in cache:
+        if entry.link == url:
+            continue
+        vec = embeddings_cache.get(entry.link)
+        if not vec:
+            continue
+        score = _cosine_similarity(target, vec)
+        is_seen = _hash_url(entry.link) in seen
+        scored.append((score, is_seen, entry))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    for score, is_seen, entry in scored:
+        if not is_seen:
+            return entry
+
+    return None
+
+
 def generate_appreciated_feed():
     """Generate Atom feed for appreciated posts"""
     global appreciated_feed
@@ -551,7 +611,7 @@ def update_all():
         favorites_dict, \
         appreciated_feed
 
-    url = "https://kagi.com/api/v1/smallweb/feed/"
+    url = API_BASE + "/"
 
     try:
         logger.info("begin update_all")
@@ -1000,9 +1060,34 @@ def index():
             post_categories=post_categories,
             feed_url=feed_url,
             gh_meta=gh_meta,
+            has_embedding=(bool(embeddings_cache) and url in embeddings_cache),
         )
     )
     return _set_seen_cookie(resp, seen, url)
+
+
+@app.route("/similar")
+@app.route(f"{prefix}/similar")
+def similar():
+    url = request.args.get("url", "")
+    if not url or url not in embeddings_cache:
+        return redirect(prefix + "/")
+
+    # Use the same cache as mode 0 (websites)
+    seen = _get_seen(request)
+    result = find_similar(url, seen, urls_cache)
+
+    # Build redirect params preserving cat filter
+    params = {}
+    cat = request.args.get("cat")
+    if cat:
+        params["cat"] = cat
+
+    if result:
+        params["url"] = result.link
+    # If no similar found, redirect to random (no url param)
+
+    return redirect(prefix + "/?" + urlencode(params) if params else prefix + "/")
 
 
 @app.post("/favorite")
@@ -1043,6 +1128,17 @@ def favorite():
                 )
         except OSError as e:
             logger.error("Cannot write favorites file: %s", e)
+
+        # 30% chance: redirect to a similar post instead of the random next
+        if url in embeddings_cache and random.random() < 0.3:
+            seen = _get_seen(request)
+            sim = find_similar(url, seen, urls_cache)
+            if sim:
+                params = {"url": sim.link}
+                cat = request.form.get("cat") or request.args.get("cat")
+                if cat:
+                    params["cat"] = cat
+                return redirect(prefix + "/?" + urlencode(params))
 
         next_url = request.form.get("next")
         if next_url:
@@ -1270,6 +1366,7 @@ flagged_content_dict = _load_json(PATH_FLAGGED) or {}
 
 # get feeds
 update_all()
+update_embeddings()
 
 opml_cache = generate_opml_feed()
 
@@ -1277,6 +1374,7 @@ opml_cache = generate_opml_feed()
 scheduler = BackgroundScheduler()
 scheduler.start()
 scheduler.add_job(update_all, "interval", minutes=5)
+scheduler.add_job(update_embeddings, "interval", minutes=5)
 
 
 def save_all_data():

@@ -1079,6 +1079,60 @@ svg {
   border-left-color: var(--color-text);
 }
 
+.similar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-left: 50px;
+  background: var(--panel-light);
+  border: 2px solid var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
+  border-radius: 0;
+  color: var(--color-text);
+  font-size: var(--header-control-font-size);
+  padding: 0 8px;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  white-space: nowrap;
+  height: var(--header-control-height);
+  min-height: var(--header-control-height);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.similar-btn-icon {
+  display: none;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.similar-btn:focus-visible {
+  outline: none;
+  background: var(--color-accent-light);
+}
+
+.similar-btn:hover {
+  background: var(--color-accent-light);
+}
+
+.similar-btn.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.similar-btn:active {
+  border-top-color: var(--color-bg);
+  border-left-color: var(--color-bg);
+  border-right-color: var(--color-text);
+  border-bottom-color: var(--color-text);
+  transform: translate(1px, 1px);
+}
+
 .cat-inline-clear,
 .mode-inline-clear {
   align-items: center;
@@ -1350,19 +1404,22 @@ svg {
   }
 
   .mode-container > .dropdown-link,
-  .category-toggle {
+  .category-toggle,
+  .similar-btn {
     width: var(--header-control-height);
     min-width: var(--header-control-height);
     padding: 0;
   }
 
   .mode-toggle-label,
-  .category-toggle .category-toggle-label {
+  .category-toggle .category-toggle-label,
+  .similar-btn-label {
     display: none;
   }
 
   .mode-toggle-icon,
-  .category-toggle-icon {
+  .category-toggle-icon,
+  .similar-btn-icon {
     display: block;
   }
 }
@@ -1398,6 +1455,18 @@ svg {
     display: flex;
     flex: 0 0 auto;
     width: fit-content;
+  }
+
+  .similar-btn {
+    margin-left: 10px;
+  }
+
+  .similar-btn-label {
+    display: none;
+  }
+
+  .similar-btn-icon {
+    display: block;
   }
 
   .category-toggle {

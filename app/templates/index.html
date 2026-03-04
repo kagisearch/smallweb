@@ -146,6 +146,14 @@
         {% endif %}
         <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
       </form>
+      <a class="similar-btn{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Find a similar post" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>
+        <svg class="similar-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="M11 8v6"></path>
+          <path d="M8 11h6"></path>
+        </svg>
+        <span class="similar-btn-label">More like this</span>
+      </a>
     </div>
     <div class="middle">
       {% if not no_results %}
