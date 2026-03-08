@@ -1025,12 +1025,14 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: 2px solid transparent;
+  background: var(--panel-light);
+  border: 2px solid var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
   border-radius: 0;
   color: var(--color-text);
   font-size: var(--header-control-font-size);
-  padding: 6px;
+  padding: 0 8px;
   cursor: pointer;
   transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
   white-space: nowrap;
@@ -1085,14 +1087,12 @@ svg {
   justify-content: center;
   gap: 5px;
   margin-left: 50px;
-  background: var(--panel-light);
-  border: 2px solid var(--color-bg);
-  border-top-color: var(--color-text);
-  border-left-color: var(--color-text);
+  background: transparent;
+  border: 2px solid transparent;
   border-radius: 0;
   color: var(--color-text);
   font-size: var(--header-control-font-size);
-  padding: 0 8px;
+  padding: 6px;
   cursor: pointer;
   transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
   white-space: nowrap;
@@ -1113,11 +1113,17 @@ svg {
 
 .similar-btn:focus-visible {
   outline: none;
-  background: var(--color-accent-light);
+  background: var(--panel-light);
+  border-color: var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
 }
 
 .similar-btn:hover {
-  background: var(--color-accent-light);
+  background: var(--panel-light);
+  border-color: var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
 }
 
 .similar-btn.hidden {
@@ -1126,6 +1132,7 @@ svg {
 }
 
 .similar-btn:active {
+  background: var(--panel-light);
   border-top-color: var(--color-bg);
   border-left-color: var(--color-bg);
   border-right-color: var(--color-text);
@@ -1475,7 +1482,6 @@ svg {
     padding: 0 8px;
   }
 
-  .category-toggle,
   .right > .dropdown-container.about > .dropdown-link {
     background: var(--panel-light);
     border-color: var(--color-bg);
