@@ -4,3 +4,4 @@ requests
 APScheduler
 fastfeedparser
 feedwerk
+numpy

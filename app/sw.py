@@ -2,7 +2,6 @@ import atexit
 import hashlib
 import json
 import logging
-import math
 import os
 import random
 import re
@@ -13,6 +12,7 @@ from typing import NamedTuple
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import fastfeedparser
+import numpy as np
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from feedwerk.atom import AtomFeed
@@ -332,8 +332,24 @@ def _set_seen_cookie(response, seen, new_url):
     return response
 
 
-# --- Embeddings for "More like this" ----------------------------------------
-embeddings_cache = {}  # url → list[float]
+# --- Embeddings for "Show similar" ------------------------------------------
+embeddings_cache = {}  # url → set (for membership checks only)
+_emb_matrix = None     # normalized numpy matrix (N x dim), float32
+_emb_urls = []         # url list aligned with matrix rows
+_emb_url_to_idx = {}   # url → row index
+
+
+def _build_embedding_matrix(emb):
+    """Build a pre-normalized numpy matrix from the raw embeddings dict."""
+    global _emb_matrix, _emb_urls, _emb_url_to_idx
+    urls = list(emb.keys())
+    mat = np.array([emb[u] for u in urls], dtype=np.float32)
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    mat /= norms
+    _emb_matrix = mat
+    _emb_urls = urls
+    _emb_url_to_idx = {u: i for i, u in enumerate(urls)}
 
 
 def update_embeddings():
@@ -348,43 +364,29 @@ def update_embeddings():
         emb = data.get("embeddings", {})
         if emb:
             embeddings_cache = emb
+            _build_embedding_matrix(emb)
             logger.info("Loaded %d embeddings", len(emb))
     except Exception as e:
         logger.error("Failed to fetch embeddings: %s", e)
 
 
-def _cosine_similarity(a, b):
-    """Cosine similarity between two equal-length vectors."""
-    dot = sum(x * y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x * x for x in a))
-    norm_b = math.sqrt(sum(x * x for x in b))
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-    return dot / (norm_a * norm_b)
-
-
 def find_similar(url, seen, cache):
     """Find the most similar unseen entry to `url` using cached embeddings."""
-    target = embeddings_cache.get(url)
-    if not target:
+    idx = _emb_url_to_idx.get(url)
+    if idx is None or _emb_matrix is None:
         return None
 
-    scored = []
-    for entry in cache:
-        if entry.link == url:
-            continue
-        vec = embeddings_cache.get(entry.link)
-        if not vec:
-            continue
-        score = _cosine_similarity(target, vec)
-        is_seen = _hash_url(entry.link) in seen
-        scored.append((score, is_seen, entry))
+    scores = _emb_matrix @ _emb_matrix[idx]
+    scores[idx] = -1.0  # exclude self
 
-    scored.sort(key=lambda x: x[0], reverse=True)
-
-    for score, is_seen, entry in scored:
-        if not is_seen:
-            return entry
+    entry_map = {e.link: e for e in cache}
+    order = np.argsort(scores)[::-1]
+    for i in order:
+        candidate_url = _emb_urls[i]
+        if candidate_url not in entry_map:
+            continue
+        if _hash_url(candidate_url) not in seen:
+            return entry_map[candidate_url]
 
     return None
 
@@ -1129,8 +1131,8 @@ def favorite():
         except OSError as e:
             logger.error("Cannot write favorites file: %s", e)
 
-        # 30% chance: redirect to a similar post instead of the random next
-        if url in embeddings_cache and random.random() < 0.3:
+        # Always try to redirect to a similar post after a like
+        if url in embeddings_cache:
             seen = _get_seen(request)
             sim = find_similar(url, seen, urls_cache)
             if sim:
