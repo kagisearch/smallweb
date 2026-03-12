@@ -1231,6 +1231,12 @@ def flag_content():
     return response
 
 
+@app.route("/get")
+@app.route(f"{prefix}/get")
+def get_page():
+    return app.send_static_file("extension.html")
+
+
 @app.route("/feed")
 @app.route(f"{prefix}/feed")
 def feed():
