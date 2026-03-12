@@ -12,6 +12,9 @@ build/
 develop-eggs/
 dist/
 downloads/
+!app/static/downloads/
+!app/static/downloads/kagi-small-web-chrome.zip
+!app/static/downloads/kagi-small-web-firefox.zip
 eggs/
 .eggs/
 lib/
