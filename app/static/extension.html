@@ -6,10 +6,14 @@
     <title>Small Web Apps & Extensions</title>
     <meta name="description" content="Your gateway to the Small Web on your device and browser">
     <link rel="icon" type="image/png" href="static/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+    <link rel="preload" href="static/vt323-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
     <style>
+      @font-face {
+        font-family: "VT323";
+        src: url("static/vt323-regular-webfont.woff2") format("woff2");
+        font-display: block;
+      }
+
       :root {
         --bg: #2c3e50;
         --text: #ecf0f1;
