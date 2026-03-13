@@ -321,8 +321,20 @@ def _pick_unseen(cache, seen):
     return random.choice(candidates)
 
 
+def _is_prefetch():
+    """Detect prefetch / prerender requests (browsers send Sec-Purpose header)."""
+    purpose = request.headers.get("Sec-Purpose", "") or request.headers.get("Purpose", "")
+    return "prefetch" in purpose.lower() or "prerender" in purpose.lower()
+
+
 def _set_seen_cookie(response, seen, new_url):
-    """Append new_url hash to seen cookie, keeping last SEEN_MAX entries."""
+    """Append new_url hash to seen cookie, keeping last SEEN_MAX entries.
+
+    Skips the update for prefetch/prerender requests to avoid a race condition
+    where the speculative request overwrites the cookie set by the main navigation.
+    """
+    if _is_prefetch():
+        return response
     h = _hash_url(new_url)
     seen_list = [x for x in seen if x and x != h]
     seen_list.append(h)
