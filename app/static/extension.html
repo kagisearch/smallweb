@@ -6,10 +6,14 @@
     <title>Small Web Apps & Extensions</title>
     <meta name="description" content="Your gateway to the Small Web on your device and browser">
     <link rel="icon" type="image/png" href="static/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+    <link rel="preload" href="static/vt323-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
     <style>
+      @font-face {
+        font-family: "VT323";
+        src: url("static/vt323-regular-webfont.woff2") format("woff2");
+        font-display: block;
+      }
+
       :root {
         --bg: #2c3e50;
         --text: #ecf0f1;
@@ -40,7 +44,7 @@
       }
 
       .page {
-        max-width: 1100px;
+        max-width: 1000px;
         margin: 0 auto;
         padding: 24px;
         display: flex;
@@ -208,7 +212,7 @@
 
       .download-row {
         display: grid;
-        grid-template-columns: minmax(140px, 180px) 1fr;
+        grid-template-columns: minmax(170px, 220px) 1fr;
         gap: 10px;
         align-items: center;
         padding: 14px;
@@ -223,6 +227,32 @@
         display: flex;
         align-items: center;
         gap: 10px;
+      }
+
+      .row-title-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .row-title-link-icon {
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
+        display: block;
+        shape-rendering: crispEdges;
+      }
+
+      .row-title-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .row-subtitle {
+        font-size: 15px;
+        line-height: 1.2;
+        color: rgba(236, 240, 241, 0.78);
       }
 
       .row-icon {
@@ -345,11 +375,13 @@
       }
 
       .external-icon {
-        width: 20px;
-        height: 20px;
+        width: 12px;
+        height: 12px;
         flex-shrink: 0;
-        vertical-align: -3px;
-        margin-left: 6px;
+        vertical-align: -1px;
+        margin-left: 0;
+        display: inline-block;
+        shape-rendering: crispEdges;
       }
 
       .brand {
@@ -495,59 +527,12 @@
       </header>
 
       <main class="section-grid">
-        <section class="panel download">
-          <h2>Browser extensions</h2>
-          <div class="download-table">
-            <div class="download-row">
-              <div class="row-title">
-                <img class="row-icon" src="https://translate.kagi.com/orion_logo.svg" alt="Orion logo" loading="lazy">
-                Orion
-              </div>
-              <div class="row-buttons">
-                <a class="btn" href="#" onclick="return false;" aria-label="Chrome Web Store (link coming soon)"><span class="btn-strong">Chrome</span> Web Store</a>
-                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
-              </div>
-            </div>
-            <div class="download-row">
-              <div class="row-title">
-                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg" alt="Chromium logo" loading="lazy">
-                Chromium-based
-              </div>
-              <div class="row-buttons">
-                <a class="btn" href="#" onclick="return false;" aria-label="Chrome Web Store (link coming soon)"><span class="btn-strong">Chrome</span> Web Store</a>
-                <a class="btn" href="#" onclick="return false;" aria-label="Edge Add-ons (link coming soon)"><span class="btn-strong">Edge</span> Add-ons</a>
-                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
-              </div>
-            </div>
-            <div class="download-row">
-              <div class="row-title">
-                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Firefox_logo%2C_2017.svg" alt="Firefox logo" loading="lazy">
-                Firefox-based
-              </div>
-              <div class="row-buttons">
-                <a class="btn" href="#" onclick="return false;" aria-label="Firefox Add-ons (link coming soon)"><span class="btn-strong">Firefox</span> Add-ons</a>
-                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
-              </div>
-            </div>
-            <div class="download-row">
-              <div class="row-title">
-                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/52/Safari_browser_logo.svg" alt="Safari logo" loading="lazy">
-                Safari
-              </div>
-              <div class="row-buttons">
-                <a class="btn" href="#" onclick="return false;" aria-label="TestFlight (link coming soon)"><span class="btn-strong">TestFlight</span></a>
-                <a class="btn direct" href="#" onclick="return false;" aria-label="Direct Download (link coming soon)">Direct Download</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section class="mobile-apps-grid">
           <h2 class="mobile-apps-heading">
             <span>MOBILE</span>
             <span>APPS</span>
           </h2>
-          <a class="mobile-app-store panel-button" href="#" onclick="return false;" aria-label="App Store (coming soon)">
+          <a class="mobile-app-store panel-button" href="https://apps.apple.com/in/app/small-web/id6756679001" target="_blank" rel="noopener noreferrer" aria-label="Download Small Web for iOS on the App Store">
             <div class="mobile-app-header">
               <svg class="row-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
               iOS
@@ -595,7 +580,7 @@
               </svg>
             </span>
           </a>
-          <a class="mobile-app-store panel-button" href="#" onclick="return false;" aria-label="Google Play (coming soon)">
+          <a class="mobile-app-store panel-button" href="https://play.google.com/store/apps/details?id=com.kagi.smallweb" target="_blank" rel="noopener noreferrer" aria-label="Download Small Web for Android on Google Play">
             <div class="mobile-app-header">
               <svg class="row-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.523 2.047a.5.5 0 0 0-.682.181L15.07 5.326A8.87 8.87 0 0 0 12 4.818a8.87 8.87 0 0 0-3.07.508L7.16 2.228a.5.5 0 1 0-.863.501l1.72 2.96A8.96 8.96 0 0 0 3.09 12.5h17.82a8.96 8.96 0 0 0-4.927-6.811l1.72-2.96a.5.5 0 0 0-.18-.682M8.5 10.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2m7 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2M3 13.5v6A2.5 2.5 0 0 0 5.5 22h13a2.5 2.5 0 0 0 2.5-2.5v-6z"/></svg>
               Android
@@ -636,6 +621,52 @@
             </span>
           </a>
         </section>
+
+        <section class="panel download">
+          <h2>Browser extensions</h2>
+          <div class="download-table">
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://translate.kagi.com/orion_logo.svg" alt="Orion logo" loading="lazy">
+                <a class="row-title-link" href="https://orionbrowser.com" target="_blank" rel="noopener noreferrer">
+                  Orion
+                  <svg class="row-title-link-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
+                  </svg>
+                </a>
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="https://chromewebstore.google.com/detail/fpkdkmpobclemkibekgnidcoooijbjdf?utm_source=item-share-cb" target="_blank" rel="noopener noreferrer" aria-label="Install from the Chrome Web Store"><span class="btn-strong">Chrome</span> Web Store</a>
+              </div>
+            </div>
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Chromium_Logo.svg" alt="Chromium logo" loading="lazy">
+                <div class="row-title-text">
+                  <span>Chromium-based</span>
+                  <span class="row-subtitle">Chrome, Edge, Brave</span>
+                </div>
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="https://chromewebstore.google.com/detail/fpkdkmpobclemkibekgnidcoooijbjdf?utm_source=item-share-cb" target="_blank" rel="noopener noreferrer" aria-label="Install from the Chrome Web Store"><span class="btn-strong">Chrome</span> Web Store</a>
+                <a class="btn direct" href="static/downloads/kagi-small-web-chrome.zip" target="_blank" rel="noopener noreferrer" aria-label="Direct download for Chromium-based browsers">Direct Download</a>
+              </div>
+            </div>
+            <div class="download-row">
+              <div class="row-title">
+                <img class="row-icon" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Firefox_logo%2C_2017.svg" alt="Firefox logo" loading="lazy">
+                <div class="row-title-text">
+                  <span>Firefox-based</span>
+                  <span class="row-subtitle">Firefox, Floorp, LibreWolf</span>
+                </div>
+              </div>
+              <div class="row-buttons">
+                <a class="btn" href="https://addons.mozilla.org/en-US/firefox/addon/kagi-small-web/" target="_blank" rel="noopener noreferrer" aria-label="Install from Firefox Add-ons"><span class="btn-strong">Firefox</span> Add-ons</a>
+                <a class="btn direct" href="static/downloads/kagi-small-web-firefox.zip" target="_blank" rel="noopener noreferrer" aria-label="Direct download for Firefox-based browsers">Direct Download</a>
+              </div>
+            </div>
+          </div>
+        </section>
         <section class="panel">
           <h2>How to participate</h2>
           <div class="button-stack">
@@ -655,10 +686,8 @@
         <a class="btn ghost link-button" href="https://www.youtube.com/watch?v=af0OjIkt9dY" target="_blank" rel="noopener noreferrer">
           <span>
             Learn more about why <span class="brand">Kagi</span> is committed to the <span class="brand">Small Web</span>
-            <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-              <polyline points="15 3 21 3 21 9"></polyline>
-              <line x1="10" y1="14" x2="21" y2="3"></line>
+            <svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
             </svg>
           </span>
         </a>
@@ -666,7 +695,7 @@
 
       <footer class="footer">
         <div class="footer-inner">
-          <div>Small Web highlights genuine human voices across the web. Read the <a href="https://blog.kagi.com/small-web" target="_blank" rel="noopener noreferrer">blog post</a> and explore the <a href="https://github.com/kagisearch/smallweb#small-web" target="_blank" rel="noopener noreferrer">sources</a>.</div>
+          <div><a href="/smallweb">Small Web</a> highlights genuine human voices across the web. Read the <a href="https://blog.kagi.com/small-web" target="_blank" rel="noopener noreferrer">blog post</a> and explore the <a href="https://github.com/kagisearch/smallweb#small-web" target="_blank" rel="noopener noreferrer">sources</a>.</div>
           <a class="footer-right" href="https://kagi.com" target="_blank" rel="noopener noreferrer">kagi.com</a>
         </div>
       </footer>

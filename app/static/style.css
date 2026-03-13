@@ -927,15 +927,6 @@ svg {
   filter: drop-shadow(0 0 3px rgba(255, 59, 92, 0.4));
 }
 
-.emoji-badge:first-of-type {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
 .emoji-badge {
   display: flex;
   align-items: center;
@@ -943,9 +934,11 @@ svg {
   height: var(--header-control-height);
   min-height: var(--header-control-height);
   gap: 4px;
-  background: transparent;
+  background: var(--panel-light);
   color: var(--color-text);
-  border: 2px solid transparent;
+  border: 2px solid var(--color-bg);
+  border-top-color: var(--color-text);
+  border-left-color: var(--color-text);
   border-radius: 0;
   padding: 6px;
   font-size: var(--header-control-font-size);
