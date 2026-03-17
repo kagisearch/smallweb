@@ -418,5 +418,16 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
   {% endif %}
   </main>
 
+  {% if not request.args.get('url') and url %}
+  <script>
+    (function() {
+      const currentUrlParams = new URLSearchParams(window.location.search);
+      currentUrlParams.set('url', "{{url}}");
+      const newUrl = window.location.pathname + '?' + currentUrlParams.toString();
+      window.history.replaceState(null, '', newUrl);
+    })();
+  </script>
+  {% endif %}
+  
 </body>
 </html>
