@@ -1228,6 +1228,7 @@ svg {
   z-index: 1001;
   box-shadow: none;
   padding: 12px;
+  box-sizing: border-box;
 }
 
 .category-dropdown.open {
