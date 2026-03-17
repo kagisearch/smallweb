@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Small Web Apps & Extensions</title>
     <meta name="description" content="Your gateway to the Small Web on your device and browser">
-    <link rel="icon" type="image/png" href="static/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon.png?v=20260317">
+    <link rel="shortcut icon" href="static/favicon.png?v=20260317">
     <link rel="preload" href="static/vt323-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
     <style>
       @font-face {
@@ -97,6 +98,14 @@
 
       .hero {
         padding: 12px 16px;
+      }
+
+      .back-link {
+        align-self: flex-start;
+        color: var(--text);
+        font-size: 17px;
+        line-height: 1;
+        text-decoration: underline;
       }
 
       .hero-bar {
@@ -425,9 +434,10 @@
       }
 
       .btn:focus-visible,
+      .back-link:focus-visible,
       .footer-inner a:focus-visible,
       .panel-button:focus-visible {
-        outline: 2px solid var(--white);
+        outline: 2px solid var(--yellow);
         outline-offset: 2px;
       }
 
@@ -497,6 +507,7 @@
   </head>
   <body>
     <div class="page">
+      <a class="back-link" href="/smallweb">Back to Small Web</a>
       <header class="hero panel">
         <div class="hero-bar">
           <div class="hero-brand">

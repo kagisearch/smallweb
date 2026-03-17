@@ -6,7 +6,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
-  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+  {% set favicon_url = url_for('static', filename='favicon.png', v='20260317') %}
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_url }}">
+  <link rel="shortcut icon" href="{{ favicon_url }}">
   <meta property="og:title" content="Kagi Small Web">
   <meta property="og:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
   <meta property="og:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
@@ -59,8 +61,6 @@
       {%- endif -%}
     {%- endfor -%}
     {%- set mode_has_selection = mode_ns.index >= 0 and current_mode != 0 -%}
-    {%- set mode_prev = mode_entries[mode_ns.index - 1] if mode_has_selection and mode_ns.index > 0 else None -%}
-    {%- set mode_next = mode_entries[mode_ns.index + 1] if mode_has_selection and mode_ns.index < mode_entries|length - 1 else None -%}
     {%- set mode_button_label = mode_entries[mode_ns.index][0] if mode_ns.index >= 0 else "Mode" -%}
     <div class="left">
       {% if not no_results %}
@@ -95,12 +95,32 @@
       </div>
       {% endif %}
 
-      <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
-        {% if mode_prev %}
-        <a class="mode-nav" href="{{ mode_prev[1] }}" title="{{ mode_prev[0] }}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <a class="similar-btn{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>
+        <svg class="similar-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="M11 8v6"></path>
+          <path d="M8 11h6"></path>
+        </svg>
+        <span class="similar-btn-label">Show similar</span>
+      </a>
+
+      <form action="{{ prefix }}" method="get" id="search-form">
+        <div class="search-container">
+          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
+        </div>
+        {% if search_query %}
+        <a href="{{ prefix }}" class="clear-search" title="Clear search" aria-label="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </a>
         {% endif %}
+        <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
+      </form>
+    </div>
+    <div class="middle">
+      <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
         <div class="dropdown-container mode-container">
           <button type="button" class="dropdown-link{% if mode_has_selection %} has-filter{% endif %}" title="Filter by mode" aria-label="Filter by mode" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="modes-dropdown">
             <svg class="mode-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" viewBox="0 0 24 24" aria-hidden="true">
@@ -118,61 +138,13 @@
           </div>
         </div>
         {% if mode_has_selection %}
-        <a class="mode-inline-clear" href="{{ prefix }}" title="Clear mode filter" aria-label="Clear mode filter">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </a>
-        {% endif %}
-        {% if mode_next %}
-        <a class="mode-nav" href="{{ mode_next[1] }}" title="{{ mode_next[0] }}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
+        <a class="mode-inline-clear" href="{{ prefix }}" title="Clear selected mode" aria-label="Clear selected mode">X</a>
         {% endif %}
       </div>
 
-      <form action="{{ prefix }}" method="get" id="search-form">
-        <div class="search-container">
-          <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
-        </div>
-        {% if search_query %}
-        <a href="{{ prefix }}" class="clear-search" title="Clear search" aria-label="Clear search">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </a>
-        {% endif %}
-        <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
-      </form>
-      <a class="similar-btn{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Find a similar post" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>
-        <svg class="similar-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="M11 8v6"></path>
-          <path d="M8 11h6"></path>
-        </svg>
-        <span class="similar-btn-label">Show similar</span>
-      </a>
-    </div>
-    <div class="middle">
       {% if not no_results %}
         {% if current_mode == 0 %}
-        {%- if current_cat %}
-          {%- set all_slugs = [] %}
-          {%- for g_name, g_slugs in category_groups.items() %}
-            {%- for s in g_slugs %}{%- if all_slugs.append(s) %}{%- endif %}{%- endfor %}
-          {%- endfor %}
-          {%- set cat_idx = all_slugs.index(current_cat) if current_cat in all_slugs else -1 %}
-          {%- set prev_cat = all_slugs[cat_idx - 1] if cat_idx > 0 else '' %}
-          {%- set next_cat = all_slugs[cat_idx + 1] if cat_idx >= 0 and cat_idx < all_slugs|length - 1 else '' %}
-        {%- endif %}
         <div class="category-wrapper{% if current_cat %} has-filter{% endif %}">
-          {% if current_cat and prev_cat %}
-          <a class="category-nav" href="{{ prefix }}?cat={{ prev_cat }}" title="{{ categories[prev_cat][0] }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          </a>
-          {% endif %}
           <button class="category-toggle{% if current_cat %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic" aria-label="Filter by topic">
             <svg class="category-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7"></rect>
@@ -189,17 +161,7 @@
             </span>
           </button>
           {% if current_cat and current_cat in categories %}
-          <a class="cat-inline-clear" href="{{ prefix }}" title="Clear filter" aria-label="Clear filter">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </a>
-          {% endif %}
-          {% if current_cat and next_cat %}
-          <a class="category-nav" href="{{ prefix }}?cat={{ next_cat }}" title="{{ categories[next_cat][0] }}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </a>
+          <a class="cat-inline-clear" href="{{ prefix }}" title="Clear selected topic" aria-label="Clear selected topic">X</a>
           {% endif %}
           <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
             <div class="cat-columns">
@@ -262,7 +224,7 @@
 
         <div class="dropdown-container">
           <button type="button"
-                  class="dropdown-link flag-link"
+                  class="dropdown-link"
                   title="Flag this post"
                   data-dropdown-trigger
                   aria-haspopup="true"
@@ -283,15 +245,12 @@
       <a href="https://kagi.com" title="Visit Kagi" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
         <img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif">
       </a>
-      <a href="https://github.com/kagisearch/smallweb#the-small-web-seal-badge-of-authentic-creation" title="Small Web badges" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
+      <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
         <img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif">
       </a>
-      <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link contribute-link" target="_blank" rel="noopener noreferrer">
-        Contribute
-        <svg class="external-link-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
-        </svg>
-      </a>
+      <div class="dropdown-container">
+        <a href="{{ prefix }}get" title="Get Mobile Apps &amp; Browser Extensions" class="dropdown-link">Get</a>
+      </div>
       <div class="dropdown-container">
         <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="rss-dropdown">RSS</button>
         <div class="dropdown-panel spread-love rss-dropdown" id="rss-dropdown">
@@ -358,16 +317,17 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
       {% endif %}
     </div>
   {% elif current_mode == 1 %}
+    {% set yt_embed_url = "https://www.youtube.com/embed/" ~ videoid ~ "?rel=0" %}
     <div id="content-yt">
       <iframe
         width="840"
         height="472"
-        src="https://www.youtube.com/embed/{{videoid}}?rel=0"
+        src="{{ yt_embed_url }}"
         title="{{title}} video"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
         {% if flag_content_count and flag_content_count >= 5 %}
-          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/embed/{{videoid}}?rel=0">View Flagged Video</a>'
+          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a target="_blank" rel="noopener noreferrer" href="{{ yt_embed_url }}">View Flagged Video</a>'
         {% endif %}
       ></iframe>
     </div>
