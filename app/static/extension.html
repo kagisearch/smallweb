@@ -100,6 +100,14 @@
         padding: 12px 16px;
       }
 
+      .back-link {
+        align-self: flex-start;
+        color: var(--text);
+        font-size: 17px;
+        line-height: 1;
+        text-decoration: underline;
+      }
+
       .hero-bar {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -426,9 +434,10 @@
       }
 
       .btn:focus-visible,
+      .back-link:focus-visible,
       .footer-inner a:focus-visible,
       .panel-button:focus-visible {
-        outline: 2px solid var(--white);
+        outline: 2px solid var(--yellow);
         outline-offset: 2px;
       }
 
@@ -498,6 +507,7 @@
   </head>
   <body>
     <div class="page">
+      <a class="back-link" href="/smallweb">Back to Small Web</a>
       <header class="hero panel">
         <div class="hero-bar">
           <div class="hero-brand">
