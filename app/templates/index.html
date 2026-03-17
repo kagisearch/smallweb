@@ -6,11 +6,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
-  {% set favicon_svg_url = url_for('static', filename='favicon.svg', v='20260317') %}
-  {% set favicon_16_url = url_for('static', filename='favicon.png', v='20260317') %}
-  {% set favicon_32_url = url_for('static', filename='favicon-32.png', v='20260317') %}
-  {% set apple_touch_icon_url = url_for('static', filename='apple-touch-icon.png', v='20260317') %}
-  <link rel="icon" type="image/svg+xml" href="{{ favicon_svg_url }}">
+  {% set favicon_16_url = url_for('static', filename='favicon.png', v='20260317-classic') %}
+  {% set favicon_32_url = url_for('static', filename='favicon-32.png', v='20260317-classic') %}
+  {% set apple_touch_icon_url = url_for('static', filename='apple-touch-icon.png', v='20260317-classic') %}
   <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32_url }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16_url }}">
   <link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon_url }}">
