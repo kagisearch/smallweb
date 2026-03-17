@@ -64,7 +64,7 @@ Clicking "Remove website" will edit small web list in new tab, where you can loc
 
 [Remove website](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 
-[Remove channel](https://github.com/kagisearch/smallweb/edit/main/smallt.txt)
+[Remove channel](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
 
 ## The Small Web seal: badge of authentic creation
 Small Web initiative members can display badges on their websites to identify themselves as part of a community committed to authentic, human-centered content.
