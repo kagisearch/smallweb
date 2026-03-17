@@ -21,6 +21,7 @@
   --color-accent-light: rgba(52, 152, 219, 0.2);
   --color-cat-desc: #b0bec5;
   --color-cat-count: #7f8c8d;
+  --search-width: clamp(80px, 8vw, 100px);
 }
 
 body {
@@ -107,16 +108,20 @@ svg {
 
 /* ── Search ── */
 #search-form {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  position: relative;
   margin: 0;
   flex: 0 0 auto;
+  width: var(--search-width);
+  height: var(--header-control-height);
+}
+
+#search-form.has-clear {
+  width: calc(var(--search-width) + var(--header-control-height) + 4px);
 }
 
 .search-container {
   position: relative;
-  width: clamp(80px, 8vw, 100px);
+  width: var(--search-width);
   height: var(--header-control-height);
 }
 
@@ -130,17 +135,11 @@ svg {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
+  width: var(--search-width);
   height: var(--header-control-height);
   box-sizing: border-box;
   background: #fff;
   color: var(--color-bg);
-  z-index: 1;
-  transition: width 0.12s ease;
-}
-
-.search-container:focus-within #search-input {
-  width: clamp(120px, 12vw, 180px);
 }
 
 #search-input:focus {
@@ -151,8 +150,9 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: calc(var(--search-width) + 4px);
   width: var(--header-control-height);
   height: var(--header-control-height);
   box-sizing: border-box;
@@ -162,15 +162,10 @@ svg {
   color: var(--color-text);
   cursor: pointer;
   font-size: var(--header-control-font-size);
+  font-family: inherit;
   line-height: 1;
   text-decoration: none;
   transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
-}
-
-.clear-search svg {
-  width: 14px;
-  height: 14px;
-  display: block;
 }
 
 .clear-search:hover {
@@ -1346,8 +1341,13 @@ svg {
   .cat-item { min-height: 36px; padding: 6px 14px; }
 }
 
+@media (max-width: 1270px) {
+  .right > .badge-link {
+    display: none;
+  }
+}
+
 @media (max-width: 1100px) {
-  .right > .badge-link,
   .right > #dark-mode-toggle {
     display: none;
   }

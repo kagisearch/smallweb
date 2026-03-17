@@ -6,9 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kagi Small Web</title>
-  {% set favicon_url = url_for('static', filename='favicon.png', v='20260317') %}
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_url }}">
-  <link rel="shortcut icon" href="{{ favicon_url }}">
+  {% set favicon_svg_url = url_for('static', filename='favicon.svg', v='20260317') %}
+  {% set favicon_16_url = url_for('static', filename='favicon.png', v='20260317') %}
+  {% set favicon_32_url = url_for('static', filename='favicon-32.png', v='20260317') %}
+  {% set apple_touch_icon_url = url_for('static', filename='apple-touch-icon.png', v='20260317') %}
+  <link rel="icon" type="image/svg+xml" href="{{ favicon_svg_url }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32_url }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16_url }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon_url }}">
   <meta property="og:title" content="Kagi Small Web">
   <meta property="og:description" content="Discover the small web - personal blogs, independent YouTube channels, and webcomics from genuine humans on the internet.">
   <meta property="og:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
@@ -104,17 +109,12 @@
         <span class="similar-btn-label">Show similar</span>
       </a>
 
-      <form action="{{ prefix }}" method="get" id="search-form">
+      <form action="{{ prefix }}" method="get" id="search-form"{% if search_query %} class="has-clear"{% endif %}>
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
         </div>
         {% if search_query %}
-        <a href="{{ prefix }}" class="clear-search" title="Clear search" aria-label="Clear search">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </a>
+        <a href="{{ prefix }}" class="clear-search" title="Clear search" aria-label="Clear search">X</a>
         {% endif %}
         <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
       </form>
