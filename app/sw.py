@@ -786,6 +786,7 @@ def index():
     global urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_flagged_cache
 
     url = request.args.get("url")
+    should_redirect_to_chosen_url = not url
     search_query = request.args.get("search", "").lower()
     title = None
     post_cats = []
@@ -902,6 +903,11 @@ def index():
                 "Nothing to see",
                 "Feed not active, try later",
             )
+
+    if should_redirect_to_chosen_url and url:
+        params = request.args.to_dict(flat=True)
+        params["url"] = url.replace("http://", "https://", 1)
+        return redirect(prefix + "/?" + urlencode(params), code=302)
 
     # -------------------------------------------------
     # Build deterministic "next post" link and pre-load it

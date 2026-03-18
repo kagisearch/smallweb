@@ -14,8 +14,14 @@
     return Math.round(header.getBoundingClientRect().bottom);
   }
 
+  function getViewportHeight() {
+    return Math.round(window.visualViewport?.height || window.innerHeight);
+  }
+
   function positionDropdown() {
-    dropdown.style.top = `${getDropdownTop()}px`;
+    const dropdownTop = getDropdownTop();
+    dropdown.style.top = `${dropdownTop}px`;
+    dropdown.style.maxHeight = `${Math.max(160, getViewportHeight() - dropdownTop - 8)}px`;
 
     const dropdownWidth = dropdown.getBoundingClientRect().width;
     const toggleRect = toggle.getBoundingClientRect();
@@ -95,6 +101,17 @@
       positionDropdown();
     }
   });
+
+  const visualViewport = window.visualViewport;
+  if (visualViewport) {
+    const onViewportChange = () => {
+      if (dropdown.classList.contains('open')) {
+        positionDropdown();
+      }
+    };
+    visualViewport.addEventListener('resize', onViewportChange);
+    visualViewport.addEventListener('scroll', onViewportChange);
+  }
 
   function updateFocus() {
     allItems.forEach((item, i) => {
