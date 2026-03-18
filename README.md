@@ -14,14 +14,8 @@ Few things to note:
 
 - There is an [OPML file](https://kagi.com/smallweb/opml) of the sites which make up the above RSS feed
 
-## Criteria for posts to show on the website
-
-If the blog is included in small web feed list (which means it has content in English, it is informational/educational by nature and it is not trying to sell anything) we check for these two things to show it on the site:
-
-- Blog has recent posts (<7 days old)
-- The website can appear in an iframe
   
-## ⚠️ Guidelines for adding a site or channel to the list ⚠️
+## ⚠️ Guidelines for site inclusion to the list ⚠️
 
 Add a new personal blog RSS feed to the list. Rules:
 
@@ -65,6 +59,15 @@ Clicking "Remove website" will edit small web list in new tab, where you can loc
 [Remove website](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 
 [Remove channel](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
+
+## What we show on the site
+
+If the blog is included in small web feed list (which means it has content in English, it is informational/educational by nature and it is not trying to sell anything) we check for these two things to show it on the site:
+
+- Blog has recent posts (<7 days old)
+- The website can appear in an iframe
+
+The pages will still show in Kagi search results even if they cna not show on the ite due technical reasons (eg iframe not allowed).
 
 ## The Small Web seal: badge of authentic creation
 Small Web initiative members can display badges on their websites to identify themselves as part of a community committed to authentic, human-centered content.
