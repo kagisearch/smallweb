@@ -109,7 +109,7 @@ svg {
 /* ── Search ── */
 #search-form {
   position: relative;
-  margin: 0;
+  margin: 0 0 0 48px;
   flex: 0 0 auto;
   width: var(--search-width);
   height: var(--header-control-height);
@@ -1010,60 +1010,8 @@ svg {
   transform: translate(1px, 1px);
 }
 
-.similar-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 0;
-  color: var(--color-text);
-  font-size: var(--header-control-font-size);
-  padding: 6px;
-  cursor: pointer;
-  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
-  white-space: nowrap;
-  height: var(--header-control-height);
-  min-height: var(--header-control-height);
-  flex-shrink: 0;
-  box-sizing: border-box;
-  line-height: 1;
-  text-decoration: none;
-}
-
-.similar-btn-icon {
-  display: none;
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-.similar-btn:focus-visible {
-  background: var(--panel-light);
-  border-color: var(--color-bg);
-  border-top-color: var(--color-text);
-  border-left-color: var(--color-text);
-}
-
-.similar-btn:hover {
-  background: var(--panel-light);
-  border-color: var(--color-bg);
-  border-top-color: var(--color-text);
-  border-left-color: var(--color-text);
-}
-
 .similar-btn.hidden {
   display: none;
-}
-
-.similar-btn:active {
-  background: var(--panel-light);
-  border-top-color: var(--color-bg);
-  border-left-color: var(--color-bg);
-  border-right-color: var(--color-text);
-  border-bottom-color: var(--color-text);
-  transform: translate(1px, 1px);
 }
 
 .cat-inline-clear,
@@ -1373,9 +1321,6 @@ svg {
     display: block;
   }
 
-  .similar-btn {
-    display: none;
-  }
 }
 
 @media (max-width: 900px) {
@@ -1391,6 +1336,7 @@ svg {
   #url-display-phone,
   .mode-wrapper,
   .middle > .dropdown-container,
+  .middle > .similar-btn,
   .middle > .post-cats,
   .right > :not(.about),
   .next-btn-suffix {

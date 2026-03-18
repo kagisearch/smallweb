@@ -98,15 +98,6 @@
       </div>
       {% endif %}
 
-      <a class="similar-btn{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>
-        <svg class="similar-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="M11 8v6"></path>
-          <path d="M8 11h6"></path>
-        </svg>
-        <span class="similar-btn-label">Show similar</span>
-      </a>
-
       <form action="{{ prefix }}" method="get" id="search-form"{% if search_query %} class="has-clear"{% endif %}>
         <div class="search-container">
           <input type="text" name="search" placeholder="Search..." value="{{ search_query }}" id="search-input" title="Search posts">
@@ -219,6 +210,8 @@
                class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
           </div>
         </div>
+
+        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
 
         <div class="dropdown-container">
           <button type="button"

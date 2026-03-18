@@ -851,8 +851,12 @@ def index():
                     category_counts.get("uncategorized", 0) + 1
                 )
 
-    # Category filtering
+    # Exclude spam unless explicitly requested
     current_cat = request.args.get("cat", "")
+    if current_cat != "spam":
+        cache = [entry for entry in cache if "spam" not in entry.categories]
+
+    # Category filtering
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
             cache = [
