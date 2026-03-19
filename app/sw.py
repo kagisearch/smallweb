@@ -931,15 +931,22 @@ def index():
             next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
             if not next_candidates:
                 next_candidates = next_pool
+            # 7% chance next post comes from the liked pool (unseen)
+            if current_mode != 2 and urls_app_cache and random.random() < 0.07:
+                liked_unseen = [e for e in urls_app_cache if _hash_url(e.link) not in seen_plus and e.link != url]
+                if liked_unseen:
+                    next_entry = random.choice(liked_unseen)
+                    next_candidates = None  # skip normal selection
             # 60% chance to stay in the same category when browsing all
-            if not current_cat and post_cats and random.random() < 0.6:
+            if next_candidates and not current_cat and post_cats and random.random() < 0.6:
                 same_cat = [
                     e for e in next_candidates
                     if any(c in e.categories for c in post_cats)
                 ]
                 if same_cat:
                     next_candidates = same_cat
-            next_entry = random.choice(next_candidates)
+            if next_candidates:
+                next_entry = random.choice(next_candidates)
 
         if next_entry:
             next_params = request.args.to_dict(flat=True)

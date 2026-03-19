@@ -334,6 +334,7 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  margin-right: 8px;
 }
 
 .mode-container > .dropdown-link,
