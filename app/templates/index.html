@@ -46,6 +46,7 @@
   <script defer src="{{ url_for('static', filename='header-dark-mode.js') }}"></script>
   <script defer src="{{ url_for('static', filename='header-dropdowns.js') }}"></script>
   <script defer src="{{ url_for('static', filename='header-keyboard-shortcuts.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='header-last-search.js') }}"></script>
 </head>
 
 <body>
@@ -107,6 +108,10 @@
         {% endif %}
         <button type="submit" class="hidden-submit" tabindex="-1">Search</button>
       </form>
+      <span id="last-search" class="last-search" hidden>
+        <a id="last-search-link" class="last-search-term" title="Repeat last search"></a>
+        <button type="button" id="last-search-clear" class="last-search-x" title="Remove saved search" aria-label="Remove saved search">X</button>
+      </span>
     </div>
     <div class="middle">
       <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
