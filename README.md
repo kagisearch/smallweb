@@ -67,7 +67,7 @@ If the blog is included in small web feed list (which means it has content in En
 - Blog has recent posts (<7 days old)
 - The website can appear in an iframe
 
-The pages will still show in Kagi search results even if they cna not show on the ite due technical reasons (eg iframe not allowed).
+The pages will still show in Kagi search results even if they cannot show on the site due technical reasons (eg iframe not allowed).
 
 ## The Small Web seal: badge of authentic creation
 Small Web initiative members can display badges on their websites to identify themselves as part of a community committed to authentic, human-centered content.
