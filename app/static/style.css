@@ -1274,6 +1274,55 @@ svg {
   display: block;
 }
 
+/* Category eye toggle (hide/show) */
+.cat-item-row {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.cat-item-row .cat-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.cat-eye {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  padding: 4px;
+  color: var(--color-text);
+  z-index: 1;
+  line-height: 1;
+}
+
+.cat-item-row:hover .cat-eye {
+  opacity: 0.4;
+}
+
+.cat-item-row:hover .cat-eye:hover {
+  opacity: 1;
+}
+
+.cat-item-row.excluded .cat-eye {
+  opacity: 0.35;
+}
+
+.cat-item-row.excluded .cat-item {
+  opacity: 0.35;
+}
+
+.cat-item-row.excluded:hover .cat-eye {
+  opacity: 0.6;
+}
+
 /* Post category chips */
 .post-cats {
   display: inline-flex;

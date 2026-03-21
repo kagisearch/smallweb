@@ -166,12 +166,15 @@
               {% for slug in slugs %}
                 {% if slug != 'uncategorized' or category_counts.get('uncategorized', 0) %}
                 {% set cat = categories[slug] %}
-                <a href="{{ prefix }}?cat={{ slug }}"
-                   class="cat-item{% if current_cat == slug %} selected{% endif %}"
-                   data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
-                  <div class="cat-name">{{ cat[2] }} {{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
-                  <div class="cat-desc">{{ cat[1] }}</div>
-                </a>
+                <div class="cat-item-row" data-slug="{{ slug }}">
+                  <button class="cat-eye" data-slug="{{ slug }}" title="Hide {{ cat[0] }} from random browsing" aria-label="Toggle {{ cat[0] }} visibility">👁</button>
+                  <a href="{{ prefix }}?cat={{ slug }}"
+                     class="cat-item{% if current_cat == slug %} selected{% endif %}"
+                     data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if current_cat == slug else 'false' }}">
+                    <div class="cat-name">{{ cat[2] }} {{ cat[0] }}{% if category_counts.get(slug, 0) %} <span class="cat-count">({{ category_counts[slug] }})</span>{% endif %}</div>
+                    <div class="cat-desc">{{ cat[1] }}</div>
+                  </a>
+                </div>
                 {% endif %}
               {% endfor %}
             {% endfor %}
