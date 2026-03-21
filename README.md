@@ -23,7 +23,7 @@ Add a new personal blog RSS feed to the list. Rules:
 - Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - No illegal or NSFW content.
-- No auto generated, LLM generated or spam content.
+- No auto generated, LLM generated or spam content. (see below for the nuance)
 - Only personal blogs may be submitted. 
 - The blog must have a recent post, no older than 12 months, to meet the recency criteria for inclusion.
 - The site must not contain any forms of advertisements or undisclosed affiliate links
@@ -35,6 +35,12 @@ For comics:
 - Must be independently created art (no AI generated content)
 - RSS feed must show the full comic in the feed
 - No commercial syndicated comics
+
+Guidelines on LLM usage:
+- **Intent matters** - use of LLMs to deceive, overwhelm, or otherwise taint the rules of good discourse is not allowed.
+- **No "content automation"** - content must be heavily guided by and reviewed by humans and done at human scale for human audiences. Examples of "guided by" are: outlines or drafts of content covering the main idea and key points, and "reviewed by" is a human reading and checking to make sure it adheres to their intent.
+- **Acknowledgment** - Effort should be made to acknowledge heavier LLM usage (via sidebar, authorship byline, or other such marker.)
+- **General Assistance** - Use of LLMs to assist in human authors communicating is otherwise fine, and viewed as having little difference from using a spell checker or grammar checker, as long as the above points are followed.
 
 [Add website RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
