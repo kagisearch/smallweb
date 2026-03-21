@@ -24,12 +24,12 @@ Add a new personal blog RSS/Atom feed to the list. Rules:
 - Content must be in English (currently, other languages are not accepted).
 - No illegal or NSFW content.
 - No auto generated, LLM generated or spam content. (see below for the nuance)
-- Only personal blogs may be submitted. 
+- Only personal blogs may be submitted (no multi-author blogs). 
 - The blog must have a recent post, no older than 12 months, to meet the recency criteria for inclusion.
 - The site must not contain any forms of advertisements or undisclosed affiliate links
-- Site should not have newsletter signup popups (substack sites are not accepted too)
-- A YT channel must not post more than twice a week.
-- A YT channel must have fewer than 400,000 subscribers.
+- Site should not have popups (newsletter signup, cookie selection, etc)
+- A Youtube channel must not post more than twice a week.
+- A Youtube channel must have fewer than 400,000 subscribers.
 
 For comics:
 - Must be independently created art (no AI generated content)
