@@ -856,6 +856,18 @@ def index():
     if current_cat != "spam":
         cache = [entry for entry in cache if "spam" not in entry.categories]
 
+    # Exclude user-hidden categories (stored in cookie)
+    excluded_cats_raw = request.cookies.get("sw_excluded_cats", "")
+    excluded_cats = set(
+        slug for slug in excluded_cats_raw.split(",") if slug in CATEGORIES
+    )
+    if excluded_cats and not current_cat:
+        cache = [
+            entry
+            for entry in cache
+            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
+        ]
+
     # Category filtering
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":

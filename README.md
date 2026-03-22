@@ -17,19 +17,19 @@ Few things to note:
   
 ## ⚠️ Guidelines for site inclusion to the list ⚠️
 
-Add a new personal blog RSS feed to the list. Rules:
+Add a new personal blog RSS/Atom feed to the list. Rules:
 
 - **If submitting your own website, you must add at least 2 other sites that are not yours (and are not in list yet) in the same commit.**
-- Locate and submit the RSS feed of the website. Place in the file so that it remains sorted.
+- Locate and submit the RSS/Atom feed of the website. Place in the file so that it remains sorted.
 - Content must be in English (currently, other languages are not accepted).
 - No illegal or NSFW content.
 - No auto generated, LLM generated or spam content. (see below for the nuance)
-- Only personal blogs may be submitted. 
+- Only personal blogs may be submitted (no multi-author blogs). 
 - The blog must have a recent post, no older than 12 months, to meet the recency criteria for inclusion.
 - The site must not contain any forms of advertisements or undisclosed affiliate links
-- Site should not have newsletter signup popups (substack sites are not accepted too)
-- A YT channel must not post more than twice a week.
-- A YT channel must have fewer than 400,000 subscribers.
+- Site should not have popups (newsletter signup, cookie selection, etc)
+- A Youtube channel must not post more than twice a week.
+- A Youtube channel must have fewer than 400,000 subscribers.
 
 For comics:
 - Must be independently created art (no AI generated content)
@@ -40,7 +40,7 @@ Guidelines on LLM usage:
 - **Intent matters** - use of LLMs to deceive, overwhelm, or otherwise taint the rules of good discourse is not allowed.
 - **No "content automation"** - content must be heavily guided by and reviewed by humans and done at human scale for human audiences. Examples of "guided by" are: outlines or drafts of content covering the main idea and key points, and "reviewed by" is a human reading and checking to make sure it adheres to their intent.
 - **Acknowledgment** - Effort should be made to acknowledge heavier LLM usage (via sidebar, authorship byline, or other such marker.)
-- **General Assistance** - Use of LLMs to assist in human authors communicating is otherwise fine, and viewed as having little difference from using a spell checker or grammar checker, as long as the above points are followed.
+- **General assistance** - Use of LLMs to assist in human authors communicating is otherwise fine, and viewed as having little difference from using a spell checker or grammar checker, as long as the above points are followed.
 
 [Add website RSS
 feed](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)

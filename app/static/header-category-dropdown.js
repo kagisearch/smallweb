@@ -7,6 +7,63 @@
   if (!toggle || !dropdown || !backdrop) return;
 
   const allItems = [...dropdown.querySelectorAll('.cat-item')];
+
+  // ── Category exclusion (eye toggle) ──
+  const STORAGE_KEY = 'sw_excluded_cats';
+
+  function getExcluded() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? new Set(raw.split(',').filter(Boolean)) : new Set();
+    } catch { return new Set(); }
+  }
+
+  function saveExcluded(set) {
+    const val = [...set].join(',');
+    try { localStorage.setItem(STORAGE_KEY, val); } catch {}
+    document.cookie = `sw_excluded_cats=${encodeURIComponent(val)};path=/;max-age=31536000;SameSite=Lax`;
+  }
+
+  function applyExcludedUI() {
+    const excluded = getExcluded();
+    dropdown.querySelectorAll('.cat-item-row').forEach(row => {
+      const slug = row.dataset.slug;
+      row.classList.toggle('excluded', excluded.has(slug));
+    });
+    // Update toggle label to show count
+    const label = toggle.querySelector('.category-toggle-label');
+    if (label && !label.dataset.originalText) {
+      label.dataset.originalText = label.textContent.trim();
+    }
+    if (label && excluded.size > 0 && label.dataset.originalText === 'Topics') {
+      label.textContent = `Topics (-${excluded.size})`;
+    } else if (label && excluded.size === 0 && label.dataset.originalText === 'Topics') {
+      label.textContent = 'Topics';
+    }
+  }
+
+  // Sync cookie on page load
+  saveExcluded(getExcluded());
+  applyExcludedUI();
+
+  let excludedChanged = false;
+
+  dropdown.addEventListener('click', (e) => {
+    const eyeBtn = e.target.closest('.cat-eye');
+    if (!eyeBtn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const slug = eyeBtn.dataset.slug;
+    const excluded = getExcluded();
+    if (excluded.has(slug)) {
+      excluded.delete(slug);
+    } else {
+      excluded.add(slug);
+    }
+    saveExcluded(excluded);
+    applyExcludedUI();
+    excludedChanged = true;
+  });
   let focusIndex = -1;
 
   function getDropdownTop() {
@@ -48,6 +105,11 @@
     backdrop.classList.remove('open');
     toggle.classList.remove('active');
     toggle.setAttribute('aria-expanded', 'false');
+    if (excludedChanged) {
+      excludedChanged = false;
+      window.location.reload();
+      return;
+    }
     if (restoreFocus) toggle.focus();
   }
 
