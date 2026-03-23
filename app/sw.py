@@ -892,8 +892,14 @@ def index():
                     category_counts.get("uncategorized", 0) + 1
                 )
 
-    # Exclude spam unless explicitly requested
-    current_cat = request.args.get("cat", "")
+    # Resolve category: URL param > sticky cookie (blog mode only)
+    if "cat" in request.args:
+        current_cat = request.args["cat"]
+    elif current_mode == 0:
+        cookie_cat = request.cookies.get("sw_sticky_cat", "")
+        current_cat = cookie_cat if cookie_cat in CATEGORIES else ""
+    else:
+        current_cat = ""
     if current_cat != "spam":
         cache = [entry for entry in cache if "spam" not in entry.categories]
 

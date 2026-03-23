@@ -46,6 +46,23 @@
   saveExcluded(getExcluded());
   applyExcludedUI();
 
+  // ── Sticky category (persist selected topic across visits) ──
+  const STICKY_KEY = 'sw_sticky_cat';
+  const urlCat = new URLSearchParams(window.location.search).get('cat');
+
+  if (urlCat) {
+    localStorage.setItem(STICKY_KEY, urlCat);
+    document.cookie = `sw_sticky_cat=${encodeURIComponent(urlCat)};path=/;max-age=31536000;SameSite=Lax`;
+  }
+
+  const clearBtn = document.querySelector('.cat-inline-clear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      localStorage.removeItem(STICKY_KEY);
+      document.cookie = 'sw_sticky_cat=;path=/;max-age=0;SameSite=Lax';
+    });
+  }
+
   let excludedChanged = false;
 
   dropdown.addEventListener('click', (e) => {
