@@ -612,6 +612,7 @@ def _render_no_results(
     current_cat="",
     category_counts=None,
     no_results_cat="",
+    feed_unavailable=False,
 ):
     """Render the index template with no results."""
     return render_template(
@@ -632,6 +633,7 @@ def _render_no_results(
         search_query=search_query,
         no_results=True,
         no_results_cat=no_results_cat,
+        feed_unavailable=feed_unavailable,
         reactions_dict=OrderedDict(),
         reactions_list=[],
         favorites_total=0,
@@ -961,10 +963,11 @@ def index():
                 chosen.categories,
             )
         else:
-            url, title, author = (
-                "https://blog.kagi.com/small-web",
-                "Nothing to see",
-                "Feed not active, try later",
+            return _render_no_results(
+                current_mode,
+                current_cat=current_cat,
+                category_counts=category_counts,
+                feed_unavailable=True,
             )
 
     if should_redirect_to_chosen_url and url:

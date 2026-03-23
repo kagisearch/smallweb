@@ -309,7 +309,10 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
   <main>
   {% if no_results %}
     <div id="content" class="no-results no-results-content">
-      {% if no_results_cat is defined and no_results_cat %}
+      {% if feed_unavailable is defined and feed_unavailable %}
+      <h2 class="no-results-heading">Feed temporarily unavailable</h2>
+      <p class="no-results-sub">We're working on it. Please check back shortly.</p>
+      {% elif no_results_cat is defined and no_results_cat %}
       <h2 class="no-results-heading">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
       <a href="{{ prefix }}" class="btn clear-search-button">Show All Topics</a>
       {% else %}

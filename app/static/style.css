@@ -743,6 +743,12 @@ svg {
   margin-bottom: 20px;
 }
 
+.no-results-sub {
+  color: var(--color-bg);
+  opacity: 0.7;
+  font-size: 1.1rem;
+}
+
 /* ── Popups ── */
 .dropdown-container {
   display: inline-block;
