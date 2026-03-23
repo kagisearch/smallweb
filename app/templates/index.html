@@ -129,6 +129,8 @@
             {%- for label, href, mode_value in mode_entries if mode_value != current_mode -%}
             <a class="share-option" href="{{ href }}" title="Open {{ label }} mode">{{ label }}</a>
             {%- endfor -%}
+            <hr class="share-separator">
+            <a class="share-option" href="{{ prefix }}river{% if current_mode == 1 %}?yt{% elif current_mode == 3 %}?gh{% elif current_mode == 4 %}?comic{% endif %}" title="River view">River</a>
           </div>
         </div>
         {% if mode_has_selection %}

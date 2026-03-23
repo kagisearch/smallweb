@@ -1458,6 +1458,7 @@ svg {
     display: none;
   }
 
+
   #header > .middle,
   #header > .right {
     display: flex;

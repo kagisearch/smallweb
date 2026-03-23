@@ -559,6 +559,38 @@ def time_ago(timestamp):
         return f"{int(seconds // 86400)} days"
 
 
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def river_date(timestamp):
+    """Format date for river cards: '2h ago', 'Mar 22', 'Jan 5, 2025'."""
+    now = datetime.now()
+    delta = now - timestamp
+    seconds = delta.total_seconds()
+    if seconds < 3600:
+        mins = max(1, int(seconds // 60))
+        return f"{mins}m ago"
+    if seconds < 86400:
+        return f"{int(seconds // 3600)}h ago"
+    if timestamp.year == now.year:
+        return timestamp.strftime("%b %-d")
+    return timestamp.strftime("%b %-d, %Y")
+
+
+def make_excerpt(html, max_len=200):
+    """Strip HTML tags and truncate at word boundary."""
+    text = _TAG_RE.sub("", html or "")
+    text = " ".join(text.split())  # collapse whitespace
+    if len(text) <= max_len:
+        return text
+    truncated = text[:max_len]
+    # cut at last space to avoid mid-word truncation
+    last_space = truncated.rfind(" ")
+    if last_space > max_len // 2:
+        truncated = truncated[:last_space]
+    return truncated + "\u2026"
+
+
 prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
 app.jinja_env.filters["time_ago"] = time_ago
@@ -1107,6 +1139,109 @@ def index():
         )
     )
     return _set_seen_cookie(resp, seen, url)
+
+
+RIVER_PAGE_SIZE = 50
+
+
+@app.route("/river")
+@app.route(f"{prefix}/river")
+def river():
+    """River view: reverse-chronological card stream."""
+    # Pick cache based on mode
+    if "yt" in request.args:
+        cache = sorted(urls_yt_cache, key=lambda e: e.updated, reverse=True)
+        mode = "yt"
+        feed_url = prefix + "/feed?yt"
+    elif "gh" in request.args:
+        cache = sorted(urls_gh_cache, key=lambda e: e.updated, reverse=True)
+        mode = "gh"
+        feed_url = prefix + "/feed?gh"
+    elif "comic" in request.args:
+        cache = sorted(urls_comic_cache, key=lambda e: e.updated, reverse=True)
+        mode = "comic"
+        feed_url = prefix + "/feed?comic"
+    else:
+        cache = sorted(urls_cache, key=lambda e: e.updated, reverse=True)
+        mode = ""
+        feed_url = prefix + "/feed"
+
+    # Exclude spam
+    cache = [e for e in cache if "spam" not in e.categories]
+
+    # Topic filtering
+    topic = request.args.get("topic", "")
+    if topic and topic in CATEGORIES:
+        if topic == "uncategorized":
+            cache = [e for e in cache if not e.categories or "uncategorized" in e.categories]
+        else:
+            cache = [e for e in cache if topic in e.categories]
+        feed_url = prefix + f"/feed?cat={topic}"
+
+    # Pagination
+    page = request.args.get("page", "1")
+    try:
+        page = max(1, int(page))
+    except ValueError:
+        page = 1
+
+    total = len(cache)
+    start = (page - 1) * RIVER_PAGE_SIZE
+    end = start + RIVER_PAGE_SIZE
+    entries = cache[start:end]
+    has_next = end < total
+
+    # Build cards with pre-computed display fields
+    cards = []
+    for entry in entries:
+        domain = get_registered_domain(entry.link)
+        domain = re.sub(r"^(www\.)?", "", domain)
+        desc = entry.description or ""
+        excerpt = make_excerpt(desc, 200)
+        # Topic badge: first non-spam category
+        badge = None
+        for cat_slug in entry.categories:
+            if cat_slug in CATEGORIES and cat_slug != "spam":
+                badge = (cat_slug, CATEGORIES[cat_slug][0], CATEGORIES[cat_slug][2])
+                break
+        # Build Small Web URL: /?url=<post>&mode_param
+        sw_params = {"url": entry.link}
+        if mode == "yt":
+            sw_params["yt"] = ""
+        elif mode == "gh":
+            sw_params["gh"] = ""
+        sw_url = prefix + "/?" + urlencode(sw_params)
+        cards.append({
+            "link": entry.link,
+            "sw_url": sw_url,
+            "title": entry.title,
+            "domain": domain,
+            "date": river_date(entry.updated),
+            "excerpt": excerpt,
+            "badge": badge,
+        })
+
+    # Build next page URL preserving params
+    next_page_url = None
+    if has_next:
+        params = {k: v for k, v in request.args.items() if k != "page"}
+        params["page"] = str(page + 1)
+        next_page_url = prefix + "/river?" + urlencode(params)
+
+    return render_template(
+        "river.html",
+        cards=cards,
+        page=page,
+        has_next=has_next,
+        next_page_url=next_page_url,
+        mode=mode,
+        topic=topic,
+        prefix=prefix + "/",
+        categories=CATEGORIES,
+        category_groups=CATEGORY_GROUPS,
+        feed_url=feed_url,
+        total=total,
+    )
 
 
 @app.route("/similar")

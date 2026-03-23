@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Small Web River</title>
+  {% set favicon_16_url = url_for('static', filename='favicon.png', v='20260317-classic') %}
+  {% set favicon_32_url = url_for('static', filename='favicon-32.png', v='20260317-classic') %}
+  {% set apple_touch_icon_url = url_for('static', filename='apple-touch-icon.png', v='20260317-classic') %}
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_32_url }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_16_url }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon_url }}">
+  <meta property="og:title" content="Kagi Small Web River">
+  <meta property="og:description" content="A river of posts from the small web. Personal blogs, independent voices.">
+  <meta property="og:image" content="{{ url_for('static', filename='SmallWeb.png', _external=True) }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.url }}">
+  {% if feed_url %}
+  <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
+  {% endif %}
+  <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='river.css') }}">
+  <script defer src="{{ url_for('static', filename='header-dark-mode.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='header-dropdowns.js') }}"></script>
+</head>
+
+<body>
+  <header id="header">
+    <div class="left">
+      <a href="{{ prefix }}" class="dropdown-link river-back-link" title="Back to Small Web">&larr; Back</a>
+    </div>
+    <div class="middle">
+      <div class="river-modes">
+        <a href="{{ prefix }}river" class="river-mode-link{% if mode == '' and not topic %} active{% endif %}">Web</a>
+        <div class="dropdown-container">
+          <button type="button" class="river-mode-link{% if topic %} active{% endif %}" title="Filter by topic" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="river-topics-dropdown">
+            {% if topic and topic in categories %}
+              {{ categories[topic][2] }} {{ categories[topic][0] }}
+            {% else %}
+              Topics
+            {% endif %}
+          </button>
+          <div class="dropdown-panel river-topics-dropdown" id="river-topics-dropdown">
+            {% if topic %}
+            <a class="share-option" href="{{ prefix }}river">All topics</a>
+            {% endif %}
+            {% for group_name, slugs in category_groups.items() %}
+              {% for slug in slugs if slug != 'spam' %}
+                {% set cat = categories[slug] %}
+                <a class="share-option{% if topic == slug %} selected{% endif %}" href="{{ prefix }}river?topic={{ slug }}">{{ cat[2] }} {{ cat[0] }}</a>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+        {% if topic %}
+        <a class="mode-inline-clear" href="{{ prefix }}river" title="Clear topic filter" aria-label="Clear topic filter">X</a>
+        {% endif %}
+        <span class="river-modes-sep"></span>
+        <a href="{{ prefix }}river?yt" class="river-mode-link{% if mode == 'yt' %} active{% endif %}">Videos</a>
+        <a href="{{ prefix }}river?gh" class="river-mode-link{% if mode == 'gh' %} active{% endif %}">Code</a>
+      </div>
+    </div>
+    <div class="right">
+      <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
+        <img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif">
+      </a>
+      <div class="dropdown-container">
+        <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="river-rss-dropdown">RSS</button>
+        <div class="dropdown-panel spread-love" id="river-rss-dropdown">
+          <a class="share-option" target="_blank" rel="noopener noreferrer" href="{{ feed_url }}">Atom Feed</a>
+          <a class="share-option" target="_blank" rel="noopener noreferrer" href="{{ prefix }}opml">OPML</a>
+        </div>
+      </div>
+      <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 1012.79 21 9 9 0 0021 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="river-main">
+    <div class="river-stream">
+      {% if not cards %}
+      <div class="river-empty">
+        <p>No posts right now. Check back soon.</p>
+      </div>
+      {% endif %}
+
+      {% for card in cards %}
+      <a href="{{ card.sw_url }}" class="river-card">
+        <h2 class="river-card-title">{{ card.title }}</h2>
+        <div class="river-card-meta">
+          <span class="river-card-domain">{{ card.domain }}</span>
+          <span class="river-card-sep">&middot;</span>
+          <span class="river-card-date">{{ card.date }}</span>
+          {% if card.badge %}
+          <span class="river-card-sep">&middot;</span>
+          <span class="river-card-badge">{{ card.badge[2] }} {{ card.badge[1] }}</span>
+          {% endif %}
+        </div>
+        {% if card.excerpt %}
+        <p class="river-card-excerpt">{{ card.excerpt }}</p>
+        {% endif %}
+      </a>
+      {% endfor %}
+
+      {% if has_next %}
+      <div class="river-load-more">
+        <a href="{{ next_page_url }}" class="btn river-load-btn">Load more posts</a>
+      </div>
+      {% endif %}
+
+      {% if cards and not has_next %}
+      <div class="river-end">
+        <p>You've reached the end.</p>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+</body>
+
+</html>
