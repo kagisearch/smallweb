@@ -37,6 +37,7 @@ class FeedEntry(NamedTuple):
     description: str
     updated: datetime
     categories: list
+    feed_url: str = ""
 
 
 API_BASE = "https://kagi.com/api/v1/smallweb/feed"
@@ -771,6 +772,13 @@ def update_entries(url):
                 if term in CATEGORIES and term not in categories:
                     categories.append(term)
 
+            # Extract source feed URL from <link rel="via"> if present
+            via_url = ""
+            for lnk in entry.get("links", []):
+                if lnk.get("rel") == "via":
+                    via_url = lnk.get("href", "")
+                    break
+
             formatted_entries.append(
                 FeedEntry(
                     link=link,
@@ -779,6 +787,7 @@ def update_entries(url):
                     description=entry.get("description", "") or _extract_content(entry),
                     updated=updated,
                     categories=categories,
+                    feed_url=via_url,
                 )
             )
 
@@ -1219,6 +1228,7 @@ def river():
             "date": river_date(entry.updated),
             "excerpt": excerpt,
             "badge": badge,
+            "feed_url": entry.feed_url,
         })
 
     # Build next page URL preserving params

@@ -105,8 +105,8 @@
   background: rgba(255, 255, 255, 0.025);
   border-left: 3px solid transparent;
   border-radius: 2px;
-  text-decoration: none;
   color: var(--color-text);
+  cursor: pointer;
   transition: background-color 0.15s ease, border-left-color 0.15s ease;
 }
 
@@ -115,7 +115,12 @@
   border-left-color: var(--color-accent);
 }
 
-.river-card:focus-visible {
+.river-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.river-card:focus-within {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
 }
@@ -165,6 +170,18 @@
   background: rgba(255, 255, 255, 0.045);
   padding: 2px 8px;
   border-radius: 2px;
+}
+
+/* ── Feed icon ── */
+.river-card-feed {
+  display: inline-flex;
+  align-items: center;
+  color: #607080;
+  transition: color 0.15s ease;
+}
+
+.river-card-feed:hover {
+  color: #f5a623;
 }
 
 /* ── Excerpt ── */
@@ -263,6 +280,10 @@ html:has(#global-dark-mode-style) .river-card-date {
 html:has(#global-dark-mode-style) .river-card-badge {
   color: #6a7580;
   background: rgba(0, 0, 0, 0.05);
+}
+
+html:has(#global-dark-mode-style) .river-card-feed {
+  color: #8a919a;
 }
 
 html:has(#global-dark-mode-style) .river-modes-sep {

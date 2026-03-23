@@ -91,8 +91,10 @@
       {% endif %}
 
       {% for card in cards %}
-      <a href="{{ card.sw_url }}" class="river-card">
-        <h2 class="river-card-title">{{ card.title }}</h2>
+      <div class="river-card" data-href="{{ card.sw_url }}">
+        <a href="{{ card.sw_url }}" class="river-card-link">
+          <h2 class="river-card-title">{{ card.title }}</h2>
+        </a>
         <div class="river-card-meta">
           <span class="river-card-domain">{{ card.domain }}</span>
           <span class="river-card-sep">&middot;</span>
@@ -101,11 +103,17 @@
           <span class="river-card-sep">&middot;</span>
           <span class="river-card-badge">{{ card.badge[2] }} {{ card.badge[1] }}</span>
           {% endif %}
+          {% if card.feed_url %}
+          <span class="river-card-sep">&middot;</span>
+          <a href="{{ card.feed_url }}" class="river-card-feed" target="_blank" rel="noopener noreferrer" title="RSS feed for {{ card.domain }}">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="6.18" cy="17.82" r="2.18"/><path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z"/></svg>
+          </a>
+          {% endif %}
         </div>
         {% if card.excerpt %}
         <p class="river-card-excerpt">{{ card.excerpt }}</p>
         {% endif %}
-      </a>
+      </div>
       {% endfor %}
 
       {% if has_next %}
@@ -121,6 +129,15 @@
       {% endif %}
     </div>
   </main>
+  <script>
+    document.querySelector('.river-stream').addEventListener('click', function(e) {
+      var card = e.target.closest('.river-card');
+      if (!card) return;
+      if (e.target.closest('.river-card-feed')) return;
+      var href = card.dataset.href;
+      if (href) window.location = href;
+    });
+  </script>
 </body>
 
 </html>
