@@ -98,7 +98,7 @@ What is Small Web exactly? Recommend reading:
 
 - https://neustadt.fr/essays/the-small-web/
 - https://benhoyt.com/writings/the-small-web-is-beautiful/
-- https://smallweb.page/why
+- (https://wychwitch.neocities.org/finals/why
 - https://ar.al/2020/08/07/what-is-the-small-web/
 - https://news.ycombinator.com/item?id=29768197
 
