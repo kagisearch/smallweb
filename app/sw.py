@@ -1535,12 +1535,14 @@ def api_random():
     entry = _pick_unseen(cache, seen)
     domain = get_registered_domain(entry.link)
     domain = re.sub(r"^(www\.)?", "", domain)
+    likes_total = sum(likes_dict.get(entry.link, OrderedDict()).values())
 
     response = jsonify({
         "url": entry.link,
         "title": entry.title,
         "author": entry.author,
         "domain": domain,
+        "likes": likes_total,
         "categories": [
             [s, CATEGORIES[s][0], CATEGORIES[s][2]]
             for s in entry.categories if s in CATEGORIES
