@@ -1542,7 +1542,7 @@ def api_random():
         "title": entry.title,
         "author": entry.author,
         "domain": domain,
-        "likes_total": likes_total,
+        "likes": likes_total,
         "categories": [
             [s, CATEGORIES[s][0], CATEGORIES[s][2]]
             for s in entry.categories if s in CATEGORIES
