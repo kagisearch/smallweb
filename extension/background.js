@@ -24,7 +24,7 @@ let cache = {
   youtube: { entries: [], lastFetch: 0 },
   github: { entries: [], lastFetch: 0 },
   comics: { entries: [], lastFetch: 0 },
-  appreciated: { entries: [], lastFetch: 0 },
+  liked: { entries: [], lastFetch: 0 },
   saved: { entries: [], lastFetch: 0 }
 };
 
@@ -34,7 +34,7 @@ let nextQueue = {
   youtube: null,
   github: null,
   comics: null,
-  appreciated: null,
+  liked: null,
   saved: null
 };
 
@@ -129,7 +129,7 @@ const FEED_URLS = {
   youtube: API_BASE + '?yt',
   github: API_BASE + '?gh',
   comics: API_BASE + '?comic',
-  appreciated: SMALLWEB_BASE + '/appreciated'
+  liked: SMALLWEB_BASE + '/liked'
 };
 
 function fetchFeed(mode) {
@@ -209,18 +209,18 @@ function getPreloadUrl(mode) {
 }
 
 // ═══════════════════════════════════════
-// APPRECIATE
+// LIKE
 // ═══════════════════════════════════════
 
-async function appreciatePost(url) {
+async function likePost(url) {
   try {
     const formData = new FormData();
     formData.append('url', url);
     formData.append('emoji', '👍');
-    const response = await fetch(SMALLWEB_BASE + '/favorite', {
+    const response = await fetch(SMALLWEB_BASE + '/like', {
       method: 'POST', body: formData, credentials: 'include'
     });
-    cache.appreciated.lastFetch = 0;
+    cache.liked.lastFetch = 0;
     return response.ok;
   } catch (e) {
     return false;
@@ -392,11 +392,11 @@ if (IS_FIREFOX) {
 
 async function handleMessage(message) {
   const { type } = message;
+  const mode = message.mode === 'appreciated' ? 'liked' : (message.mode || 'blogs');
 
   if (type === 'init') {
     try {
-      await Promise.all(['blogs', 'youtube', 'github', 'comics', 'appreciated'].map(ensureFeedLoaded));
-      const mode = message.mode || 'blogs';
+      await Promise.all(['blogs', 'youtube', 'github', 'comics', 'liked'].map(ensureFeedLoaded));
       return { ready: cache[mode].entries.length > 0, preloadUrl: getPreloadUrl(mode) };
     } catch (e) {
       return { ready: false, error: e.message };
@@ -407,7 +407,7 @@ async function handleMessage(message) {
     await loadSavedPosts();
     return {
       blogs: cache.blogs.entries.length,
-      appreciated: cache.appreciated.entries.length,
+      liked: cache.liked.entries.length,
       youtube: cache.youtube.entries.length,
       github: cache.github.entries.length,
       comics: cache.comics.entries.length,
@@ -416,7 +416,6 @@ async function handleMessage(message) {
   }
 
   if (type === 'getNextPost') {
-    const mode = message.mode || 'blogs';
     const category = message.category || null;
     await (mode === 'saved' ? loadSavedPosts() : ensureFeedLoaded(mode));
     return { post: getNextPost(mode, category), preloadUrl: getPreloadUrl(mode) };
@@ -436,7 +435,7 @@ async function handleMessage(message) {
   }
 
   if (type === 'getPreloadUrl') {
-    return { preloadUrl: getPreloadUrl(message.mode || 'blogs') };
+    return { preloadUrl: getPreloadUrl(mode) };
   }
 
   if (type === 'navigate') {
@@ -464,8 +463,8 @@ async function handleMessage(message) {
     return { success: !!message.url };
   }
 
-  if (type === 'appreciate') {
-    return { success: await appreciatePost(message.url) };
+  if (type === 'like' || type === 'appreciate') {
+    return { success: await likePost(message.url) };
   }
 
   if (type === 'savePost') {

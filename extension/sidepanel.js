@@ -48,7 +48,7 @@ const CATEGORY_GROUPS = [
 const discoverBtn = document.getElementById('nextPost');
 const postLoading = document.getElementById('postLoading');
 const readerBtn = document.getElementById('readerBtn');
-const appreciateBtn = document.getElementById('appreciateBtn');
+const likeBtn = document.getElementById('likeBtn');
 const listLabel = document.getElementById('listLabel');
 const listItems = document.getElementById('listItems');
 const clearListBtn = document.getElementById('clearList');
@@ -75,11 +75,18 @@ async function init() {
 
   // Load saved state
   const stored = await api.storage.local.get(['history', 'currentMode', 'readerModeEnabled', 'dyslexiaModeEnabled', 'ttsEnabled', 'currentCategory']);
+  let shouldPersistState = false;
   if (stored.history) {
     history = stored.history;
+    if (history.appreciated && !history.liked) {
+      history.liked = history.appreciated;
+      delete history.appreciated;
+      shouldPersistState = true;
+    }
   }
   if (stored.currentMode) {
-    currentMode = stored.currentMode;
+    currentMode = stored.currentMode === 'appreciated' ? 'liked' : stored.currentMode;
+    shouldPersistState = shouldPersistState || currentMode !== stored.currentMode;
   }
   if (stored.readerModeEnabled) {
     readerModeEnabled = true;
@@ -96,6 +103,9 @@ async function init() {
   }
   if (stored.currentCategory) {
     currentCategory = stored.currentCategory;
+  }
+  if (shouldPersistState) {
+    api.storage.local.set({ history, currentMode });
   }
 
   updateModeUI();
@@ -141,7 +151,7 @@ async function init() {
 // Update mode tabs with item counts (shown on hover)
 const tabLabels = {
   blogs: 'Web',
-  appreciated: 'Appreciated',
+  liked: 'Liked',
   youtube: 'Videos',
   github: 'Code',
   comics: 'Comics',
@@ -233,8 +243,8 @@ function updatePostUI() {
   // Keep reader mode state
   readerBtn.classList.toggle('active', readerModeEnabled);
 
-  // Reset appreciate button
-  appreciateBtn.classList.remove('active');
+  // Reset like button
+  likeBtn.classList.remove('active');
 }
 
 // Toggle reader mode
@@ -262,23 +272,23 @@ async function toggleReaderMode() {
   }
 }
 
-// Appreciate current post (also saves it automatically)
-async function appreciatePost() {
+// Like current post (also saves it automatically)
+async function likePost() {
   if (!currentPost) {
     showToast('Discover a post first', true);
     return;
   }
 
-  appreciateBtn.classList.add('active');
+  likeBtn.classList.add('active');
 
   try {
     await Promise.all([
-      api.runtime.sendMessage({ type: 'appreciate', url: currentPost.link }),
+      api.runtime.sendMessage({ type: 'like', url: currentPost.link }),
       api.runtime.sendMessage({ type: 'savePost', post: currentPost })
     ]);
     updateTabCounts();
   } catch (error) {
-    appreciateBtn.classList.remove('active');
+    likeBtn.classList.remove('active');
   }
 }
 
@@ -425,7 +435,7 @@ async function renderList() {
     // Show recent history for this mode
     const modeLabels = {
       blogs: 'Recently Viewed',
-      appreciated: 'Recently Viewed Appreciated',
+      liked: 'Recently Viewed Liked',
       youtube: 'Recently Viewed Videos',
       github: 'Recently Viewed Code',
       comics: 'Recently Viewed Comics'
@@ -606,7 +616,7 @@ function escapeHtml(text) {
 discoverBtn.addEventListener('click', discover);
 clearListBtn.addEventListener('click', clearList);
 readerBtn.addEventListener('click', toggleReaderMode);
-appreciateBtn.addEventListener('click', appreciatePost);
+likeBtn.addEventListener('click', likePost);
 ttsBtn.addEventListener('click', toggleTTS);
 dyslexiaBtn.addEventListener('click', toggleDyslexia);
 
