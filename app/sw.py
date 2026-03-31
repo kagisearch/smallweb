@@ -510,6 +510,8 @@ DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
     os.makedirs(DIR_DATA)
 PATH_LIKES = os.path.join(DIR_DATA, "likes.json")
+# Keep the legacy filename in sync while older deployments/rollbacks still
+# expect favorites.json on disk.
 PATH_FAVORITES_LEGACY = os.path.join(DIR_DATA, "favorites.json")
 PATH_NOTES = os.path.join(DIR_DATA, "notes.json")
 PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.json")
@@ -852,6 +854,7 @@ def index():
     elif "yt" in request.args:
         cache = urls_yt_cache
         current_mode = 1
+    # `?app` is kept as a legacy alias for older native-app builds.
     elif "liked" in request.args or "app" in request.args:
         cache = urls_liked_cache
         current_mode = 2
@@ -1301,6 +1304,7 @@ def similar():
 
 @app.post("/like")
 @app.post(f"{prefix}/like")
+# Keep `/favorite` working until older clients switch to `/like`.
 @app.post("/favorite")
 @app.post(f"{prefix}/favorite")
 def like():
@@ -1451,6 +1455,7 @@ def feed():
     elif "yt" in request.args:
         cache, title = urls_yt_cache, "Kagi Small Web - Videos"
         feed_url = "https://kagi.com/smallweb/feed?yt"
+    # `?app` is kept as a legacy alias for older native-app builds.
     elif "liked" in request.args or "app" in request.args:
         cache, title = urls_liked_cache, "Kagi Small Web - Liked"
         feed_url = "https://kagi.com/smallweb/feed?liked"
@@ -1492,6 +1497,7 @@ def feed():
 
 @app.route("/liked")
 @app.route(f"{prefix}/liked")
+# Keep `/appreciated` working for existing feed subscribers and older clients.
 @app.route("/appreciated")
 @app.route(f"{prefix}/appreciated")
 def liked():
@@ -1504,6 +1510,7 @@ def liked():
 def api_random():
     if "yt" in request.args:
         cache = urls_yt_cache
+    # `?app` is kept as a legacy alias for older native-app builds.
     elif "liked" in request.args or "app" in request.args:
         cache = urls_liked_cache
     elif "gh" in request.args:

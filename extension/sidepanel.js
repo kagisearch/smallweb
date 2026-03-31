@@ -78,6 +78,7 @@ async function init() {
   let shouldPersistState = false;
   if (stored.history) {
     history = stored.history;
+    // Migrate pre-rename persisted history on first launch after the update.
     if (history.appreciated && !history.liked) {
       history.liked = history.appreciated;
       delete history.appreciated;
@@ -85,6 +86,7 @@ async function init() {
     }
   }
   if (stored.currentMode) {
+    // Migrate the old persisted mode name so users stay on the same tab.
     currentMode = stored.currentMode === 'appreciated' ? 'liked' : stored.currentMode;
     shouldPersistState = shouldPersistState || currentMode !== stored.currentMode;
   }

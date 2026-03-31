@@ -392,6 +392,7 @@ if (IS_FIREFOX) {
 
 async function handleMessage(message) {
   const { type } = message;
+  // Normalize the pre-rename mode value so existing extension state keeps working.
   const mode = message.mode === 'appreciated' ? 'liked' : (message.mode || 'blogs');
 
   if (type === 'init') {
@@ -463,6 +464,7 @@ async function handleMessage(message) {
     return { success: !!message.url };
   }
 
+  // Accept the old message type while older extension code paths are still around.
   if (type === 'like' || type === 'appreciate') {
     return { success: await likePost(message.url) };
   }
