@@ -127,8 +127,8 @@ body {
   transform: translateX(3px);
 }
 
-/* Appreciate - Heart button */
-.appreciate-btn {
+/* Like - Heart button */
+.like-btn {
   width: 56px;
   height: 56px;
   display: flex;
@@ -142,18 +142,18 @@ body {
   transition: all 0.15s;
 }
 
-.appreciate-btn:hover {
+.like-btn:hover {
   border-color: var(--orange);
   color: var(--orange);
 }
 
-.appreciate-btn.active {
+.like-btn.active {
   background: var(--orange);
   border-color: var(--orange);
   color: white;
 }
 
-.appreciate-btn.active svg {
+.like-btn.active svg {
   fill: white;
 }
 

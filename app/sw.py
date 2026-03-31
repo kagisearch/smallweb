@@ -276,12 +276,12 @@ CATEGORY_GROUPS = OrderedDict(
 # Remap legacy category slugs from the feed API
 CATEGORY_REMAP = {"sysadmin": "infra", "security": "infra"}
 
-appreciated_feed = None  # Initialize the variable to store the appreciated Atom feed
+liked_feed = None  # Initialize the variable to store the liked Atom feed
 opml_cache = None  # will hold generated OPML xml
 
-# NOTE(z64): List of emotes that can be used for favoriting.
+# NOTE(z64): List of emotes that can be used for likes.
 # Used to build the list in the template, and perform validation on the server.
-favorite_emoji_list = [
+like_emoji_list = [
     "👍",
     "😍",
     "😀",
@@ -404,14 +404,14 @@ def find_similar(url, seen, cache):
     return None
 
 
-def generate_appreciated_feed():
-    """Generate Atom feed for appreciated posts"""
-    global appreciated_feed
-    appreciated_feed = AtomFeed(
-        "Kagi Small Web Appreciated", feed_url="https://kagi.com/smallweb/appreciated"
+def generate_liked_feed():
+    """Generate Atom feed for liked posts."""
+    global liked_feed
+    liked_feed = AtomFeed(
+        "Kagi Small Web Liked", feed_url="https://kagi.com/smallweb/liked"
     )
-    for entry in urls_app_cache:
-        appreciated_feed.add(
+    for entry in urls_liked_cache:
+        liked_feed.add(
             title=entry.title,
             content=entry.description,
             content_type="html",
@@ -509,7 +509,10 @@ def generate_opml_feed() -> str:
 DIR_DATA = "data"
 if not os.path.isdir(DIR_DATA):
     os.makedirs(DIR_DATA)
-PATH_FAVORITES = os.path.join(DIR_DATA, "favorites.json")
+PATH_LIKES = os.path.join(DIR_DATA, "likes.json")
+# Keep the legacy filename in sync while older deployments/rollbacks still
+# expect favorites.json on disk.
+PATH_FAVORITES_LEGACY = os.path.join(DIR_DATA, "favorites.json")
 PATH_NOTES = os.path.join(DIR_DATA, "notes.json")
 PATH_FLAGGED = os.path.join(DIR_DATA, "flagged_content.json")
 
@@ -544,6 +547,17 @@ def _load_json(path, deserializer=None):
     except Exception as e:
         logger.error("Failed to load %s: %s", path, e)
         return None
+
+
+def save_likes():
+    """Persist likes to the canonical file and the legacy favorites file."""
+    payload = {u: dict(emojis) for u, emojis in likes_dict.items()}
+    for path in [PATH_LIKES, PATH_FAVORITES_LEGACY]:
+        try:
+            with open(path, "w", encoding="utf-8") as file:
+                json.dump(payload, file)
+        except OSError as e:
+            logger.error("Cannot write likes file %s: %s", path, e)
 
 
 def time_ago(timestamp):
@@ -626,7 +640,7 @@ def _render_no_results(
         prefix=prefix + "/",
         videoid="",
         current_mode=current_mode,
-        favorites_count=0,
+        likes_count=0,
         notes_count=0,
         notes_list=[],
         flag_content_count=0,
@@ -636,7 +650,7 @@ def _render_no_results(
         feed_unavailable=feed_unavailable,
         reactions_dict=OrderedDict(),
         reactions_list=[],
-        favorites_total=0,
+        likes_total=0,
         next_link="",
         next_doc_url="",
         next_host="",
@@ -651,14 +665,14 @@ def _render_no_results(
 def update_all():
     global \
         urls_cache, \
-        urls_app_cache, \
+        urls_liked_cache, \
         urls_yt_cache, \
         urls_gh_cache, \
         urls_comic_cache, \
         urls_flagged_cache, \
         master_feed, \
-        favorites_dict, \
-        appreciated_feed
+        likes_dict, \
+        liked_feed
 
     url = API_BASE + "/"
 
@@ -702,15 +716,15 @@ def update_all():
         if not urls_comic_cache or new_entries:
             urls_comic_cache = new_entries
 
-        # Prune favorites_dict to only include URLs present in urls_cache or urls_yt_cache
+        # Prune likes_dict to only include URLs present in urls_cache or urls_yt_cache
         current_urls = set(entry.link for entry in urls_cache + urls_yt_cache)
-        favorites_dict = {
-            u: count for u, count in favorites_dict.items() if u in current_urls
+        likes_dict = {
+            u: count for u, count in likes_dict.items() if u in current_urls
         }
 
-        # Build urls_app_cache from appreciated entries in urls_cache and urls_yt_cache
-        urls_app_cache = [
-            e for e in (urls_cache + urls_yt_cache) if e.link in favorites_dict
+        # Build urls_liked_cache from liked entries in urls_cache and urls_yt_cache
+        urls_liked_cache = [
+            e for e in (urls_cache + urls_yt_cache) if e.link in likes_dict
         ]
 
         # Build urls_flagged_cache from flagged entries in all caches
@@ -720,8 +734,8 @@ def update_all():
             if e.link in flagged_content_dict
         ]
 
-        # Generate the appreciated feed
-        generate_appreciated_feed()
+        # Generate the liked feed
+        generate_liked_feed()
 
         # Update cached OPML
         global opml_cache
@@ -826,7 +840,7 @@ def get_registered_domain(url):
 
 @app.route("/")
 def index():
-    global urls_cache, urls_yt_cache, urls_app_cache, urls_gh_cache, urls_flagged_cache
+    global urls_cache, urls_yt_cache, urls_liked_cache, urls_gh_cache, urls_flagged_cache
 
     url = request.args.get("url")
     should_redirect_to_chosen_url = not url
@@ -840,8 +854,9 @@ def index():
     elif "yt" in request.args:
         cache = urls_yt_cache
         current_mode = 1
-    elif "app" in request.args:
-        cache = urls_app_cache
+    # `?app` is kept as a legacy alias for older native-app builds.
+    elif "liked" in request.args or "app" in request.args:
+        cache = urls_liked_cache
         current_mode = 2
     elif "gh" in request.args:
         cache = urls_gh_cache
@@ -994,8 +1009,8 @@ def index():
             if not next_candidates:
                 next_candidates = next_pool
             # 7% chance next post comes from the liked pool (unseen)
-            if current_mode != 2 and urls_app_cache and random.random() < 0.07:
-                liked_unseen = [e for e in urls_app_cache if _hash_url(e.link) not in seen_plus and e.link != url]
+            if current_mode != 2 and urls_liked_cache and random.random() < 0.07:
+                liked_unseen = [e for e in urls_liked_cache if _hash_url(e.link) not in seen_plus and e.link != url]
                 if liked_unseen:
                     next_entry = random.choice(liked_unseen)
                     next_candidates = None  # skip normal selection
@@ -1033,9 +1048,9 @@ def index():
             videoid = query_params["v"][0]
             current_mode = 1
 
-    # get favorites
-    reactions_dict = favorites_dict.get(url, OrderedDict())
-    favorites_total = sum(reactions_dict.values())
+    # get likes
+    reactions_dict = likes_dict.get(url, OrderedDict())
+    likes_total = sum(reactions_dict.values())
 
     # Preserve all query parameters except 'url'
     query_string = _build_redirect_params()
@@ -1095,7 +1110,7 @@ def index():
     elif current_mode == 1:
         feed_url = prefix + "/feed?yt"
     elif current_mode == 2:
-        feed_url = prefix + "/feed?app"
+        feed_url = prefix + "/feed?liked"
     elif current_mode == 3:
         feed_url = prefix + "/feed?gh"
     elif current_mode == 4:
@@ -1107,7 +1122,7 @@ def index():
 
     # Calculate counts
     all_count = len(urls_cache) if urls_cache else 0
-    appreciated_count = len(urls_app_cache) if urls_app_cache else 0
+    liked_count = len(urls_liked_cache) if urls_liked_cache else 0
     videos_count = len(urls_yt_cache) if urls_yt_cache else 0
     code_count = len(urls_gh_cache) if urls_gh_cache else 0
     comics_count = len(urls_comic_cache) if urls_comic_cache else 0
@@ -1115,7 +1130,7 @@ def index():
     # NOTE(z64): Some invalid reactions may be left over in the pkl file; filter them out.
     reactions_list = []
     for emoji, count in reactions_dict.items():
-        if emoji in favorite_emoji_list:
+        if emoji in like_emoji_list:
             reactions_list.append((emoji, count))
 
     resp = make_response(
@@ -1135,7 +1150,7 @@ def index():
             flag_content_count=flag_content_count,
             search_query=search_query,
             all_count=all_count,
-            appreciated_count=appreciated_count,
+            liked_count=liked_count,
             videos_count=videos_count,
             code_count=code_count,
             comics_count=comics_count,
@@ -1143,8 +1158,8 @@ def index():
             next_doc_url=next_doc_url,
             next_host=next_host,
             reactions_list=reactions_list,
-            favorites_total=favorites_total,
-            favorite_emoji_list=favorite_emoji_list,
+            likes_total=likes_total,
+            like_emoji_list=like_emoji_list,
             reactions_dict=reactions_dict,
             categories=CATEGORIES,
             category_groups=CATEGORY_GROUPS,
@@ -1287,44 +1302,41 @@ def similar():
     return redirect(prefix + "/?" + urlencode(params) if params else prefix + "/")
 
 
+@app.post("/like")
+@app.post(f"{prefix}/like")
+# Keep `/favorite` working until older clients switch to `/like`.
 @app.post("/favorite")
 @app.post(f"{prefix}/favorite")
-def favorite():
-    global favorites_dict, time_saved_favorites, urls_app_cache, appreciated_feed
+def like():
+    global likes_dict, time_saved_likes, urls_liked_cache, liked_feed
     url = request.form.get("url")
 
     emoji = "👍"
     emoji_from_form = request.form.get("emoji")
-    if emoji_from_form and emoji_from_form in favorite_emoji_list:
+    if emoji_from_form and emoji_from_form in like_emoji_list:
         emoji = emoji_from_form
 
     if url:
-        entry = favorites_dict.get(url)
+        entry = likes_dict.get(url)
         if not isinstance(entry, OrderedDict):
             entry = OrderedDict()  # initialise
         # enforce max 3 distinct emojis (drop oldest)
         if emoji not in entry and len(entry) >= 3:
             entry.popitem(last=False)
         entry[emoji] = entry.get(emoji, 0) + 1
-        favorites_dict[url] = entry
+        likes_dict[url] = entry
 
-        # Update urls_app_cache with the new favorite from both regular and YouTube feeds
-        urls_app_cache = [
-            e for e in (urls_cache + urls_yt_cache) if e.link in favorites_dict
+        # Update urls_liked_cache with the new liked post from both regular and YouTube feeds
+        urls_liked_cache = [
+            e for e in (urls_cache + urls_yt_cache) if e.link in likes_dict
         ]
 
-        # Regenerate the appreciated feed
-        generate_appreciated_feed()
+        # Regenerate the liked feed
+        generate_liked_feed()
 
         # Save to disk immediately (multi-instance deployment requires immediate persistence)
-        time_saved_favorites = datetime.now()
-        try:
-            with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
-                json.dump(
-                    {u: dict(emojis) for u, emojis in favorites_dict.items()}, file
-                )
-        except OSError as e:
-            logger.error("Cannot write favorites file: %s", e)
+        time_saved_likes = datetime.now()
+        save_likes()
 
         # Always try to redirect to a similar post after a like
         if url in embeddings_cache:
@@ -1443,9 +1455,10 @@ def feed():
     elif "yt" in request.args:
         cache, title = urls_yt_cache, "Kagi Small Web - Videos"
         feed_url = "https://kagi.com/smallweb/feed?yt"
-    elif "app" in request.args:
-        cache, title = urls_app_cache, "Kagi Small Web - Appreciated"
-        feed_url = "https://kagi.com/smallweb/feed?app"
+    # `?app` is kept as a legacy alias for older native-app builds.
+    elif "liked" in request.args or "app" in request.args:
+        cache, title = urls_liked_cache, "Kagi Small Web - Liked"
+        feed_url = "https://kagi.com/smallweb/feed?liked"
     elif "gh" in request.args:
         cache, title = urls_gh_cache, "Kagi Small Web - Code"
         feed_url = "https://kagi.com/smallweb/feed?gh"
@@ -1482,10 +1495,14 @@ def feed():
     return Response(atom.to_string(), mimetype="application/atom+xml")
 
 
+@app.route("/liked")
+@app.route(f"{prefix}/liked")
+# Keep `/appreciated` working for existing feed subscribers and older clients.
 @app.route("/appreciated")
-def appreciated():
-    global appreciated_feed
-    return Response(appreciated_feed.to_string(), mimetype="application/atom+xml")
+@app.route(f"{prefix}/appreciated")
+def liked():
+    global liked_feed
+    return Response(liked_feed.to_string(), mimetype="application/atom+xml")
 
 
 @app.route("/api/random")
@@ -1493,8 +1510,9 @@ def appreciated():
 def api_random():
     if "yt" in request.args:
         cache = urls_yt_cache
-    elif "app" in request.args:
-        cache = urls_app_cache
+    # `?app` is kept as a legacy alias for older native-app builds.
+    elif "liked" in request.args or "app" in request.args:
+        cache = urls_liked_cache
     elif "gh" in request.args:
         cache = urls_gh_cache
     elif "comic" in request.args:
@@ -1541,26 +1559,30 @@ def opml():
     return Response(opml_cache, mimetype="text/x-opml+xml")
 
 
-time_saved_favorites = datetime.now()
+time_saved_likes = datetime.now()
 time_saved_notes = datetime.now()
 time_saved_flagged_content = datetime.now()
 
 urls_cache = []
 urls_yt_cache = []
-urls_app_cache = []
+urls_liked_cache = []
 urls_gh_cache = []
 urls_comic_cache = []
 urls_flagged_cache = []
 
-favorites_dict = (
+likes_dict = (
     _load_json(
-        PATH_FAVORITES,
+        PATH_LIKES,
+        lambda d: {url: OrderedDict(emojis) for url, emojis in d.items()},
+    )
+    or _load_json(
+        PATH_FAVORITES_LEGACY,
         lambda d: {url: OrderedDict(emojis) for url, emojis in d.items()},
     )
     or {}
 )
-urls_app_cache = []  # Initialize empty in case urls_cache isn't loaded yet
-generate_appreciated_feed()  # Initialize the appreciated feed
+urls_liked_cache = []  # Initialize empty in case urls_cache isn't loaded yet
+generate_liked_feed()  # Initialize the liked feed
 
 notes_dict = _load_json(PATH_NOTES, deserialize_notes) or {}
 
@@ -1584,11 +1606,10 @@ def save_all_data():
     """Save all data before shutdown."""
     logger.info("Saving all data before shutdown...")
     try:
-        with open(PATH_FAVORITES, "w", encoding="utf-8") as file:
-            json.dump({u: dict(emojis) for u, emojis in favorites_dict.items()}, file)
-            logger.info("Saved %d favorites", len(favorites_dict))
+        save_likes()
+        logger.info("Saved %d likes", len(likes_dict))
     except Exception as e:
-        logger.error("Error saving favorites: %s", e)
+        logger.error("Error saving likes: %s", e)
 
     try:
         with open(PATH_NOTES, "w", encoding="utf-8") as file:
@@ -1603,7 +1624,6 @@ def save_all_data():
             logger.info("Saved %d flagged items", len(flagged_content_dict))
     except Exception as e:
         logger.error("Error saving flagged content: %s", e)
-
 
 atexit.register(save_all_data)
 atexit.register(lambda: scheduler.shutdown())

@@ -53,7 +53,7 @@
   <header id="header">
     {%- set mode_entries = [
       ("Websites", prefix, 0),
-      ("Liked", prefix ~ "?app", 2),
+      ("Liked", prefix ~ "?liked", 2),
       ("Videos", prefix ~ "?yt", 1),
       ("Code", prefix ~ "?gh", 3),
       ("Comics", prefix ~ "?comic", 4)
@@ -74,7 +74,7 @@
 
       <div id="reactions" role="group" aria-label="Reactions">
 {% set thumb_cnt = reactions_dict.get('👍', 0) %}
-<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+<form action="{{ prefix }}like?{{ request.query_string.decode()|safe }}"
       method="post" class="emoji-form">
   <input type="hidden" name="url" value="{{ url }}">
   <input type="hidden" name="emoji" value="👍">
@@ -85,7 +85,7 @@
 </form>
 
 {% for emoji, cnt in reactions_list if emoji != '👍' %}
-<form action="{{ prefix }}favorite?{{ request.query_string.decode()|safe }}"
+<form action="{{ prefix }}like?{{ request.query_string.decode()|safe }}"
       method="post" class="emoji-form">
   <input type="hidden" name="url" value="{{ url }}">
   <input type="hidden" name="emoji" value="{{ emoji }}">
@@ -257,7 +257,7 @@
         <div class="dropdown-panel spread-love rss-dropdown" id="rss-dropdown">
           <p>Grab the RSS feed you like.</p>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/">Small Web ({% if all_count is defined %}{{ all_count }}{% else %}0{% endif %})</a>
-         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/appreciated">Appreciated ({% if appreciated_count is defined %}{{ appreciated_count }}{% else %}0{% endif %})</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/liked">Liked ({% if liked_count is defined %}{{ liked_count }}{% else %}0{% endif %})</a>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos ({% if videos_count is defined %}{{ videos_count }}{% else %}0{% endif %})</a>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code ({% if code_count is defined %}{{ code_count }}{% else %}0{% endif %})</a>
          <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?comic">Comics ({% if comics_count is defined %}{{ comics_count }}{% else %}0{% endif %})</a>
