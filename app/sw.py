@@ -560,6 +560,36 @@ def save_likes():
             logger.error("Cannot write likes file %s: %s", path, e)
 
 
+def _rebuild_liked_cache():
+    """Refresh the cached liked entries and Atom feed."""
+    global urls_liked_cache
+    urls_liked_cache = [e for e in (urls_cache + urls_yt_cache) if e.link in likes_dict]
+    generate_liked_feed()
+
+
+def _apply_like(url, emoji="👍", count=1):
+    """Apply one or more reactions to a URL and persist the result."""
+    global likes_dict, time_saved_likes
+
+    entry = likes_dict.get(url)
+    if not isinstance(entry, OrderedDict):
+        entry = OrderedDict()
+
+    if emoji not in entry and len(entry) >= 3:
+        entry.popitem(last=False)
+
+    entry[emoji] = entry.get(emoji, 0) + count
+    likes_dict[url] = entry
+
+    _rebuild_liked_cache()
+
+    # Save to disk immediately (multi-instance deployment requires immediate persistence)
+    time_saved_likes = datetime.now()
+    save_likes()
+
+    return entry
+
+
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
     seconds = delta.total_seconds()
@@ -1308,7 +1338,6 @@ def similar():
 @app.post("/favorite")
 @app.post(f"{prefix}/favorite")
 def like():
-    global likes_dict, time_saved_likes, urls_liked_cache, liked_feed
     url = request.form.get("url")
 
     emoji = "👍"
@@ -1317,26 +1346,7 @@ def like():
         emoji = emoji_from_form
 
     if url:
-        entry = likes_dict.get(url)
-        if not isinstance(entry, OrderedDict):
-            entry = OrderedDict()  # initialise
-        # enforce max 3 distinct emojis (drop oldest)
-        if emoji not in entry and len(entry) >= 3:
-            entry.popitem(last=False)
-        entry[emoji] = entry.get(emoji, 0) + 1
-        likes_dict[url] = entry
-
-        # Update urls_liked_cache with the new liked post from both regular and YouTube feeds
-        urls_liked_cache = [
-            e for e in (urls_cache + urls_yt_cache) if e.link in likes_dict
-        ]
-
-        # Regenerate the liked feed
-        generate_liked_feed()
-
-        # Save to disk immediately (multi-instance deployment requires immediate persistence)
-        time_saved_likes = datetime.now()
-        save_likes()
+        _apply_like(url, emoji=emoji, count=1)
 
         # Always try to redirect to a similar post after a like
         if url in embeddings_cache:
@@ -1360,6 +1370,74 @@ def like():
     else:
         # If no URL, just redirect to prefix
         return redirect(prefix + "/")
+
+
+@app.post("/api/like")
+@app.post(f"{prefix}/api/like")
+def api_like():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"ok": False, "error": "expected JSON object"}), 400
+
+    raw_url = payload.get("url")
+    url = raw_url.strip() if isinstance(raw_url, str) else ""
+    if not url:
+        return jsonify({"ok": False, "error": "missing url"}), 400
+
+    emoji = "👍"
+    emoji_from_input = payload.get("emoji")
+    if emoji_from_input and emoji_from_input in like_emoji_list:
+        emoji = emoji_from_input
+
+    entry = _apply_like(url, emoji=emoji, count=1)
+    return jsonify(
+        {
+            "ok": True,
+            "url": url,
+            "emoji": emoji,
+            "reaction_count": entry.get(emoji, 0),
+            "likes_total": sum(entry.values()),
+        }
+    )
+
+
+@app.post("/api/likes")
+@app.post(f"{prefix}/api/likes")
+def api_likes():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"ok": False, "error": "expected JSON object"}), 400
+
+    raw_url = payload.get("url")
+    url = raw_url.strip() if isinstance(raw_url, str) else ""
+    if not url:
+        return jsonify({"ok": False, "error": "missing url"}), 400
+
+    emoji = "👍"
+    emoji_from_input = payload.get("emoji")
+    if emoji_from_input and emoji_from_input in like_emoji_list:
+        emoji = emoji_from_input
+
+    try:
+        count = int(payload.get("count", 1))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "count must be an integer"}), 400
+
+    if count < 1:
+        return jsonify({"ok": False, "error": "count must be greater than 0"}), 400
+
+    entry = _apply_like(url, emoji=emoji, count=count)
+    return jsonify(
+        {
+            "ok": True,
+            "url": url,
+            "emoji": emoji,
+            "requested": count,
+            "applied": count,
+            "reaction_count": entry.get(emoji, 0),
+            "likes_total": sum(entry.values()),
+        }
+    )
 
 
 @app.post("/note")
