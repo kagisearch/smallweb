@@ -1401,6 +1401,45 @@ def api_like():
     )
 
 
+@app.post("/api/likes")
+@app.post(f"{prefix}/api/likes")
+def api_likes():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"ok": False, "error": "expected JSON object"}), 400
+
+    raw_url = payload.get("url")
+    url = raw_url.strip() if isinstance(raw_url, str) else ""
+    if not url:
+        return jsonify({"ok": False, "error": "missing url"}), 400
+
+    emoji = "👍"
+    emoji_from_input = payload.get("emoji")
+    if emoji_from_input and emoji_from_input in like_emoji_list:
+        emoji = emoji_from_input
+
+    try:
+        count = int(payload.get("count", 1))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "error": "count must be an integer"}), 400
+
+    if count < 1:
+        return jsonify({"ok": False, "error": "count must be greater than 0"}), 400
+
+    entry = _apply_like(url, emoji=emoji, count=count)
+    return jsonify(
+        {
+            "ok": True,
+            "url": url,
+            "emoji": emoji,
+            "requested": count,
+            "applied": count,
+            "reaction_count": entry.get(emoji, 0),
+            "likes_total": sum(entry.values()),
+        }
+    )
+
+
 @app.post("/note")
 @app.post(f"{prefix}/note")
 def note():
