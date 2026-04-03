@@ -30,11 +30,9 @@ http://annievella.com/index.xml
 http://anthonybalducci.blogspot.com/atom.xml
 http://antoinealb.net/feed.xml
 http://antonym.org/feed.xml
-https://araffin.github.io/index.xml
 http://arches.io/index.xml
 http://archimago.blogspot.com/feeds/posts/default
 http://arcturus-labs.com/feed_rss_created.xml
-https://argmax.blog/index.xml
 http://armueller.github.io/feed.xml
 http://arnesonium.com/feed.xml
 http://articles.emptycrate.com/node/feed.xml
@@ -2605,6 +2603,7 @@ https://apilgriminnarnia.com/feed
 https://apiratelifefor.me/feed
 https://apisyouwonthate.com/rss
 https://apitman.com/feed_atom.xml
+https://aplaceofmyown.bearblog.dev/atom.xml
 https://aplus.rs/index.xml
 https://apmoverflow.xyz/atom
 https://apocalypse-confidential.com/atom
@@ -2651,6 +2650,7 @@ https://ar.to/index.xml
 https://arabism.bearblog.dev/feed
 https://arachnoid.com/feed.xml
 https://aradaelli.com/blog/index.xml
+https://araffin.github.io/index.xml
 https://aralroca.com/rss.xml
 https://aramallo.com/blog/rss.xml
 https://arambartholl.com/atom
@@ -2711,6 +2711,7 @@ https://aresluna.org/main.rss
 https://areweanticheatyet.com/feed.rss
 https://arg0s.in/feed.xml
 https://argentumcation.com/index.xml
+https://argmax.blog/index.xml
 https://argumatronic.com/rss.xml
 https://argusarts.com/feed.xml
 https://arhamjain.com/feed.xml
@@ -6475,6 +6476,7 @@ https://buzzmachine.com/feed
 https://bvckup2.com/wip/rss
 https://bvisness.me/index.xml
 https://bvsveera.bearblog.dev/feed/
+https://bvsveera.net/feed/
 https://bweller.me/rss
 https://bwkam.github.io/atom.xml
 https://bwplotka.dev/index.xml
@@ -7180,6 +7182,7 @@ https://christweten.com/feed
 https://chriswarrick.com/rss.xml
 https://chriswheeler.dev/index.xml
 https://chriswiegman.com/index.xml
+https://chriswood.tech/feed/
 https://chriswu.com/index.xml
 https://chrisx.xyz/index.xml
 https://chrisyoong.com/api/rss.xml
@@ -11153,6 +11156,7 @@ https://fkong.tech/index.xml
 https://flailingmonkey.com/rss.xml
 https://flak.tedunangst.com/rss
 https://flakm.com/posts/index.xml
+https://flaky.build/feed.xml
 https://flamedfury.com/feeds/posts/atom.xml
 https://flameeyes.blog/feed
 https://flamendless.xyz/feed.xml
@@ -11180,6 +11184,7 @@ https://flipchartfairytales.wordpress.com/feed
 https://flippistarchives.blogspot.com/atom.xml
 https://flo.znkr.io/feed.atom
 https://floatingliferecs.blogspot.com/feeds/posts/default
+https://flockaroo.at/blog/?feed=rss2&format=feed&type=rss
 https://flocrivello.com/rss
 https://flohgro.com/atom.xml
 https://flooey.org/index.rss
@@ -14799,6 +14804,7 @@ https://jonleverrier.com/feeds/notes.rss
 https://jonlu.ca/feed.xml
 https://jonmagic.com/feed.xml
 https://jonnegroni.com/feed
+https://jonno.nz/feed.xml
 https://jonnor.com/atom
 https://jonobacon.com/feed
 https://jonopens.com/rss.xml
@@ -14977,6 +14983,7 @@ https://jotternook.bearblog.dev/feed
 https://jouni.kantola.se/feed.xml
 https://journal.bsd.cafe/atom
 https://journal.buzzusborne.com/rss
+https://journal.citizenoctopus.com/feed/
 https://journal.dinobansigan.com/feed
 https://journal.ehrlich.dev/atom.xml
 https://journal.infinitenegativeutility.com/feed
@@ -18737,6 +18744,7 @@ https://mostlytrue.life/rss.xml
 https://mosuleye.wordpress.com/feed
 https://mot4i.bearblog.dev/feed
 https://moth.monster/blog/feed.xml
+https://mother-of-invention.net/feed/
 https://motorcyclefunerals.com/feed/atom
 https://mouha.be/feed
 https://moultano.wordpress.com/feed
@@ -19999,6 +20007,7 @@ https://oddball.blog/atom
 https://oddevan.com/atom.xml
 https://oddlama.org/atom.xml
 https://oddroads.net/feed/atom
+https://oddur.me/index.xml
 https://oddvar.moe/feed
 https://odeliachan.com/feed
 https://odersky.github.io/feed.xml
@@ -22178,6 +22187,7 @@ https://reedmeyerson.com/blog.xml
 https://reedtaylorbarnes.com/rss.xml
 https://reedybear.bearblog.dev/feed
 https://reesamarris.bearblog.dev/atom
+https://reeseappalachiantrail.bearblog.dev/atom.xml
 https://reeserichardson.blog/feed
 https://reeshill.net/index.xml
 https://reeswrites.com/feed.xml
@@ -29552,6 +29562,7 @@ https://www.dragonsreach.it/index.xml
 https://www.dragtimes.com/blog/feed
 https://www.drashsmith.com/index.xml
 https://www.drcathicks.com/blog-feed.xml
+https://www.drcoen.com/feed/
 https://www.drdonnahenderson.com/blog-feed.xml
 https://www.dreamweapons.net/feeds/posts/default
 https://www.drehmflight.com/blog-feed.xml
