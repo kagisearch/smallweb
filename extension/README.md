@@ -5,11 +5,11 @@ Discover the indie web directly in your browser. Random posts from personal blog
 ## Features
 
 - **Discover**: Random posts from curated indie content
-- **Multiple Modes**: Blogs, Appreciated, Videos, Code, Comics, Saved
+- **Multiple Modes**: Blogs, Liked, Videos, Code, Comics, Saved
 - **Reader Mode**: Clean reading experience with optional dyslexia-friendly font
 - **Text-to-Speech**: Listen to articles hands-free
 - **Save for Later**: Bookmark posts to your local collection
-- **Appreciate**: Send appreciation to content creators
+- **Like**: Send likes to content creators
 - **History**: Per-mode browsing history
 - **Keyboard Shortcuts**:
   - `Space` - Discover next post

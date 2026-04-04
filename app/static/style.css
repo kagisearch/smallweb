@@ -310,7 +310,7 @@ svg {
   font-size: 20px;
 }
 
-#appreciated-next-text {
+#liked-next-text {
   display: inline-flex;
   align-items: center;
   gap: 6px;
