@@ -1085,6 +1085,34 @@ svg {
   display: none;
 }
 
+/* ── Mobile more menu ── */
+.mobile-more {
+  display: none;
+}
+
+.mobile-more > .dropdown-link {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 0 4px;
+}
+
+.mobile-flag-form {
+  margin: 0;
+}
+
+.mobile-flag-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  padding: 0;
+}
+
 .cat-inline-clear,
 .mode-inline-clear {
   align-items: center;
@@ -1456,12 +1484,16 @@ svg {
 @media (max-width: 800px) {
   #url-display-phone,
   .mode-wrapper,
-  .middle > .dropdown-container,
+  .middle > .dropdown-container:not(.mobile-more),
   .middle > .similar-btn,
   .middle > .post-cats,
   .right > :not(.about),
   .next-btn-suffix {
     display: none;
+  }
+
+  .mobile-more {
+    display: inline-flex;
   }
 
 
