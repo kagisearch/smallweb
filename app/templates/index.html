@@ -414,6 +414,22 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
   <script>
   (function() {
     var LIKE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
+    var SWEEP_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+    try {
+      var now = Date.now();
+      var lastSweep = parseInt(localStorage.getItem('sw_like_sweep'), 10) || 0;
+      if (now - lastSweep > SWEEP_INTERVAL_MS) {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+          var key = localStorage.key(i);
+          if (key && key.indexOf('sw_like_') === 0 && key !== 'sw_like_sweep') {
+            var ts = parseInt(localStorage.getItem(key), 10);
+            if (!ts || now - ts > LIKE_EXPIRY_MS) localStorage.removeItem(key);
+          }
+        }
+        localStorage.setItem('sw_like_sweep', now.toString());
+      }
+    } catch(e) {}
 
     function likeKey(url, emoji) {
       var hash = 0;
