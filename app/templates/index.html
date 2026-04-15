@@ -411,5 +411,91 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
     </div>
   {% endif %}
   </main>
+  <script>
+  (function() {
+    var LIKE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
+
+    function likeKey(url, emoji) {
+      var hash = 0;
+      for (var i = 0; i < url.length; i++) {
+        hash = ((hash << 5) - hash + url.charCodeAt(i)) | 0;
+      }
+      return 'sw_like_' + hash + '_' + emoji;
+    }
+
+    function hasLiked(url, emoji) {
+      try {
+        var val = localStorage.getItem(likeKey(url, emoji));
+        if (!val) return false;
+        if (Date.now() - parseInt(val, 10) > LIKE_EXPIRY_MS) {
+          localStorage.removeItem(likeKey(url, emoji));
+          return false;
+        }
+        return true;
+      } catch(e) { return false; }
+    }
+
+    function markLiked(url, emoji) {
+      try { localStorage.setItem(likeKey(url, emoji), Date.now().toString()); }
+      catch(e) {}
+    }
+
+    document.querySelectorAll('.emoji-form').forEach(function(form) {
+      var urlInput = form.querySelector('input[name="url"]');
+      var emojiInput = form.querySelector('input[name="emoji"]');
+      if (!urlInput || !emojiInput) return;
+
+      var url = urlInput.value;
+      var emoji = emojiInput.value;
+      var btn = form.querySelector('button[type="submit"]');
+
+      if (hasLiked(url, emoji)) {
+        btn.classList.add('already-liked');
+        btn.style.opacity = '0.5';
+        btn.style.pointerEvents = 'none';
+        btn.title = 'Already liked';
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (hasLiked(url, emoji)) return;
+
+        btn.style.pointerEvents = 'none';
+
+        fetch('{{ prefix }}api/like', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url, emoji: emoji })
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (!data.ok) return;
+            markLiked(url, emoji);
+            btn.classList.add('already-liked');
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            btn.title = 'Already liked';
+
+            if (emoji === '\uD83D\uDC4D') {
+              var span = btn.querySelector('span');
+              if (span) {
+                span.textContent = data.reaction_count;
+              } else {
+                var s = document.createElement('span');
+                s.textContent = data.reaction_count;
+                btn.appendChild(s);
+              }
+            } else {
+              var spans = btn.querySelectorAll('span');
+              if (spans.length >= 2) spans[1].textContent = data.reaction_count;
+            }
+          })
+          .catch(function() {
+            btn.style.pointerEvents = '';
+          });
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
