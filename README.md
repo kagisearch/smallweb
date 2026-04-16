@@ -29,7 +29,7 @@ Add a new personal blog RSS/Atom feed to the list. Rules:
 - The site must not contain any forms of advertisements or undisclosed affiliate links
 - Site should not have popups (newsletter signup, cookie selection, etc)
 - A Youtube channel must not post more than twice a week.
-- A Youtube channel must have fewer than 400,000 subscribers.
+- A Youtube channel must have fewer than 100,000 subscribers.
 
 For comics:
 - Must be independently created art (no AI generated content)

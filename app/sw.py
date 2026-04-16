@@ -25,6 +25,7 @@ from flask import (
     render_template,
     request,
 )
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -638,6 +639,7 @@ def make_excerpt(html, max_len=200):
 
 prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.jinja_env.filters["time_ago"] = time_ago
 
 master_feed = False
