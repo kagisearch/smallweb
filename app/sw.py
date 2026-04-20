@@ -651,6 +651,81 @@ def _build_redirect_params():
     return "&".join(f"{k}={v}" for k, v in params.items())
 
 
+def _similar_candidate_cache(req):
+    """Mirror the current page filters for similar-post selection."""
+    current_mode = 0
+    if "recent" in req.args:
+        cache = sorted(urls_cache, key=lambda e: e.updated, reverse=True)
+        current_mode = 6
+    elif "yt" in req.args:
+        cache = urls_yt_cache
+        current_mode = 1
+    elif "liked" in req.args or "app" in req.args:
+        cache = urls_liked_cache
+        current_mode = 2
+    elif "gh" in req.args:
+        cache = urls_gh_cache
+        current_mode = 3
+    elif "comic" in req.args:
+        cache = urls_comic_cache
+        current_mode = 4
+    elif "flagged" in req.args:
+        cache = urls_flagged_cache
+        current_mode = 5
+    else:
+        cache = urls_cache
+
+    search_query = req.args.get("search", "").lower()
+    if search_query.strip():
+        cache = [
+            entry
+            for entry in cache
+            if (
+                search_query in entry.link.lower()
+                or any(search_query == word.lower() for word in entry.title.split())
+                or any(search_query == word.lower() for word in entry.author.split())
+                or any(
+                    search_query == word.lower()
+                    for word in entry.description.split()
+                )
+            )
+        ]
+
+    if "cat" in req.args:
+        current_cat = req.args["cat"]
+    elif current_mode == 0:
+        cookie_cat = req.cookies.get("sw_sticky_cat", "")
+        current_cat = cookie_cat if cookie_cat in CATEGORIES else ""
+    else:
+        current_cat = ""
+
+    if current_cat != "spam":
+        cache = [entry for entry in cache if "spam" not in entry.categories]
+
+    excluded_cats_raw = req.cookies.get("sw_excluded_cats", "")
+    excluded_cats = set(
+        slug for slug in excluded_cats_raw.split(",") if slug in CATEGORIES
+    )
+    if excluded_cats and not current_cat:
+        cache = [
+            entry
+            for entry in cache
+            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
+        ]
+
+    if current_cat and current_cat in CATEGORIES:
+        if current_cat == "uncategorized":
+            cache = [
+                entry
+                for entry in cache
+                if not entry.categories or "uncategorized" in entry.categories
+            ]
+        else:
+            cache = [entry for entry in cache if current_cat in entry.categories]
+
+    return cache
+
+
 def _render_no_results(
     current_mode,
     title="",
@@ -1317,15 +1392,10 @@ def similar():
     if not url or url not in embeddings_cache:
         return redirect(prefix + "/")
 
-    # Use the same cache as mode 0 (websites)
-    seen = _get_seen(request)
-    result = find_similar(url, seen, urls_cache)
-
-    # Build redirect params preserving cat filter
-    params = {}
-    cat = request.args.get("cat")
-    if cat:
-        params["cat"] = cat
+    seen = _get_seen(request) | {_hash_url(url)}
+    result = find_similar(url, seen, _similar_candidate_cache(request))
+    params = request.args.to_dict(flat=True)
+    params.pop("url", None)
 
     if result:
         params["url"] = result.link
@@ -1352,12 +1422,13 @@ def like():
 
         # Always try to redirect to a similar post after a like
         if url in embeddings_cache:
-            seen = _get_seen(request)
-            sim = find_similar(url, seen, urls_cache)
+            seen = _get_seen(request) | {_hash_url(url)}
+            sim = find_similar(url, seen, _similar_candidate_cache(request))
             if sim:
-                params = {"url": sim.link}
-                cat = request.form.get("cat") or request.args.get("cat")
-                if cat:
+                params = request.args.to_dict(flat=True)
+                params["url"] = sim.link
+                cat = request.form.get("cat")
+                if cat and "cat" not in params:
                     params["cat"] = cat
                 return redirect(prefix + "/?" + urlencode(params))
 

@@ -221,7 +221,7 @@
           </div>
         </div>
 
-        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
+        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
 
         <div class="dropdown-container">
           <button type="button"
@@ -261,7 +261,7 @@
             <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
             {% if current_mode == 0 and has_embedding %}
             <hr class="share-separator">
-            <a class="share-option" href="{{ prefix }}similar?url={{ url|urlencode }}{% if current_cat %}&cat={{ current_cat }}{% endif %}" title="Show similar post">Similar</a>
+            <a class="share-option" href="{{ prefix }}similar?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show similar post">Similar</a>
             {% endif %}
             <hr class="share-separator">
             <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post" class="mobile-flag-form">
