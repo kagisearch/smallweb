@@ -977,6 +977,11 @@ def index():
     else:
         cache = urls_cache
 
+    # Reference to the per-mode cache before any filtering, so an explicit
+    # ?url= lookup always finds the requested post even when the sticky
+    # category or excluded-category filters would hide it.
+    mode_cache = cache
+
     if (
         search_query.strip()
     ):  # Only perform search if query is not empty or just whitespace
@@ -1060,10 +1065,12 @@ def index():
 
     if url is not None:
         http_url = url.replace("https://", "http://")
+        # Look up against the unfiltered mode cache so the requested post
+        # always opens even when sticky/excluded category filters would hide it.
         title, author, description, post_cats = next(
             (
                 (e.title, e.author, e.description, e.categories)
-                for e in cache
+                for e in mode_cache
                 if e.link == url or e.link == http_url
             ),
             (None, None, None, []),
