@@ -5,6 +5,7 @@ import logging
 import os
 import random
 import re
+import unicodedata
 from collections import OrderedDict
 from datetime import datetime, timedelta, timezone
 from html import escape
@@ -645,6 +646,66 @@ app.jinja_env.filters["time_ago"] = time_ago
 master_feed = False
 
 
+_WORD_RE = re.compile(r"\w+", re.UNICODE)
+_QUERY_TOKEN_RE = re.compile(r'"([^"]+)"|(\S+)')
+_TITLE_PREFIX_MIN = 4
+
+
+def _fold(text):
+    # Lowercase + strip diacritics so 'cafe' matches 'café'.
+    return "".join(
+        c
+        for c in unicodedata.normalize("NFKD", text)
+        if not unicodedata.combining(c)
+    ).lower()
+
+
+def _parse_search_query(query):
+    # "quoted" segments become phrases (substring match); bare words are
+    # tokenized with \w+ so trailing punctuation doesn't disqualify a match.
+    phrases, words = [], []
+    for m in _QUERY_TOKEN_RE.finditer(query):
+        phrase, word = m.group(1), m.group(2)
+        if phrase:
+            p = _fold(phrase).strip()
+            if p:
+                phrases.append(p)
+        elif word:
+            words.extend(_WORD_RE.findall(_fold(word)))
+    return phrases, words
+
+
+def _entry_matches_search(entry, query):
+    phrases, words = _parse_search_query(query)
+    if not phrases and not words:
+        return True
+
+    title_norm = _fold(entry.title)
+    rest_norm = _fold(" ".join((entry.author, entry.description)))
+    # Slug separators → spaces so phrase searches match URL paths like
+    # /seasons-of-time-by-nathalie-rubens.
+    link_norm = entry.link.lower().replace("-", " ").replace("_", " ")
+    title_tokens = set(_WORD_RE.findall(title_norm))
+    rest_tokens = set(_WORD_RE.findall(rest_norm))
+
+    if phrases:
+        haystack = " ".join((title_norm, rest_norm, link_norm))
+        for phrase in phrases:
+            if phrase not in haystack:
+                return False
+
+    for word in words:
+        if word in title_tokens or word in rest_tokens or word in link_norm:
+            continue
+        # Title-only prefix match for longer tokens: 'photo' → 'photography'.
+        if len(word) >= _TITLE_PREFIX_MIN and any(
+            t.startswith(word) for t in title_tokens
+        ):
+            continue
+        return False
+    return True
+
+
 def _build_redirect_params():
     """Build query string from request.args, excluding 'url'."""
     params = {k: v for k, v in request.args.items() if k != "url"}
@@ -677,19 +738,7 @@ def _similar_candidate_cache(req):
 
     search_query = req.args.get("search", "").lower()
     if search_query.strip():
-        cache = [
-            entry
-            for entry in cache
-            if (
-                search_query in entry.link.lower()
-                or any(search_query == word.lower() for word in entry.title.split())
-                or any(search_query == word.lower() for word in entry.author.split())
-                or any(
-                    search_query == word.lower()
-                    for word in entry.description.split()
-                )
-            )
-        ]
+        cache = [entry for entry in cache if _entry_matches_search(entry, search_query)]
 
     if "cat" in req.args:
         current_cat = req.args["cat"]
@@ -985,24 +1034,7 @@ def index():
     if (
         search_query.strip()
     ):  # Only perform search if query is not empty or just whitespace
-        cache = [
-            entry
-            for entry in cache
-            if (
-                search_query in entry.link.lower()  # url
-                or any(
-                    search_query.lower() == word.lower() for word in entry.title.split()
-                )  # title
-                or any(
-                    search_query.lower() == word.lower()
-                    for word in entry.author.split()
-                )  # author
-                or any(
-                    search_query.lower() == word.lower()
-                    for word in entry.description.split()
-                )
-            )  # description
-        ]
+        cache = [entry for entry in cache if _entry_matches_search(entry, search_query)]
         if not cache:
             return _render_no_results(
                 current_mode,
