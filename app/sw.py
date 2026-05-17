@@ -1315,6 +1315,8 @@ def index():
             feed_url=feed_url,
             gh_meta=gh_meta,
             has_embedding=(bool(embeddings_cache) and url in embeddings_cache),
+            seen_hash=_hash_url(url) if url else "",
+            seen_max=SEEN_MAX,
         )
     )
     return _set_seen_cookie(resp, seen, url)

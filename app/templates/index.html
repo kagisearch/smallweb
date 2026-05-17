@@ -24,6 +24,11 @@
   {% if feed_url is defined and feed_url %}
   <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
   {% endif %}
+  {% if seen_hash is defined and seen_hash %}
+  <meta name="sw-seen-hash" content="{{ seen_hash }}">
+  <meta name="sw-seen-max" content="{{ seen_max }}">
+  <script defer src="{{ url_for('static', filename='seen-cookie.js') }}"></script>
+  {% endif %}
   <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if next_link %}
