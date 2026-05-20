@@ -39,10 +39,10 @@
       <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
         <div class="show-tabs" role="tablist" aria-label="Show">
           <a class="show-tab{% if mode == '' %} active{% endif %}" href="{{ prefix }}river{% if topic %}?topic={{ topic }}{% endif %}" role="tab" title="Blogs (river)">Blogs</a>
+          <a class="show-tab" href="{{ prefix }}?liked" role="tab" title="Liked (discovery view)">Liked</a>
           <a class="show-tab{% if mode == 'yt' %} active{% endif %}" href="{{ prefix }}river?yt{% if topic %}&topic={{ topic }}{% endif %}" role="tab" title="Videos (river)">Videos</a>
           <a class="show-tab{% if mode == 'gh' %} active{% endif %}" href="{{ prefix }}river?gh{% if topic %}&topic={{ topic }}{% endif %}" role="tab" title="Code (river)">Code</a>
           <a class="show-tab{% if mode == 'comic' %} active{% endif %}" href="{{ prefix }}river?comic{% if topic %}&topic={{ topic }}{% endif %}" role="tab" title="Comics (river)">Comics</a>
-          <a class="show-tab" href="{{ prefix }}?liked" role="tab" title="Liked (discovery view)">Liked</a>
         </div>
         <div class="dropdown-container mode-container">
           <button type="button" class="dropdown-link{% if mode_has_selection %} has-filter{% endif %}" title="Filter by mode" aria-label="Filter by mode" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="modes-dropdown">
@@ -56,10 +56,10 @@
           <div class="dropdown-panel modes-dropdown" id="modes-dropdown">
             <p>Discover the web you like.</p>
             <a class="share-option" href="{{ prefix }}river{% if topic %}?topic={{ topic }}{% endif %}">Blogs</a>
+            <a class="share-option" href="{{ prefix }}?liked">Liked</a>
             <a class="share-option" href="{{ prefix }}river?yt{% if topic %}&topic={{ topic }}{% endif %}">Videos</a>
             <a class="share-option" href="{{ prefix }}river?gh{% if topic %}&topic={{ topic }}{% endif %}">Code</a>
             <a class="share-option" href="{{ prefix }}river?comic{% if topic %}&topic={{ topic }}{% endif %}">Comics</a>
-            <a class="share-option" href="{{ prefix }}?liked">Liked</a>
             <hr class="share-separator">
             <a class="share-option" href="{{ discover_href }}">Back to discovery</a>
           </div>

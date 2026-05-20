@@ -58,10 +58,10 @@
   <header id="header">
     {%- set mode_entries = [
       ("Blogs", prefix, 0),
+      ("Liked", prefix ~ "?liked", 2),
       ("Videos", prefix ~ "?yt", 1),
       ("Code", prefix ~ "?gh", 3),
-      ("Comics", prefix ~ "?comic", 4),
-      ("Liked", prefix ~ "?liked", 2)
+      ("Comics", prefix ~ "?comic", 4)
     ] -%}
     {%- set mode_ns = namespace(index=-1) -%}
     {%- for label, href, mode_value in mode_entries -%}
