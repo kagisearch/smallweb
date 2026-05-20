@@ -1173,6 +1173,60 @@ svg {
   display: inline-flex;
 }
 
+/* ── Inline mode tabs (desktop view of Show:) ── */
+.show-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  height: var(--header-control-height);
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.show-tab {
+  position: relative;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--header-control-font-size);
+  line-height: 1;
+  padding: 4px 0 6px;
+  opacity: 0.55;
+  transition: opacity 0.12s ease;
+  white-space: nowrap;
+}
+
+.show-tab:hover {
+  opacity: 1;
+}
+
+.show-tab.active {
+  opacity: 1;
+}
+
+.show-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--color-accent);
+}
+
+.show-tab:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+.mode-wrapper > .mode-container {
+  display: none;
+}
+
+.mode-wrapper > .mode-inline-clear {
+  display: none;
+}
+
 .category-dropdown {
   display: none;
   position: fixed;
@@ -1468,6 +1522,18 @@ svg {
   .mode-toggle-icon,
   .category-toggle-icon {
     display: block;
+  }
+
+  .show-tabs {
+    display: none;
+  }
+
+  .mode-wrapper > .mode-container {
+    display: inline-flex;
+  }
+
+  .mode-wrapper > .mode-inline-clear {
+    display: inline-flex;
   }
 
 }

@@ -25,54 +25,120 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='river.css') }}">
   <script defer src="{{ url_for('static', filename='header-dark-mode.js') }}"></script>
   <script defer src="{{ url_for('static', filename='header-dropdowns.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='header-category-dropdown.js') }}"></script>
 </head>
 
 <body>
+  {%- set mode_has_selection = mode != '' -%}
+  {%- set discover_href = prefix ~ ("?yt" if mode == "yt" else "?gh" if mode == "gh" else "?comic" if mode == "comic" else "") -%}
   <header id="header">
     <div class="left">
-      <a href="{{ prefix }}" class="dropdown-link river-back-link" title="Back to Small Web">&larr; Back</a>
+      <a href="{{ discover_href }}" class="discover-back" title="Back to random discovery">&larr; Discover</a>
     </div>
     <div class="middle">
-      <div class="river-modes">
-        <a href="{{ prefix }}river" class="river-mode-link{% if mode == '' and not topic %} active{% endif %}">Web</a>
-        <div class="dropdown-container">
-          <button type="button" class="river-mode-link{% if topic %} active{% endif %}" title="Filter by topic" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="river-topics-dropdown">
-            {% if topic and topic in categories %}
-              {{ categories[topic][2] }} {{ categories[topic][0] }}
-            {% else %}
-              Topics
-            {% endif %}
+      <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
+        <div class="show-tabs" role="tablist" aria-label="Show">
+          <a class="show-tab{% if mode == '' %} active{% endif %}" href="{{ prefix }}river{% if topic %}?topic={{ topic }}{% endif %}" role="tab" title="Blogs (river)">Blogs</a>
+          <a class="show-tab{% if mode == 'yt' %} active{% endif %}" href="{{ prefix }}river?yt{% if topic %}&topic={{ topic }}{% endif %}" role="tab" title="Videos (river)">Videos</a>
+          <a class="show-tab{% if mode == 'gh' %} active{% endif %}" href="{{ prefix }}river?gh{% if topic %}&topic={{ topic }}{% endif %}" role="tab" title="Code (river)">Code</a>
+          <a class="show-tab{% if mode == 'comic' %} active{% endif %}" href="{{ prefix }}river?comic{% if topic %}&topic={{ topic }}{% endif %}" role="tab" title="Comics (river)">Comics</a>
+          <a class="show-tab" href="{{ prefix }}?liked" role="tab" title="Liked (discovery view)">Liked</a>
+        </div>
+        <div class="dropdown-container mode-container">
+          <button type="button" class="dropdown-link{% if mode_has_selection %} has-filter{% endif %}" title="Filter by mode" aria-label="Filter by mode" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="modes-dropdown">
+            <svg class="mode-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+            <span class="mode-toggle-label">River</span>
           </button>
-          <div class="dropdown-panel river-topics-dropdown" id="river-topics-dropdown">
-            {% if topic %}
-            <a class="share-option" href="{{ prefix }}river">All topics</a>
-            {% endif %}
+          <div class="dropdown-panel modes-dropdown" id="modes-dropdown">
+            <p>Discover the web you like.</p>
+            <a class="share-option" href="{{ prefix }}river{% if topic %}?topic={{ topic }}{% endif %}">Blogs</a>
+            <a class="share-option" href="{{ prefix }}river?yt{% if topic %}&topic={{ topic }}{% endif %}">Videos</a>
+            <a class="share-option" href="{{ prefix }}river?gh{% if topic %}&topic={{ topic }}{% endif %}">Code</a>
+            <a class="share-option" href="{{ prefix }}river?comic{% if topic %}&topic={{ topic }}{% endif %}">Comics</a>
+            <a class="share-option" href="{{ prefix }}?liked">Liked</a>
+            <hr class="share-separator">
+            <a class="share-option" href="{{ discover_href }}">Back to discovery</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-wrapper{% if topic %} has-filter{% endif %}">
+        <button class="category-toggle{% if topic %} has-filter{% endif %}" id="catToggle" aria-haspopup="listbox" aria-expanded="false" title="Filter by topic" aria-label="Filter by topic">
+          <svg class="category-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+          </svg>
+          <span class="category-toggle-label">
+            {% if topic and topic in categories %}{{ categories[topic][0] }}{% else %}Topics{% endif %}
+          </span>
+        </button>
+        {% if topic %}
+        <a class="cat-inline-clear" href="{{ prefix }}river{% if mode == 'yt' %}?yt{% elif mode == 'gh' %}?gh{% elif mode == 'comic' %}?comic{% endif %}" title="Clear topic filter" aria-label="Clear topic filter">X</a>
+        {% endif %}
+        <div class="category-dropdown" id="catDropdown" role="listbox" aria-label="Topic categories">
+          <div class="cat-columns">
             {% for group_name, slugs in category_groups.items() %}
+              <div class="cat-group-label">{{ group_name }}</div>
               {% for slug in slugs if slug != 'spam' %}
                 {% set cat = categories[slug] %}
-                <a class="share-option{% if topic == slug %} selected{% endif %}" href="{{ prefix }}river?topic={{ slug }}">{{ cat[2] }} {{ cat[0] }}</a>
+                <div class="cat-item-row" data-slug="{{ slug }}">
+                  <a href="{{ prefix }}river?topic={{ slug }}{% if mode == 'yt' %}&yt{% elif mode == 'gh' %}&gh{% elif mode == 'comic' %}&comic{% endif %}"
+                     class="cat-item{% if topic == slug %} selected{% endif %}"
+                     data-slug="{{ slug }}" role="option" aria-selected="{{ 'true' if topic == slug else 'false' }}">
+                    <div class="cat-name">{{ cat[2] }} {{ cat[0] }}</div>
+                    <div class="cat-desc">{{ cat[1] }}</div>
+                  </a>
+                </div>
               {% endfor %}
             {% endfor %}
           </div>
         </div>
-        {% if topic %}
-        <a class="mode-inline-clear" href="{{ prefix }}river" title="Clear topic filter" aria-label="Clear topic filter">X</a>
-        {% endif %}
-        <span class="river-modes-sep"></span>
-        <a href="{{ prefix }}river?yt" class="river-mode-link{% if mode == 'yt' %} active{% endif %}">Videos</a>
-        <a href="{{ prefix }}river?gh" class="river-mode-link{% if mode == 'gh' %} active{% endif %}">Code</a>
       </div>
     </div>
     <div class="right">
+      <a href="https://kagi.com" title="Visit Kagi" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
+        <img src="{{ url_for('static', filename='UseKagiV4C.gif') }}" alt="Use Kagi" class="kagi-gif">
+      </a>
       <a href="https://github.com/kagisearch/smallweb" title="Visit GitHub repository" class="header-link badge-link" target="_blank" rel="noopener noreferrer">
         <img src="{{ url_for('static', filename='sw.png') }}" alt="Small Web" class="kagi-gif">
       </a>
       <div class="dropdown-container">
-        <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="river-rss-dropdown">RSS</button>
-        <div class="dropdown-panel spread-love" id="river-rss-dropdown">
-          <a class="share-option" target="_blank" rel="noopener noreferrer" href="{{ feed_url }}">Atom Feed</a>
-          <a class="share-option" target="_blank" rel="noopener noreferrer" href="{{ prefix }}opml">OPML</a>
+        <a href="{{ prefix }}get" title="Get Mobile Apps &amp; Browser Extensions" class="dropdown-link">Get</a>
+      </div>
+      <div class="dropdown-container">
+        <button type="button" class="dropdown-link" title="Subscribe to RSS" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="rss-dropdown">RSS</button>
+        <div class="dropdown-panel spread-love rss-dropdown" id="rss-dropdown">
+          <p>Grab the RSS feed you like.</p>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/">Small Web</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/liked">Liked</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?yt">Videos</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?gh">Code</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/api/v1/smallweb/feed/?comic">Comics</a>
+         <a class="share-option" target="_blank" rel="noopener noreferrer" href="https://kagi.com/smallweb/opml">OPML</a>
         </div>
+      </div>
+      <div class="dropdown-container right-dropdown-container about">
+          <button type="button" class="dropdown-link" title="About Small Web" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="about-dropdown">About</button>
+          <div class="dropdown-panel right-dropdown" id="about-dropdown">
+<p>Hey there, welcome to Kagi Small Web!</p>
+<p>Imagine the internet like a huge neighborhood. There's a lot of folks around, but we rarely bump into each other, right? Kagi's all about
+humanizing the web and we want to help surface the people behind the posts and stories that zip
+by. This less known corner of the web is also known as the "small web". Read
+more in our <a class="container-link" href="https://blog.kagi.com/small-web" target="_blank" rel="noopener noreferrer">blog post</a>.</p>
+<p>We want to amplify the voices of genuine humans on the web - see <a class="container-link"
+href="https://github.com/kagisearch/smallweb#small-web" target="_blank" rel="noopener noreferrer">our sources</a>
+or check if your blog is in the <a class="container-link" href="https://github.com/kagisearch/smallweb/blob/main/smallweb.txt" target="_blank" rel="noopener noreferrer">list</a>. You'll also
+encounter these pages now in <a class="container-link" href="https://kagi.com" target="_blank" rel="noopener noreferrer">Kagi search</a> when you're looking for something relevant.</p>
+<p>And yep, this whole thing is <a class="container-link"
+href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener noreferrer">open-source</a>.</p>
+<p>So, what do you say? Ready to meet some neighbors?</p>
+          </div>
       </div>
       <button id="dark-mode-toggle" class="dark-toggle" title="Toggle dark mode">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
@@ -81,6 +147,9 @@
       </button>
     </div>
   </header>
+
+  <div class="cat-backdrop" id="catBackdrop"></div>
+  <div class="dropdown-backdrop" id="dropdownBackdrop"></div>
 
   <main class="river-main">
     <div class="river-stream">

@@ -57,11 +57,11 @@
 <body>
   <header id="header">
     {%- set mode_entries = [
-      ("Websites", prefix, 0),
-      ("Liked", prefix ~ "?liked", 2),
+      ("Blogs", prefix, 0),
       ("Videos", prefix ~ "?yt", 1),
       ("Code", prefix ~ "?gh", 3),
-      ("Comics", prefix ~ "?comic", 4)
+      ("Comics", prefix ~ "?comic", 4),
+      ("Liked", prefix ~ "?liked", 2)
     ] -%}
     {%- set mode_ns = namespace(index=-1) -%}
     {%- for label, href, mode_value in mode_entries -%}
@@ -71,6 +71,7 @@
     {%- endfor -%}
     {%- set mode_has_selection = mode_ns.index >= 0 and current_mode != 0 -%}
     {%- set mode_button_label = mode_entries[mode_ns.index][0] if mode_ns.index >= 0 else "Mode" -%}
+    {%- set river_href = prefix ~ "river" ~ ("?yt" if current_mode == 1 else "?gh" if current_mode == 3 else "?comic" if current_mode == 4 else "") -%}
     <div class="left">
       {% if not no_results %}
       {% if next_link %}
@@ -120,6 +121,16 @@
     </div>
     <div class="middle">
       <div class="mode-wrapper{% if mode_has_selection %} has-filter{% endif %}">
+        <div class="show-tabs" role="tablist" aria-label="Show">
+          {%- for label, href, mode_value in mode_entries -%}
+          <a class="show-tab{% if mode_value == current_mode %} active{% endif %}"
+             href="{{ href }}"
+             role="tab"
+             aria-selected="{{ 'true' if mode_value == current_mode else 'false' }}"
+             title="Show {{ label }}">{{ label }}</a>
+          {%- endfor -%}
+          <a class="show-tab" href="{{ river_href }}" role="tab" title="River view">River</a>
+        </div>
         <div class="dropdown-container mode-container">
           <button type="button" class="dropdown-link{% if mode_has_selection %} has-filter{% endif %}" title="Filter by mode" aria-label="Filter by mode" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="modes-dropdown">
             <svg class="mode-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" viewBox="0 0 24 24" aria-hidden="true">
@@ -135,7 +146,7 @@
             <a class="share-option" href="{{ href }}" title="Open {{ label }} mode">{{ label }}</a>
             {%- endfor -%}
             <hr class="share-separator">
-            <a class="share-option" href="{{ prefix }}river{% if current_mode == 1 %}?yt{% elif current_mode == 3 %}?gh{% elif current_mode == 4 %}?comic{% endif %}" title="River view">River</a>
+            <a class="share-option" href="{{ river_href }}" title="River view">River</a>
           </div>
         </div>
         {% if mode_has_selection %}

@@ -1,3 +1,21 @@
+/* ── Discover back link (exit river to discovery view) ── */
+.discover-back {
+  display: inline-flex;
+  align-items: center;
+  height: var(--header-control-height);
+  padding: 0 10px;
+  font-size: var(--header-control-font-size);
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.discover-back:hover,
+.discover-back:focus-visible {
+  color: var(--color-text);
+}
+
 /* ── River layout ── */
 .river-main {
   margin-top: var(--header-height);
@@ -11,84 +29,6 @@
 .river-stream {
   width: 100%;
   max-width: 660px;
-}
-
-/* ── River mode tabs ── */
-.river-modes {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.river-mode-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--header-control-height);
-  padding: 0 10px;
-  color: rgba(255, 255, 255, 0.45);
-  text-decoration: none;
-  font-size: var(--header-control-font-size);
-  border: 2px solid transparent;
-  box-sizing: border-box;
-  transition: color 0.15s ease;
-}
-
-.river-mode-link:hover {
-  color: var(--color-text);
-}
-
-.river-mode-link.active {
-  color: #fff;
-  border-bottom: 2px solid var(--color-accent);
-  background: none;
-}
-
-/* Override dropdown-link styles for Topics button inside river-modes */
-.river-modes .dropdown-container {
-  display: inline-flex;
-}
-
-.river-modes .dropdown-container > button.river-mode-link {
-  background: none;
-  border: 2px solid transparent;
-  border-bottom-color: transparent;
-  padding: 0 10px;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.river-modes .dropdown-container > button.river-mode-link:hover {
-  color: var(--color-text);
-  background: none;
-  border: 2px solid transparent;
-}
-
-.river-modes .dropdown-container > button.river-mode-link.active {
-  color: #fff;
-  border: 2px solid transparent;
-  border-bottom: 2px solid var(--color-accent);
-  background: none;
-}
-
-.river-modes-sep {
-  display: inline-block;
-  width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.15);
-  margin: 0 6px;
-  vertical-align: middle;
-}
-
-/* ── Header left ── */
-.river-back-link {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-right: 10px;
-}
-
-.river-back-link:hover {
-  color: #fff;
 }
 
 .river-title {
@@ -228,11 +168,6 @@
   font-size: 18px;
 }
 
-/* ── Topic dropdown selected state ── */
-.river-topics-dropdown .share-option.selected {
-  background: var(--color-accent-light);
-}
-
 /* ── Light mode (toggled via header-dark-mode.js injecting #global-dark-mode-style) ── */
 html:has(#global-dark-mode-style) .river-main {
   background: #f4f1ec;
@@ -286,10 +221,6 @@ html:has(#global-dark-mode-style) .river-card-feed {
   color: #8a919a;
 }
 
-html:has(#global-dark-mode-style) .river-modes-sep {
-  background: rgba(0, 0, 0, 0.15);
-}
-
 html:has(#global-dark-mode-style) .river-load-btn {
   background: #fff;
   color: #1a1a2e;
@@ -324,15 +255,6 @@ html:has(#global-dark-mode-style) .river-end {
 }
 
 @media (max-width: 600px) {
-  .river-modes {
-    gap: 0;
-  }
-
-  .river-mode-link {
-    padding: 0 6px;
-    font-size: 16px;
-  }
-
   .right > #dark-mode-toggle {
     display: none;
   }
