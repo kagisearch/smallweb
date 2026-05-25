@@ -40,6 +40,13 @@ class FeedEntry(NamedTuple):
     updated: datetime
     categories: list
     feed_url: str = ""
+    # Precomputed search fields. Built once at ingest in update_entries() so the
+    # per-entry filter is just set/substring lookups instead of unicode folding
+    # and regex tokenization on every request.
+    search_haystack: str = ""
+    search_title_tokens: frozenset = frozenset()
+    search_rest_tokens: frozenset = frozenset()
+    search_link: str = ""
 
 
 API_BASE = "https://kagi.com/api/v1/smallweb/feed"
@@ -660,6 +667,21 @@ def _fold(text):
     ).lower()
 
 
+def _build_search_fields(title, author, description, link):
+    """Precompute the per-entry search fields used by _entry_matches."""
+    title_norm = _fold(title)
+    rest_norm = _fold(" ".join((author, description)))
+    # Slug separators -> spaces so phrase searches match URL paths like
+    # /seasons-of-time-by-nathalie-rubens.
+    link_norm = link.lower().replace("-", " ").replace("_", " ")
+    return (
+        " ".join((title_norm, rest_norm, link_norm)),
+        frozenset(_WORD_RE.findall(title_norm)),
+        frozenset(_WORD_RE.findall(rest_norm)),
+        link_norm,
+    )
+
+
 def _parse_search_query(query):
     # "quoted" segments become phrases (substring match); bare words are
     # tokenized with \w+ so trailing punctuation doesn't disqualify a match.
@@ -675,34 +697,30 @@ def _parse_search_query(query):
     return phrases, words
 
 
-def _entry_matches_search(entry, query):
-    phrases, words = _parse_search_query(query)
+def _entry_matches(entry, phrases, words):
+    """Match against precomputed entry.search_* fields. Parse query once upstream."""
     if not phrases and not words:
         return True
 
-    title_norm = _fold(entry.title)
-    rest_norm = _fold(" ".join((entry.author, entry.description)))
-    # Slug separators → spaces so phrase searches match URL paths like
-    # /seasons-of-time-by-nathalie-rubens.
-    link_norm = entry.link.lower().replace("-", " ").replace("_", " ")
-    title_tokens = set(_WORD_RE.findall(title_norm))
-    rest_tokens = set(_WORD_RE.findall(rest_norm))
-
     if phrases:
-        haystack = " ".join((title_norm, rest_norm, link_norm))
+        haystack = entry.search_haystack
         for phrase in phrases:
             if phrase not in haystack:
                 return False
 
-    for word in words:
-        if word in title_tokens or word in rest_tokens or word in link_norm:
-            continue
-        # Title-only prefix match for longer tokens: 'photo' → 'photography'.
-        if len(word) >= _TITLE_PREFIX_MIN and any(
-            t.startswith(word) for t in title_tokens
-        ):
-            continue
-        return False
+    if words:
+        title_tokens = entry.search_title_tokens
+        rest_tokens = entry.search_rest_tokens
+        link_norm = entry.search_link
+        for word in words:
+            if word in title_tokens or word in rest_tokens or word in link_norm:
+                continue
+            # Title-only prefix match for longer tokens: 'photo' -> 'photography'.
+            if len(word) >= _TITLE_PREFIX_MIN and any(
+                t.startswith(word) for t in title_tokens
+            ):
+                continue
+            return False
     return True
 
 
@@ -738,7 +756,9 @@ def _similar_candidate_cache(req):
 
     search_query = req.args.get("search", "").lower()
     if search_query.strip():
-        cache = [entry for entry in cache if _entry_matches_search(entry, search_query)]
+        phrases, words = _parse_search_query(search_query)
+        if phrases or words:
+            cache = [entry for entry in cache if _entry_matches(entry, phrases, words)]
 
     if "cat" in req.args:
         current_cat = req.args["cat"]
@@ -951,15 +971,25 @@ def update_entries(url):
                     via_url = lnk.get("href", "")
                     break
 
+            title = entry.get("title", "")
+            author = entry.get("author", "")
+            description = entry.get("description", "") or _extract_content(entry)
+            haystack, title_tokens, rest_tokens, link_norm = _build_search_fields(
+                title, author, description, link
+            )
             formatted_entries.append(
                 FeedEntry(
                     link=link,
-                    title=entry.get("title", ""),
-                    author=entry.get("author", ""),
-                    description=entry.get("description", "") or _extract_content(entry),
+                    title=title,
+                    author=author,
+                    description=description,
                     updated=updated,
                     categories=categories,
                     feed_url=via_url,
+                    search_haystack=haystack,
+                    search_title_tokens=title_tokens,
+                    search_rest_tokens=rest_tokens,
+                    search_link=link_norm,
                 )
             )
 
@@ -1034,7 +1064,9 @@ def index():
     if (
         search_query.strip()
     ):  # Only perform search if query is not empty or just whitespace
-        cache = [entry for entry in cache if _entry_matches_search(entry, search_query)]
+        phrases, words = _parse_search_query(search_query)
+        if phrases or words:
+            cache = [entry for entry in cache if _entry_matches(entry, phrases, words)]
         if not cache:
             return _render_no_results(
                 current_mode,
