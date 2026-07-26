@@ -2022,6 +2022,44 @@ def opml():
     return Response(opml_cache, mimetype="text/x-opml+xml")
 
 
+# Cloud Run probe endpoints. Registered without the URL prefix because the
+# probes talk to the container port directly, not through the kagi.com proxy.
+# Both are intentionally contentless -- the deployment is
+# --allow-unauthenticated, so the run.app URL exposes them publicly.
+
+
+@app.route("/readyz")
+def readyz():
+    """Startup gate: 503 until this instance has feeds it can serve.
+
+    Every feed is fetched at import time, and gunicorn's master binds the port
+    before the worker gets that far, so a TCP probe passes on an instance that
+    is still minutes away from serving a post. `urls_cache` is the cache every
+    mode falls back to, so having it is what "ready" means.
+    """
+    if not urls_cache:
+        return Response("feeds not loaded\n", status=503, mimetype="text/plain")
+    return Response("ok\n", mimetype="text/plain")
+
+
+@app.route("/healthz")
+def healthz():
+    """Liveness: 503 once the gcsfuse data mount has gone away.
+
+    gcsfuse_run.sh daemonizes gcsfuse, so a mount that dies after startup
+    leaves this process happily serving reads while every like, note and flag
+    write fails into a swallowed exception. A dead FUSE daemon leaves the
+    mountpoint in place but fails stat() with ENOTCONN, which is the cheapest
+    signal available: one syscall, no GCS round trip.
+    """
+    try:
+        os.stat(DIR_DATA)
+    except OSError as e:
+        logger.error("healthz: data dir %s is unusable: %s", DIR_DATA, e)
+        return Response("data unavailable\n", status=503, mimetype="text/plain")
+    return Response("ok\n", mimetype="text/plain")
+
+
 time_saved_likes = datetime.now()
 time_saved_notes = datetime.now()
 time_saved_flagged_content = datetime.now()

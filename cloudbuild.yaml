@@ -18,7 +18,13 @@ steps:
       '--cpu=1',
       '--memory=1Gi',
       '--min-instances', '2',
-      '--max-instances', '4'
+      '--max-instances', '4',
+      # Startup budget of 220s (under Cloud Run's 240s ceiling) covers the
+      # worst case for the import-time feed fetches in sw.py.
+      '--startup-probe', 'httpGet.path=/readyz,httpGet.port=8080,periodSeconds=10,timeoutSeconds=5,failureThreshold=22',
+      # Deliberately slack: one gunicorn worker also runs the 5-minute feed
+      # refresh, so a tight probe would restart healthy instances mid-parse.
+      '--liveness-probe', 'httpGet.path=/healthz,httpGet.port=8080,periodSeconds=30,timeoutSeconds=10,failureThreshold=3'
     ]
 images:
   - us-central1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/smallweb:${SHORT_SHA}
