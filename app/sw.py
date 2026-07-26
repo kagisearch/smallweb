@@ -1090,9 +1090,9 @@ def _pick_next_entry(
 ):
     """Pick the post that follows `url`, or None when there is nothing to show.
 
-    `liked_pool` is the already-filtered set the 7% surprise post is drawn from.
-    It defaults to empty so a caller that omits it cannot leak an unfiltered
-    post into a filtered pool.
+    `liked_pool` is the already-filtered set the 7% surprise post is drawn from,
+    in blogs mode only. It defaults to empty so a caller that omits it cannot
+    leak an unfiltered post into a filtered pool.
     """
     if not cache:
         return None
@@ -1110,8 +1110,10 @@ def _pick_next_entry(
     next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
     if not next_candidates:
         next_candidates = next_pool
-    # 7% chance next post comes from the liked pool (unseen)
-    if current_mode != 2 and liked_pool and random.random() < 0.07:
+    # 7% chance next post comes from the liked pool (unseen). Blogs only: the
+    # liked pool is blog posts, so surfacing one while browsing Comics or Videos
+    # drops the reader out of the mode they chose.
+    if current_mode == 0 and liked_pool and random.random() < 0.07:
         liked_unseen = [
             e for e in liked_pool
             if _hash_url(e.link) not in seen_plus and e.link != url
