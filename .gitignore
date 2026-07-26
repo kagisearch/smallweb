@@ -171,3 +171,6 @@ app/data
 
 # Editor backup files
 *~
+
+# macOS
+.DS_Store
