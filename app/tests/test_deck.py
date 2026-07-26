@@ -1,6 +1,8 @@
 """Tests for the prefetch deck: next-post selection and the /api/deck payload."""
 import json
 
+from conftest import entry
+
 
 # --- _pick_next_entry ---------------------------------------------------------
 
@@ -206,3 +208,76 @@ def test_index_no_longer_prerenders(client):
 def test_deck_json_is_serializable(client):
     res = client.get("/api/deck?count=2&url=https://a.example/1")
     json.loads(res.get_data(as_text=True))
+
+
+# --- search -------------------------------------------------------------------
+
+# index() filters the pool by ?search before picking a post, so the deck has to
+# apply the same filter or Next walks out of the result set.
+
+def _searchable(app_module):
+    """Three posts about rust, two about baking."""
+    app_module.urls_cache = [
+        entry("https://r.example/1", "Rust ownership", ["tech"]),
+        entry("https://r.example/2", "Rust lifetimes", ["tech"]),
+        entry("https://r.example/3", "Learning Rust", ["tech"]),
+        entry("https://k.example/1", "Sourdough baking", ["food"]),
+        entry("https://k.example/2", "Baking bread", ["food"]),
+    ]
+    return app_module.urls_cache
+
+
+def test_deck_respects_search_filter(client, app_module):
+    _searchable(app_module)
+    res = client.get("/api/deck?search=rust&count=4&url=https://r.example/1")
+    assert res.status_code == 200
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert links, "deck queued nothing for a search with two more matches"
+    assert set(links) == {"https://r.example/2", "https://r.example/3"}
+
+
+def test_deck_search_excludes_non_matching_posts(client, app_module):
+    _searchable(app_module)
+    res = client.get("/api/deck?search=baking&count=5&url=https://k.example/1")
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert links == ["https://k.example/2"]
+
+
+def test_deck_search_with_no_other_match_queues_nothing(client, app_module):
+    _searchable(app_module)
+    # "sourdough" matches only the post already on screen.
+    res = client.get("/api/deck?search=sourdough&count=3&url=https://k.example/1")
+    assert res.status_code == 200
+    assert res.get_json()["posts"] == []
+
+
+def test_deck_search_with_zero_matches_returns_404(client, app_module):
+    _searchable(app_module)
+    res = client.get("/api/deck?search=nothingmatchesthis&count=3")
+    assert res.status_code == 404
+
+
+def test_deck_search_combines_with_category(client, app_module):
+    _searchable(app_module)
+    # Category narrows to food; the search term only matches tech posts.
+    res = client.get("/api/deck?search=rust&cat=food&count=3")
+    assert res.status_code == 404
+
+
+def test_deck_page_url_round_trips_search(client, app_module):
+    _searchable(app_module)
+    res = client.get("/api/deck?search=rust&count=1&url=https://r.example/1")
+    post = res.get_json()["posts"][0]
+    # Following the deck's own link must land back in the same result set.
+    assert "search=rust" in post["page_url"]
+
+
+def test_index_search_and_deck_agree_on_pool(client, app_module):
+    """The no-JS next anchor and the deck must not disagree about the pool."""
+    _searchable(app_module)
+    res = client.get("/?search=rust&url=https://r.example/1", follow_redirects=True)
+    body = res.get_data(as_text=True)
+    assert "k.example" not in body, "index leaked a non-matching post"
+    deck = client.get("/api/deck?search=rust&count=4&url=https://r.example/1")
+    for post in deck.get_json()["posts"]:
+        assert "k.example" not in post["url"]

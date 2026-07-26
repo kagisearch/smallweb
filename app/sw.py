@@ -724,6 +724,20 @@ def _entry_matches(entry, phrases, words):
     return True
 
 
+def _apply_search_filter(cache, search_query):
+    """Narrow the pool to entries matching ?search.
+
+    Shared by index() and api_deck() so the deck queues from the same result set
+    the page was rendered from.
+    """
+    if not search_query.strip():
+        return cache
+    phrases, words = _parse_search_query(search_query)
+    if not phrases and not words:
+        return cache
+    return [entry for entry in cache if _entry_matches(entry, phrases, words)]
+
+
 def _build_redirect_params():
     """Build query string from request.args, excluding 'url'."""
     params = {k: v for k, v in request.args.items() if k != "url"}
@@ -1139,9 +1153,7 @@ def index():
     if (
         search_query.strip()
     ):  # Only perform search if query is not empty or just whitespace
-        phrases, words = _parse_search_query(search_query)
-        if phrases or words:
-            cache = [entry for entry in cache if _entry_matches(entry, phrases, words)]
+        cache = _apply_search_filter(cache, search_query)
         if not cache:
             return _render_no_results(
                 current_mode,
@@ -1883,7 +1895,11 @@ def api_deck():
     if current_mode not in DECK_MODES:
         return jsonify({"error": "mode does not support deck"}), 400
 
+    # Unfiltered, so the current post's categories resolve even when it sits
+    # outside the active search or category filter.
     mode_cache = cache
+    # Same order as index(): search narrows the pool, then category filters.
+    cache = _apply_search_filter(cache, request.args.get("search", "").lower())
     current_cat = _resolve_current_cat(request, current_mode)
     cache = _apply_cat_filters(cache, current_cat, _excluded_cats(request))
     if not cache:

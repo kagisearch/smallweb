@@ -26,15 +26,24 @@ import sw  # noqa: E402
 sw.scheduler.shutdown(wait=False)
 
 
-def entry(link, title="T", cats=None, minutes_old=0):
+def entry(link, title="T", cats=None, minutes_old=0, author="A", description="D"):
     # Naive timestamps, matching what update_entries() stores.
+    haystack, title_tokens, rest_tokens, link_norm = sw._build_search_fields(
+        title, author, description, link
+    )
     return sw.FeedEntry(
         link=link,
         title=title,
-        author="A",
-        description="D",
+        author=author,
+        description=description,
         updated=datetime.now() - timedelta(minutes=minutes_old),
         categories=cats if cats is not None else [],
+        # update_entries() precomputes these at ingest; _entry_matches reads only
+        # these fields, so a fixture without them can never match a search.
+        search_haystack=haystack,
+        search_title_tokens=title_tokens,
+        search_rest_tokens=rest_tokens,
+        search_link=link_norm,
     )
 
 
