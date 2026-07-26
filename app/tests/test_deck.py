@@ -272,6 +272,80 @@ def test_deck_page_url_round_trips_search(client, app_module):
     assert "search=rust" in post["page_url"]
 
 
+# --- liked-pool injection ------------------------------------------------------
+
+# _pick_next_entry has a 7% chance of returning a post from the liked pool. That
+# branch used to ignore its `cache` argument, so the surprise post escaped any
+# active search or category filter.
+
+KNITTING = "https://liked.example/9"
+
+
+def _liked(app_module, *entries):
+    app_module.urls_liked_cache = list(entries)
+    return app_module.urls_liked_cache
+
+
+def test_liked_injection_respects_search(app_module):
+    _searchable(app_module)
+    _liked(app_module, entry(KNITTING, "Knitting patterns", ["food"]))
+    pool = app_module._apply_search_filter(app_module.urls_cache, "rust")
+    allowed = {e.link for e in pool}
+    liked = app_module._liked_pool("rust", "", set())
+    for _ in range(500):
+        nxt = app_module._pick_next_entry(
+            pool, "https://r.example/1", set(), [], "", 0, liked
+        )
+        assert nxt.link in allowed, f"{nxt.link} escaped the search filter"
+
+
+def test_liked_injection_respects_category(app_module):
+    _searchable(app_module)
+    _liked(app_module, entry(KNITTING, "Knitting patterns", ["food"]))
+    pool = app_module._apply_cat_filters(app_module.urls_cache, "tech", set())
+    allowed = {e.link for e in pool}
+    liked = app_module._liked_pool("", "tech", set())
+    for _ in range(500):
+        nxt = app_module._pick_next_entry(
+            pool, "https://r.example/1", set(), [], "tech", 0, liked
+        )
+        assert nxt.link in allowed, f"{nxt.link} escaped the category filter"
+
+
+def test_liked_injection_still_fires_without_filters(app_module):
+    """Guard against 'fixing' the leak by deleting the feature outright."""
+    cache = app_module.urls_cache
+    _liked(app_module, entry(KNITTING, "A liked post"))
+    liked = app_module._liked_pool("", "", set())
+    assert liked, "liked pool was empty before the injection test"
+    for _ in range(300):
+        nxt = app_module._pick_next_entry(
+            cache, cache[0].link, set(), [], "", 0, liked
+        )
+        if nxt.link == KNITTING:
+            return
+    raise AssertionError("liked-pool injection never fired in 300 picks")
+
+
+def test_deck_search_never_queues_liked_posts_outside_results(client, app_module):
+    _searchable(app_module)
+    _liked(app_module, entry(KNITTING, "Knitting patterns", ["food"]))
+    for _ in range(50):
+        res = client.get("/api/deck?search=rust&count=3&url=https://r.example/1")
+        for post in res.get_json()["posts"]:
+            assert "liked.example" not in post["url"]
+
+
+def test_index_next_link_never_leaves_search_results(client, app_module):
+    _searchable(app_module)
+    _liked(app_module, entry(KNITTING, "Knitting patterns", ["food"]))
+    for _ in range(50):
+        res = client.get(
+            "/?search=rust&url=https://r.example/1", follow_redirects=True
+        )
+        assert "liked.example" not in res.get_data(as_text=True)
+
+
 # --- non-embeddable domains ----------------------------------------------------
 
 # Tumblr sends X-Frame-Options: deny, so an iframe pointed at it renders blank.

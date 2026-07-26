@@ -1115,8 +1115,25 @@ def _apply_cat_filters(cache, current_cat, excluded_cats):
     return cache
 
 
-def _pick_next_entry(cache, url, seen, post_cats, current_cat, current_mode):
-    """Pick the post that follows `url`, or None when there is nothing to show."""
+def _liked_pool(search_query, current_cat, excluded_cats):
+    """Liked posts narrowed by the same filters as the main pool.
+
+    _pick_next_entry draws its occasional surprise post from here, so the
+    surprise cannot land outside an active search or category.
+    """
+    pool = _apply_search_filter(urls_liked_cache, search_query)
+    return _apply_cat_filters(pool, current_cat, excluded_cats)
+
+
+def _pick_next_entry(
+    cache, url, seen, post_cats, current_cat, current_mode, liked_pool=()
+):
+    """Pick the post that follows `url`, or None when there is nothing to show.
+
+    `liked_pool` is the already-filtered set the 7% surprise post is drawn from.
+    It defaults to empty so a caller that omits it cannot leak an unfiltered
+    post into a filtered pool.
+    """
     if not cache:
         return None
 
@@ -1134,9 +1151,9 @@ def _pick_next_entry(cache, url, seen, post_cats, current_cat, current_mode):
     if not next_candidates:
         next_candidates = next_pool
     # 7% chance next post comes from the liked pool (unseen)
-    if current_mode != 2 and urls_liked_cache and random.random() < 0.07:
+    if current_mode != 2 and liked_pool and random.random() < 0.07:
         liked_unseen = [
-            e for e in urls_liked_cache
+            e for e in liked_pool
             if _hash_url(e.link) not in seen_plus and e.link != url
         ]
         if liked_unseen:
@@ -1191,7 +1208,8 @@ def index():
                 )
 
     current_cat = _resolve_current_cat(request, current_mode)
-    cache = _apply_cat_filters(cache, current_cat, _excluded_cats(request))
+    excluded_cats = _excluded_cats(request)
+    cache = _apply_cat_filters(cache, current_cat, excluded_cats)
 
     if current_cat and current_cat in CATEGORIES and not cache:
         return _render_no_results(
@@ -1246,7 +1264,15 @@ def index():
     # Build deterministic "next post" link (no-JS fallback path)
     # -------------------------------------------------
     next_link = None
-    next_entry = _pick_next_entry(cache, url, seen, post_cats, current_cat, current_mode)
+    next_entry = _pick_next_entry(
+        cache,
+        url,
+        seen,
+        post_cats,
+        current_cat,
+        current_mode,
+        _liked_pool(search_query, current_cat, excluded_cats),
+    )
     if next_entry:
         next_params = request.args.to_dict(flat=True)
         next_params["url"] = next_entry.link
@@ -1921,11 +1947,14 @@ def api_deck():
     # outside the active search or category filter.
     mode_cache = cache
     # Same order as index(): search narrows the pool, then category filters.
-    cache = _apply_search_filter(cache, request.args.get("search", "").lower())
+    search_query = request.args.get("search", "").lower()
+    cache = _apply_search_filter(cache, search_query)
     current_cat = _resolve_current_cat(request, current_mode)
-    cache = _apply_cat_filters(cache, current_cat, _excluded_cats(request))
+    excluded_cats = _excluded_cats(request)
+    cache = _apply_cat_filters(cache, current_cat, excluded_cats)
     if not cache:
         return jsonify({"error": "no posts available"}), 404
+    liked_pool = _liked_pool(search_query, current_cat, excluded_cats)
 
     try:
         count = int(request.args.get("count", 3))
@@ -1950,7 +1979,7 @@ def api_deck():
         seen = seen | {_hash_url(cur_url)}
     for _ in range(count):
         entry = _pick_next_entry(
-            cache, cur_url, seen, cur_cats, current_cat, current_mode
+            cache, cur_url, seen, cur_cats, current_cat, current_mode, liked_pool
         )
         # _pick_next_entry recycles seen posts once the pool is exhausted, which
         # is right for a single Next but would queue duplicates here.
