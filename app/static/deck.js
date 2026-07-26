@@ -21,20 +21,14 @@
     document.querySelector('meta[name="sw-seen-max"]')?.content || '', 10
   );
   const SEEN_MAX = Number.isFinite(parsedSeenMax) ? parsedSeenMax : 100;
-  // Slide transition is off: posts swap instantly. Flip to true to bring the
-  // right-to-left slide in slideIn() back.
-  const SLIDE_ENABLED = false;
   const HISTORY_MAX = 50;      // cached posts kept for Back; older ones reload
   const QUEUE_TARGET = 3;      // posts to keep queued ahead of the current one
   const QUEUE_REFILL_AT = 2;   // refill once the queue drops to this
-  const SLIDE_MS = 350;
   const FETCH_TIMEOUT_MS = 8000;
   const SLOT_IDS = [
     'reactions', 'post-cats', 'url-display-phone',
     'share-dropdown', 'mobile-more-dropdown', 'flag-dropdown', 'flag-btn-label',
   ];
-
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /** @type {Array<object>} upcoming posts, index 0 is the one rendered behind */
   let queue = [];
@@ -43,13 +37,9 @@
   /** @type {object} the post on screen right now */
   let current = null;
   let sliding = false;
-  let fetching = false;
+  let refillPromise = null;
   let deckBroken = false;
-  /** @type {string|null} a popstate that arrived mid-slide, applied afterwards */
-  let pendingPop = null;
-  /** @type {object|null} where a like on the current post goes: its nearest
-   *  unseen neighbour, resolved server-side after every swap */
-  let likeTarget = null;
+  let historyIndex = 0;
 
   function slotEl(id) {
     return document.getElementById(id) || document.querySelector(`.${id}`);
@@ -59,13 +49,28 @@
     return location.pathname + location.search;
   }
 
+  function identityUrl(post) {
+    return post ? post.source_url || post.url : '';
+  }
+
   // --- data ----------------------------------------------------------------
 
   /* Read from state, not the DOM: between a slide finishing and the next panel
      being mounted, DOM order does not identify the current post. */
   function currentUrl() {
-    return current ? current.url : '';
+    return identityUrl(current);
   }
+
+  const likeClient = window.createSmallWebLikeClient?.({
+    likeUrl: LIKE_URL,
+    targetUrl: LIKE_TARGET_URL,
+    timeoutMs: FETCH_TIMEOUT_MS,
+    currentUrl,
+    onTarget(post) {
+      remember(post);
+      mountLikeTarget(post);
+    },
+  });
 
   function remember(post) {
     byPageUrl.set(post.page_url, post);
@@ -74,112 +79,106 @@
     }
   }
 
-  async function fetchDeck(count) {
-    const sep = DECK_URL.includes('?') ? '&' : '?';
-    const url = `${DECK_URL}${sep}count=${count}&url=${encodeURIComponent(currentUrl())}`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: {Accept: 'application/json'},
-      });
-      if (!res.ok) return [];
-      const data = await res.json();
-      return Array.isArray(data.posts) ? data.posts : [];
-    } catch {
-      return [];
-    } finally {
-      clearTimeout(timer);
+  async function fetchDeck(count, afterUrl) {
+    const url = new URL(DECK_URL, location.href);
+    url.searchParams.set('count', String(count));
+    url.searchParams.set('url', afterUrl);
+    url.searchParams.delete('exclude');
+    for (const post of [current, ...queue]) {
+      const value = identityUrl(post);
+      if (value) url.searchParams.append('exclude', value);
     }
-  }
-
-  /**
-   * Record a reaction without navigating. Fired and not awaited so the deck can
-   * advance immediately; `keepalive` keeps it in flight if the page is left.
-   */
-  function sendLike(form) {
-    if (!LIKE_URL) return false;
-    const url = form.querySelector('input[name="url"]')?.value;
-    const emoji = form.querySelector('input[name="emoji"]')?.value;
-    if (!url) return false;
-
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    fetch(LIKE_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({url, emoji}),
-      signal: controller.signal,
-      keepalive: true,
-    })
-      .catch(() => {})
-      .finally(() => clearTimeout(timer));
-    return true;
-  }
-
-  /**
-   * Resolve where a like on the current post would go. Cheap JSON only: the
-   * panel behind it is not built until the user shows intent to like, so posts
-   * that are never liked cost no extra page load.
-   */
-  async function refreshLikeTarget() {
-    likeTarget = null;
-    if (!LIKE_TARGET_URL) return;
-    const sep = LIKE_TARGET_URL.includes('?') ? '&' : '?';
-    const url = `${LIKE_TARGET_URL}${sep}url=${encodeURIComponent(currentUrl())}`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const requestedFor = currentUrl();
     try {
-      const res = await fetch(url, {
+      const res = await fetch(url.href, {
         signal: controller.signal,
         headers: {Accept: 'application/json'},
       });
-      if (!res.ok) return;
+      if (!res.ok) return {ok: false, posts: []};
       const data = await res.json();
-      // A swap may have landed while this was in flight; a stale target would
-      // send the next like to the wrong post's neighbour.
-      if (currentUrl() !== requestedFor) return;
-      if (data && data.post) {
-        likeTarget = data.post;
-        remember(likeTarget);
-      }
+      return {
+        ok: true,
+        posts: Array.isArray(data.posts) ? data.posts : [],
+      };
     } catch {
-      // Leave likeTarget null: liking falls back to the next post.
+      return {ok: false, posts: []};
     } finally {
       clearTimeout(timer);
     }
   }
 
   /** Build the like target's panel so its iframe is loading before the click. */
-  function mountLikeTarget() {
-    if (!likeTarget || sliding) return;
-    const selector = `.deck-panel[data-url="${CSS.escape(likeTarget.url)}"]`;
+  function mountLikeTarget(post) {
+    if (!post || sliding) return;
+    const selector = `.deck-panel[data-url="${CSS.escape(post.url)}"]`;
     if (content.querySelector(selector)) return;
-    const panel = buildPanel(likeTarget);
+    const panel = buildPanel(post);
     panel.classList.add('is-preload');
     content.appendChild(panel);
   }
 
-  async function refill() {
-    if (fetching || deckBroken) return;
-    fetching = true;
-    try {
-      const posts = await fetchDeck(QUEUE_TARGET);
+  function updateNextLink() {
+    const nextBtn = document.querySelector('.next-button');
+    if (!nextBtn) return;
+    const href = queue[0]?.page_url || current?.next_link || '';
+    if (href) {
+      nextBtn.href = href;
+      nextBtn.removeAttribute('aria-disabled');
+    } else {
+      nextBtn.removeAttribute('href');
+      if (deckBroken) nextBtn.setAttribute('aria-disabled', 'true');
+      else nextBtn.removeAttribute('aria-disabled');
+    }
+    nextBtn.setAttribute('aria-busy', refillPromise && !queue.length ? 'true' : 'false');
+  }
+
+  function refill() {
+    if (deckBroken) return Promise.resolve(false);
+    if (refillPromise) return refillPromise;
+
+    const anchor = queue[queue.length - 1] || current;
+    const anchorUrl = identityUrl(anchor);
+    const anchorPageUrl = anchor?.page_url;
+    const count = Math.max(1, QUEUE_TARGET - queue.length);
+
+    refillPromise = (async () => {
+      const result = await fetchDeck(count, anchorUrl);
+      if (!result.ok) return false;
+
+      const anchorIsRelevant =
+        current?.page_url === anchorPageUrl ||
+        queue.some((post) => post.page_url === anchorPageUrl);
+      if (!anchorIsRelevant) return false;
+
+      const known = new Set([current, ...queue].map(identityUrl));
+      const posts = result.posts.filter((post) => {
+        const key = identityUrl(post);
+        if (!key || known.has(key)) return false;
+        known.add(key);
+        return true;
+      });
+
       if (!posts.length) {
-        // Nothing to queue: leave Next as a plain link rather than a dead button.
         if (!queue.length) deckBroken = true;
-        return;
+        return false;
       }
+
+      const tail = queue[queue.length - 1] || current;
+      if (tail) tail.next_link = posts[0].page_url;
       for (const post of posts) {
         queue.push(post);
         remember(post);
       }
       mountNextPanel();
-    } finally {
-      fetching = false;
-    }
+      return true;
+    })().finally(() => {
+      refillPromise = null;
+      updateNextLink();
+    });
+
+    updateNextLink();
+    return refillPromise;
   }
 
   // --- rendering -----------------------------------------------------------
@@ -188,6 +187,7 @@
     const panel = document.createElement('div');
     panel.className = 'deck-panel';
     panel.dataset.url = post.url;
+    panel.dataset.sourceUrl = identityUrl(post);
 
     const frame = document.createElement('iframe');
     if (post.flagged) {
@@ -211,7 +211,11 @@
 
   /** Mount the head of the queue behind the current panel, loading it now. */
   function mountNextPanel() {
-    if (sliding || !queue.length) return;
+    if (sliding) return;
+    if (!queue.length) {
+      content.querySelector('.deck-panel.is-next')?.remove();
+      return;
+    }
     const post = queue[0];
     const existing = content.querySelector('.deck-panel.is-next');
     if (existing && existing.dataset.url === post.url) return;
@@ -237,6 +241,7 @@
     const nextBtn = document.querySelector('.next-button');
     return {
       url: panel.dataset.url,
+      source_url: panel.dataset.sourceUrl || panel.dataset.url,
       page_url: pageKey(),
       slots,
       similar_href:
@@ -269,8 +274,6 @@
       }
     }
 
-    const nextBtn = document.querySelector('.next-button');
-    if (nextBtn && post.next_link) nextBtn.href = post.next_link;
   }
 
   function markSeen(hash) {
@@ -278,92 +281,35 @@
     const raw = document.cookie
       .split('; ')
       .find((c) => c.startsWith('seen='));
-    const list = raw ? decodeURIComponent(raw.slice(5)).split(',').filter(Boolean) : [];
+    let value = raw ? raw.slice(5) : '';
+    try {
+      value = decodeURIComponent(value);
+    } catch {
+      value = '';
+    }
+    const list = value.split(',').filter(Boolean);
     const next = list.filter((h) => h !== hash);
     next.push(hash);
     const trimmed = next.slice(-SEEN_MAX);
     document.cookie = `seen=${trimmed.join(',')};path=/;max-age=86400;SameSite=Lax`;
   }
 
-  // --- transition ----------------------------------------------------------
-
-  /**
-   * Slide `panel` in over the current one, right to left for the next post and
-   * left to right going back. Resolves once state is committed, whether the
-   * transition fired or the timeout guard did.
-   */
-  function slideIn(panel, direction) {
-    return new Promise((resolve) => {
-      // Preload panels sit in the DOM alongside the next one; neither is the
-      // panel being replaced, so both must be excluded here.
-      const outgoing = content.querySelector(
-        '.deck-panel:not(.is-next):not(.is-preload)'
-      );
-      panel.classList.remove('is-next');
-      panel.classList.remove('is-preload');
-
-      const finish = () => {
-        if (outgoing && outgoing !== panel) outgoing.remove();
-        panel.classList.remove('is-sliding');
-        panel.style.transition = '';
-        panel.style.transform = '';
-        if (outgoing) {
-          outgoing.style.transition = '';
-          outgoing.style.transform = '';
-        }
-        resolve();
-      };
-
-      if (!SLIDE_ENABLED || reduceMotion) {
-        finish();
-        return;
-      }
-
-      const from = direction === 'next' ? '100%' : '-100%';
-      const outTo = direction === 'next' ? '-100%' : '100%';
-
-      panel.classList.add('is-sliding');
-      panel.style.transition = 'none';
-      panel.style.transform = `translateX(${from})`;
-      if (outgoing) {
-        outgoing.style.transition = 'none';
-        outgoing.style.transform = 'translateX(0)';
-      }
-
-      // Two frames: the first commits the start position, the second animates.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const ease = `transform ${SLIDE_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-          panel.style.transition = ease;
-          panel.style.transform = 'translateX(0)';
-          if (outgoing) {
-            outgoing.style.transition = ease;
-            outgoing.style.transform = `translateX(${outTo})`;
-          }
-        });
-      });
-
-      // A dropped transitionend must not wedge the deck.
-      let done = false;
-      const once = () => {
-        if (done) return;
-        done = true;
-        panel.removeEventListener('transitionend', once);
-        clearTimeout(guard);
-        finish();
-      };
-      const guard = setTimeout(once, SLIDE_MS + 250);
-      panel.addEventListener('transitionend', once);
-    });
+  function swapPanel(panel) {
+    const outgoing = content.querySelector(
+      '.deck-panel:not(.is-next):not(.is-preload)'
+    );
+    panel.classList.remove('is-next', 'is-preload');
+    if (outgoing && outgoing !== panel) outgoing.remove();
   }
 
   // --- navigation ----------------------------------------------------------
 
-  async function show(post, direction, push) {
-    if (sliding) return;
+  function show(post, push) {
+    if (sliding) return false;
     sliding = true;
 
-    queue = queue.filter((p) => p.url !== post.url);
+    const postKey = identityUrl(post);
+    queue = queue.filter((candidate) => identityUrl(candidate) !== postKey);
 
     let panel = content.querySelector(`.deck-panel[data-url="${CSS.escape(post.url)}"]`);
     if (!panel) {
@@ -371,13 +317,16 @@
       content.appendChild(panel);
     }
 
-    // Push before the slide, not after: a Back pressed mid-slide needs the
-    // entry to already exist, or it walks off the site instead of going back.
-    if (push) history.pushState({url: post.page_url}, '', post.page_url);
+    if (push) {
+      historyIndex += 1;
+      history.pushState(
+        {swDeck: true, index: historyIndex, url: post.page_url},
+        '',
+        post.page_url
+      );
+    }
 
-    await slideIn(panel, direction);
-    sliding = false;
-
+    swapPanel(panel);
     current = post;
     applySlots(post);
     markSeen(post.seen_hash);
@@ -389,52 +338,56 @@
       if (stale !== panel) stale.remove();
     }
 
+    likeClient?.reset();
+    sliding = false;
     mountNextPanel();
+    updateNextLink();
     if (queue.length <= QUEUE_REFILL_AT) refill();
-    refreshLikeTarget();
-
-    // A Back pressed mid-slide would otherwise leave the address bar pointing
-    // at a post that is not on screen.
-    if (pendingPop !== null) {
-      const key = pendingPop;
-      pendingPop = null;
-      handlePop(key);
-    }
+    return true;
   }
 
   async function advance() {
     if (sliding) return false;
     if (!queue.length) {
-      refill();
-      return false;
+      await refill();
+      if (!queue.length) return false;
     }
-    await show(queue[0], 'next', true);
-    return true;
+    return show(queue[0], true);
   }
 
-  function handlePop(key) {
-    const post = byPageUrl.get(key);
-    if (!post) {
+  function handlePop(key, state) {
+    const targetIndex =
+      state?.swDeck && Number.isInteger(state.index) ? state.index : null;
+    const post = byPageUrl.get(state?.url || key);
+    if (!post || targetIndex === null) {
       // A history entry this session never rendered, or one evicted from the
       // cache: let the server serve it.
       location.reload();
       return;
     }
-    if (current && current.url === post.url) return;  // already on screen
-    // The post being left goes back to the front of the queue, so Next returns
-    // to it rather than skipping ahead to an unrelated one.
-    if (current && !queue.some((p) => p.url === current.url)) {
-      queue.unshift(current);
-    }
-    show(post, 'prev', false);
-  }
 
-  window.addEventListener('popstate', () => {
-    if (sliding) {
-      pendingPop = pageKey();
+    const movingBack = targetIndex < historyIndex;
+    historyIndex = targetIndex;
+    if (current && movingBack) {
+      const currentKey = identityUrl(current);
+      queue = queue.filter((candidate) => identityUrl(candidate) !== currentKey);
+      queue.unshift(current);
+    } else if (!movingBack) {
+      const targetPosition = queue.findIndex(
+        (candidate) => identityUrl(candidate) === identityUrl(post)
+      );
+      if (targetPosition > 0) queue = queue.slice(targetPosition);
+    }
+
+    if (current && identityUrl(current) === identityUrl(post)) {
+      updateNextLink();
       return;
     }
-    handlePop(pageKey());
+    show(post, false);
+  }
+
+  window.addEventListener('popstate', (event) => {
+    handlePop(pageKey(), event.state);
   });
 
   /* Start loading the like destination as soon as the user reaches for the
@@ -445,7 +398,7 @@
       evt,
       (event) => {
         if (event.target.closest && event.target.closest('.emoji-form')) {
-          mountLikeTarget();
+          likeClient?.prepare();
         }
       },
       true  // capture: pointerenter does not bubble
@@ -455,16 +408,46 @@
   /* Liking posts the reaction and swaps to the most similar post, matching
      where the server's POST-and-redirect would have landed. Falls through to
      the plain form whenever there is nowhere to go, so a like is never lost. */
-  document.addEventListener('submit', (event) => {
+  document.addEventListener('submit', async (event) => {
     const form = event.target.closest && event.target.closest('.emoji-form');
     if (!form) return;
-    const target = likeTarget;
-    const canAdvance = !deckBroken && queue.length > 0;
-    if (!target && !canAdvance) return;
-    if (!sendLike(form)) return;
+    if (!likeClient) return;
+    if (form.dataset.submitting) {
+      event.preventDefault();
+      return;
+    }
     event.preventDefault();
-    // Same order of preference as the /like route: similar post, then next.
-    if (target) show(target, 'next', true);
+    form.dataset.submitting = 'true';
+    const button = form.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    form.parentElement?.querySelector('.reaction-error')?.remove();
+
+    const submittedFor = currentUrl();
+    const targetRequest = likeClient.prepare();
+    const refillRequest =
+      !queue.length && !deckBroken ? refill() : Promise.resolve(false);
+    const [target] = await Promise.all([targetRequest, refillRequest]);
+    if (!target && !queue.length) {
+      delete form.dataset.submitting;
+      if (button) button.disabled = false;
+      HTMLFormElement.prototype.submit.call(form);
+      return;
+    }
+
+    const saved = await likeClient.save(form);
+    if (!saved) {
+      const error = document.createElement('span');
+      error.className = 'reaction-error';
+      error.setAttribute('role', 'alert');
+      error.textContent = 'Like failed. Try again.';
+      form.insertAdjacentElement('afterend', error);
+      delete form.dataset.submitting;
+      if (button) button.disabled = false;
+      return;
+    }
+
+    if (currentUrl() !== submittedFor) return;
+    if (target) show(target, true);
     else advance();
   });
 
@@ -473,14 +456,17 @@
     const link = event.target.closest && event.target.closest('.next-button');
     if (!link) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
-    if (deckBroken || !queue.length) return;  // let the anchor navigate
+    if (deckBroken && !queue.length && link.hasAttribute('href')) return;
     event.preventDefault();
     advance();
   });
 
   current = snapshotCurrent();
   remember(current);
-  history.replaceState({url: current.page_url}, '', location.href);
+  history.replaceState(
+    {swDeck: true, index: historyIndex, url: current.page_url},
+    '',
+    location.href
+  );
   refill();
-  refreshLikeTarget();
 })();

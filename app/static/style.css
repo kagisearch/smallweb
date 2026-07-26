@@ -601,11 +601,6 @@ svg {
   z-index: 0;
 }
 
-.deck-panel.is-sliding {
-  z-index: 2;
-  will-change: transform;
-}
-
 #content iframe {
   border: none;
   width: 100%;
@@ -1001,6 +996,18 @@ svg {
 
 .emoji-form {
   display: inline-block;
+}
+
+.reaction-error {
+  align-self: center;
+  color: var(--color-danger);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.emoji-badge:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .pixel-heart {

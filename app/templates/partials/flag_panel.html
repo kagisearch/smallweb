@@ -1,5 +1,5 @@
 <p class="flag-dropdown-text" id="flag-dropdown-text">Flag this post as inappropriate?</p>
 <form action="{{ prefix }}flag_content?{{ qs|safe }}" method="post" class="flag-dropdown-form">
-  <input type="hidden" name="url" value="{{ url }}">
+  <input type="hidden" name="url" value="{{ source_url|default(url, true) }}">
   <button type="submit" class="dropdown-action" data-dropdown-autofocus>Confirm</button>
 </form>

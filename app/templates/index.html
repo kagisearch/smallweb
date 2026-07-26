@@ -31,6 +31,7 @@
   <meta name="sw-seen-max" content="{{ seen_max }}">
   <meta name="sw-like-url" content="{{ prefix }}api/like">
   <meta name="sw-like-target-url" content="{{ like_target_url }}">
+  <script defer src="{{ url_for('static', filename='deck-like.js') }}"></script>
   <script defer src="{{ url_for('static', filename='deck.js') }}"></script>
   {% endif %}
   {% if current_mode == 0 %}
@@ -176,7 +177,7 @@
           <div class="dropdown-panel spread-love" id="share-dropdown">{% include "partials/share_links.html" %}</div>
         </div>
 
-        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
+        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ source_url|default(url, true)|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
 
         <div class="dropdown-container">
           <button type="button"
@@ -337,7 +338,7 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
     </div>
   {% else %}
     <div id="content">
-      <div class="deck-panel" data-url="{{ url }}">
+      <div class="deck-panel" data-url="{{ url }}" data-source-url="{{ source_url }}">
         <iframe
           src="{{url}}"
           {% if flag_content_count and flag_content_count >= 5 %}

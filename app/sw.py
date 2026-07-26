@@ -10,7 +10,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta, timezone
 from html import escape
 from typing import NamedTuple
-from urllib.parse import parse_qs, quote, urlencode, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import fastfeedparser
 import numpy as np
@@ -312,9 +312,23 @@ SEEN_COOKIE = "seen"
 SEEN_MAX = 100
 
 
+def _https_url(link):
+    """Return the URL form that can be embedded from the HTTPS app."""
+    return link.replace("http://", "https://", 1) if link.startswith("http://") else link
+
+
+def _url_key(url):
+    """Canonical identity used when HTTP feed links are displayed as HTTPS."""
+    return _https_url(url or "")
+
+
+def _urls_match(left, right):
+    return _url_key(left) == _url_key(right)
+
+
 def _hash_url(url):
     """8-char hex hash for compact cookie storage."""
-    return hashlib.md5(url.encode()).hexdigest()[:8]
+    return hashlib.md5(_url_key(url).encode()).hexdigest()[:8]
 
 
 def _get_seen(req):
@@ -741,7 +755,7 @@ def _apply_search_filter(cache, search_query):
 def _build_redirect_params():
     """Build query string from request.args, excluding 'url'."""
     params = {k: v for k, v in request.args.items() if k != "url"}
-    return "&".join(f"{k}={v}" for k, v in params.items())
+    return urlencode(params)
 
 
 def _similar_candidate_cache(req):
@@ -1097,15 +1111,21 @@ def _pick_next_entry(
     if not cache:
         return None
 
+    current_key = _url_key(url)
     if current_mode == 6:
         # Recent mode: next is the following entry in chronological order
-        cur_idx = next((i for i, e in enumerate(cache) if e.link == url), -1)
+        cur_idx = next(
+            (i for i, e in enumerate(cache) if _url_key(e.link) == current_key),
+            -1,
+        )
         if cur_idx >= 0 and cur_idx + 1 < len(cache):
             return cache[cur_idx + 1]
         return None
 
     # Exclude current URL from next candidates, then pick unseen
-    next_pool = [e for e in cache if e.link != url] or cache
+    next_pool = [e for e in cache if _url_key(e.link) != current_key]
+    if not next_pool:
+        return None
     seen_plus = seen | {_hash_url(url)}
     next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
     if not next_candidates:
@@ -1116,7 +1136,8 @@ def _pick_next_entry(
     if current_mode == 0 and liked_pool and random.random() < 0.07:
         liked_unseen = [
             e for e in liked_pool
-            if _hash_url(e.link) not in seen_plus and e.link != url
+            if _hash_url(e.link) not in seen_plus
+            and _url_key(e.link) != current_key
         ]
         if liked_unseen:
             return random.choice(liked_unseen)
@@ -1136,6 +1157,7 @@ def index():
     global urls_cache, urls_yt_cache, urls_liked_cache, urls_gh_cache, urls_flagged_cache
 
     url = request.args.get("url")
+    source_url = url or ""
     should_redirect_to_chosen_url = not url
     search_query = request.args.get("search", "").lower()
     title = None
@@ -1184,17 +1206,20 @@ def index():
         )
 
     if url is not None:
-        http_url = url.replace("https://", "http://")
         # Look up against the unfiltered mode cache so the requested post
         # always opens even when sticky/excluded category filters would hide it.
-        title, author, description, post_cats = next(
-            (
-                (e.title, e.author, e.description, e.categories)
-                for e in mode_cache
-                if e.link == url or e.link == http_url
-            ),
-            (None, None, None, []),
+        selected_entry = next(
+            (e for e in mode_cache if _urls_match(e.link, url)),
+            None,
         )
+        if selected_entry is not None:
+            source_url = selected_entry.link
+            title, author, description, post_cats = (
+                selected_entry.title,
+                selected_entry.author,
+                selected_entry.description,
+                selected_entry.categories,
+            )
 
     seen = _get_seen(request)
 
@@ -1211,6 +1236,7 @@ def index():
                 chosen.author,
                 chosen.categories,
             )
+            source_url = chosen.link
         else:
             return _render_no_results(
                 current_mode,
@@ -1221,7 +1247,7 @@ def index():
 
     if should_redirect_to_chosen_url and url:
         params = request.args.to_dict(flat=True)
-        params["url"] = url.replace("http://", "https://", 1)
+        params["url"] = _https_url(source_url)
         return redirect(prefix + "/?" + urlencode(params), code=302)
 
     # -------------------------------------------------
@@ -1230,7 +1256,7 @@ def index():
     next_link = None
     next_entry = _pick_next_entry(
         cache,
-        url,
+        source_url,
         seen,
         post_cats,
         current_cat,
@@ -1239,9 +1265,10 @@ def index():
     )
     if next_entry:
         next_params = request.args.to_dict(flat=True)
-        next_params["url"] = next_entry.link
+        next_params["url"] = _https_url(next_entry.link)
         next_link = prefix + "/?" + urlencode(next_params)
 
+    url = _https_url(source_url)
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
 
@@ -1258,7 +1285,7 @@ def index():
             current_mode = 1
 
     # get likes
-    reactions_dict = likes_dict.get(url, OrderedDict())
+    reactions_dict = likes_dict.get(source_url, OrderedDict())
     likes_total = sum(reactions_dict.values())
 
     # Preserve all query parameters except 'url'
@@ -1267,21 +1294,16 @@ def index():
         query_string = "?" + query_string
 
     # count notes
-    notes_count = len(notes_dict.get(url, []))
-    notes_list = notes_dict.get(url, [])
+    notes_count = len(notes_dict.get(source_url, []))
+    notes_list = notes_dict.get(source_url, [])
 
     # get flagged content
-    flag_content_count = flagged_content_dict.get(url, 0)
+    flag_content_count = flagged_content_dict.get(source_url, 0)
 
     # Build (slug, label, emoji) tuples for the current post's categories
     post_categories = [
         (s, CATEGORIES[s][0], CATEGORIES[s][2]) for s in post_cats if s in CATEGORIES
     ]
-
-    if url.startswith("http://"):
-        url = url.replace(
-            "http://", "https://"
-        )  # force https as http will not work inside https iframe anyway
 
     # GitHub API enrichment for Code mode
     gh_meta = None
@@ -1356,6 +1378,7 @@ def index():
         render_template(
             "index.html",
             url=url,
+            source_url=source_url,
             short_url=short_url,
             query_string=query_string,
             qs=request.query_string.decode(),
@@ -1386,14 +1409,16 @@ def index():
             post_categories=post_categories,
             feed_url=feed_url,
             gh_meta=gh_meta,
-            has_embedding=(bool(embeddings_cache) and url in embeddings_cache),
+            has_embedding=(
+                bool(embeddings_cache) and source_url in embeddings_cache
+            ),
             seen_max=SEEN_MAX,
             deck_enabled=deck_enabled,
             deck_url=deck_url,
             like_target_url=like_target_url,
         )
     )
-    return _set_seen_cookie(resp, seen, url)
+    return _set_seen_cookie(resp, seen, source_url)
 
 
 RIVER_PAGE_SIZE = 50
@@ -1823,11 +1848,6 @@ DECK_MAX = 10
 DECK_MODES = {0, 2, 4, 5, 6}
 
 
-def _https_url(link):
-    """Force https, as http will not load inside an https iframe anyway."""
-    return link.replace("http://", "https://", 1) if link.startswith("http://") else link
-
-
 def _deck_item(entry, base_params, next_link, current_mode):
     """Build one deck post: display fields plus its server-rendered header slots."""
     link = entry.link
@@ -1845,7 +1865,7 @@ def _deck_item(entry, base_params, next_link, current_mode):
     params = dict(base_params)
     params["url"] = url
     qs = urlencode(params)
-    qs_no_url = "&".join(f"{k}={v}" for k, v in base_params.items())
+    qs_no_url = urlencode(base_params)
     query_string = "?" + qs_no_url if qs_no_url else ""
 
     has_embedding = bool(embeddings_cache) and link in embeddings_cache
@@ -1857,6 +1877,7 @@ def _deck_item(entry, base_params, next_link, current_mode):
     ctx = {
         "prefix": prefix + "/",
         "url": url,
+        "source_url": link,
         "qs": qs,
         "query_string": query_string,
         "title": entry.title,
@@ -1872,12 +1893,13 @@ def _deck_item(entry, base_params, next_link, current_mode):
 
     similar_href = ""
     if current_mode == 0 and has_embedding:
-        similar_href = f"{prefix}/similar?url={quote(url)}"
-        if qs_no_url:
-            similar_href += f"&{qs_no_url}"
+        similar_params = {"url": link}
+        similar_params.update(base_params)
+        similar_href = f"{prefix}/similar?{urlencode(similar_params)}"
 
     return {
         "url": url,
+        "source_url": link,
         "title": entry.title,
         "author": entry.author,
         "domain": domain,
@@ -1928,29 +1950,81 @@ def api_deck():
 
     cur_url = request.args.get("url", "")
     cur_cats = next(
-        (e.categories for e in mode_cache if e.link == cur_url), []
+        (e.categories for e in mode_cache if _urls_match(e.link, cur_url)),
+        [],
     )
 
     base_params = {
-        k: v for k, v in request.args.items() if k not in ("count", "url")
+        k: v
+        for k, v in request.args.items()
+        if k not in ("count", "url", "exclude")
     }
 
     seen = _get_seen(request)
     entries = []
-    # The post being viewed stays out of the whole deck, not just the next pick.
-    queued = {cur_url} if cur_url else set()
+    # Posts already held by the client stay out of a refill, including after
+    # the seen pool has been exhausted and selection starts recycling.
+    queued = {
+        _url_key(value)
+        for value in request.args.getlist("exclude")
+        if value
+    }
+    if cur_url:
+        queued.add(_url_key(cur_url))
     if cur_url:
         seen = seen | {_hash_url(cur_url)}
     for _ in range(count):
+        if current_mode == 6:
+            cur_idx = next(
+                (
+                    i
+                    for i, candidate in enumerate(cache)
+                    if _urls_match(candidate.link, cur_url)
+                ),
+                -1,
+            )
+            entry = next(
+                (
+                    candidate
+                    for candidate in cache[cur_idx + 1 :]
+                    if _url_key(candidate.link) not in queued
+                ),
+                None,
+            )
+            if cur_idx < 0 or entry is None:
+                break
+            entries.append(entry)
+            queued.add(_url_key(entry.link))
+            seen = seen | {_hash_url(entry.link)}
+            cur_url, cur_cats = entry.link, entry.categories
+            continue
+
+        remaining = [
+            candidate
+            for candidate in cache
+            if _url_key(candidate.link) not in queued
+        ]
+        if not remaining:
+            break
+        remaining_keys = {_url_key(candidate.link) for candidate in remaining}
+        remaining_liked = [
+            candidate
+            for candidate in liked_pool
+            if _url_key(candidate.link) in remaining_keys
+        ]
         entry = _pick_next_entry(
-            cache, cur_url, seen, cur_cats, current_cat, current_mode, liked_pool
+            remaining,
+            cur_url,
+            seen,
+            cur_cats,
+            current_cat,
+            current_mode,
+            remaining_liked,
         )
-        # _pick_next_entry recycles seen posts once the pool is exhausted, which
-        # is right for a single Next but would queue duplicates here.
-        if entry is None or entry.link in queued:
+        if entry is None:
             break
         entries.append(entry)
-        queued.add(entry.link)
+        queued.add(_url_key(entry.link))
         seen = seen | {_hash_url(entry.link)}
         cur_url, cur_cats = entry.link, entry.categories
 

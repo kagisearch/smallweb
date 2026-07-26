@@ -1,5 +1,6 @@
 """Tests for the prefetch deck: next-post selection and the /api/deck payload."""
 import json
+from urllib.parse import parse_qs, urlparse
 
 from conftest import entry
 
@@ -34,6 +35,16 @@ def test_next_entry_falls_back_when_everything_seen(app_module):
 
 def test_next_entry_empty_cache_returns_none(app_module):
     assert app_module._pick_next_entry([], "https://x.example", set(), [], "", 0) is None
+
+
+def test_next_entry_single_post_does_not_repeat_itself(app_module):
+    only = app_module.urls_cache[:1]
+    assert (
+        app_module._pick_next_entry(
+            only, only[0].link, set(), [], "", 0
+        )
+        is None
+    )
 
 
 def test_next_entry_recent_mode_walks_in_order(app_module):
@@ -119,6 +130,31 @@ def test_deck_bad_count_falls_back_to_default(client):
     assert len(res.get_json()["posts"]) == 3
 
 
+def test_deck_fills_batch_after_seen_pool_is_exhausted(client, app_module):
+    seen = ",".join(app_module._hash_url(e.link) for e in app_module.urls_cache)
+    client.set_cookie("seen", seen, domain="localhost")
+    res = client.get("/api/deck?count=4&url=https://a.example/1")
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert len(links) == 4
+    assert len(set(links)) == 4
+
+
+def test_deck_excludes_posts_already_queued_by_client(client):
+    res = client.get(
+        "/api/deck",
+        query_string=[
+            ("count", "4"),
+            ("url", "https://c.example/3"),
+            ("exclude", "https://a.example/1"),
+            ("exclude", "https://b.example/2"),
+        ],
+    )
+    posts = res.get_json()["posts"]
+    links = [p["url"] for p in posts]
+    assert set(links) == {"https://d.example/4", "https://e.example/5"}
+    assert all("exclude=" not in post["page_url"] for post in posts)
+
+
 # --- deck payload -------------------------------------------------------------
 
 def test_deck_slots_carry_the_posts_own_url(client):
@@ -173,12 +209,32 @@ def test_deck_page_url_round_trips_mode(client):
     assert "count=" not in post["page_url"]
 
 
+def test_deck_round_trips_reserved_characters_in_filter_values(
+    client, app_module
+):
+    app_module.embeddings_cache = {
+        entry.link: [1.0] for entry in app_module.urls_cache
+    }
+    res = client.get(
+        "/api/deck",
+        query_string={
+            "foo": "x&comic",
+            "count": "1",
+            "url": "https://a.example/1",
+        },
+    )
+    post = res.get_json()["posts"][0]
+    assert parse_qs(urlparse(post["page_url"]).query)["foo"] == ["x&comic"]
+    assert parse_qs(urlparse(post["similar_href"]).query)["foo"] == ["x&comic"]
+
+
 # --- index page ---------------------------------------------------------------
 
 def test_index_ships_deck_for_iframe_modes(client):
     res = client.get("/?url=https://a.example/1", follow_redirects=True)
     body = res.get_data(as_text=True)
     assert 'name="sw-deck-url"' in body
+    assert "deck-like.js" in body
     assert "deck.js" in body
     assert 'class="deck-panel"' in body
 
@@ -203,6 +259,51 @@ def test_index_no_longer_prerenders(client):
     body = res.get_data(as_text=True)
     assert "speculationrules" not in body
     assert "seen-cookie.js" not in body
+
+
+def test_http_feed_link_keeps_one_identity_in_index_and_deck(
+    client, app_module
+):
+    app_module.urls_cache = [
+        entry("http://legacy.example/1", "Legacy"),
+        entry("https://next.example/2", "Next"),
+    ]
+    page = client.get(
+        "/", query_string={"url": "https://legacy.example/1"}
+    ).get_data(as_text=True)
+    assert 'data-url="https://legacy.example/1"' in page
+    assert 'data-source-url="http://legacy.example/1"' in page
+    assert 'name="url" value="http://legacy.example/1"' in page
+
+    deck = client.get(
+        "/api/deck",
+        query_string={
+            "count": "1",
+            "url": "http://legacy.example/1",
+        },
+    ).get_json()["posts"]
+    assert [post["url"] for post in deck] == ["https://next.example/2"]
+    assert deck[0]["source_url"] == "https://next.example/2"
+
+
+def test_recent_mode_matches_https_display_url_to_http_source(
+    client, app_module
+):
+    app_module.urls_cache = [
+        entry("http://legacy.example/1", "Newest", minutes_old=0),
+        entry("https://next.example/2", "Older", minutes_old=1),
+    ]
+    res = client.get(
+        "/api/deck",
+        query_string={
+            "recent": "",
+            "count": "1",
+            "url": "https://legacy.example/1",
+        },
+    )
+    assert [p["url"] for p in res.get_json()["posts"]] == [
+        "https://next.example/2"
+    ]
 
 
 def test_deck_json_is_serializable(client):
