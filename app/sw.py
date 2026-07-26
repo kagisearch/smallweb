@@ -1383,8 +1383,11 @@ def index():
     deck_enabled = current_mode in DECK_MODES
     deck_params = {k: v for k, v in request.args.items() if k != "url"}
     deck_url = prefix + "/api/deck"
+    like_target_url = prefix + "/api/like-target"
     if deck_params:
-        deck_url += "?" + urlencode(deck_params)
+        encoded_deck_params = urlencode(deck_params)
+        deck_url += "?" + encoded_deck_params
+        like_target_url += "?" + encoded_deck_params
 
     resp = make_response(
         render_template(
@@ -1424,6 +1427,7 @@ def index():
             seen_max=SEEN_MAX,
             deck_enabled=deck_enabled,
             deck_url=deck_url,
+            like_target_url=like_target_url,
             no_embed=no_embed,
         )
     )
@@ -2001,6 +2005,52 @@ def api_deck():
         posts.append(_deck_item(entry, base_params, next_link, current_mode))
 
     return jsonify({"posts": posts})
+
+
+@app.route("/api/like-target")
+@app.route(f"{prefix}/api/like-target")
+def api_like_target():
+    """The post a like on ?url advances to: its nearest unseen neighbour.
+
+    Mirrors the /like route's first choice so the instant path and the plain
+    form POST land on the same post.
+    """
+    cache, current_mode = _select_mode_cache(request.args)
+    url = request.args.get("url", "")
+    if current_mode not in DECK_MODES or not url:
+        return jsonify({"post": None})
+
+    search_query = request.args.get("search", "").lower()
+    cache = _apply_search_filter(cache, search_query)
+    current_cat = _resolve_current_cat(request, current_mode)
+    excluded_cats = _excluded_cats(request)
+    cache = _apply_cat_filters(cache, current_cat, excluded_cats)
+
+    seen = _get_seen(request) | {_hash_url(url)}
+    sim = find_similar(url, seen, cache)
+    if sim is None:
+        return jsonify({"post": None})
+
+    base_params = {k: v for k, v in request.args.items() if k != "url"}
+
+    # Resolve the similar post's own next link too, so the no-JS anchor is not
+    # left pointing at the post we came from.
+    nxt = _pick_next_entry(
+        cache,
+        sim.link,
+        seen | {_hash_url(sim.link)},
+        sim.categories,
+        current_cat,
+        current_mode,
+        _liked_pool(search_query, current_cat, excluded_cats),
+    )
+    next_link = None
+    if nxt:
+        next_params = dict(base_params)
+        next_params["url"] = _https_url(nxt.link)
+        next_link = prefix + "/?" + urlencode(next_params)
+
+    return jsonify({"post": _deck_item(sim, base_params, next_link, current_mode)})
 
 
 @app.route("/opml")

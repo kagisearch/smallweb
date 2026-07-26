@@ -29,6 +29,8 @@
   {% if deck_enabled %}
   <meta name="sw-deck-url" content="{{ deck_url }}">
   <meta name="sw-seen-max" content="{{ seen_max }}">
+  <meta name="sw-like-url" content="{{ prefix }}api/like">
+  <meta name="sw-like-target-url" content="{{ like_target_url }}">
   <script defer src="{{ url_for('static', filename='deck.js') }}"></script>
   {% endif %}
   {% if current_mode == 0 %}

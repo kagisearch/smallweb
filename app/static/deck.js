@@ -13,6 +13,10 @@
   if (!deckUrlMeta || !content || !currentPanel) return;
 
   const DECK_URL = deckUrlMeta.content;
+  const LIKE_URL =
+    document.querySelector('meta[name="sw-like-url"]')?.content || '';
+  const LIKE_TARGET_URL =
+    document.querySelector('meta[name="sw-like-target-url"]')?.content || '';
   const parsedSeenMax = parseInt(
     document.querySelector('meta[name="sw-seen-max"]')?.content || '', 10
   );
@@ -43,6 +47,9 @@
   let deckBroken = false;
   /** @type {string|null} a popstate that arrived mid-slide, applied afterwards */
   let pendingPop = null;
+  /** @type {object|null} where a like on the current post goes: its nearest
+   *  unseen neighbour, resolved server-side after every swap */
+  let likeTarget = null;
 
   function slotEl(id) {
     return document.getElementById(id) || document.querySelector(`.${id}`);
@@ -85,6 +92,74 @@
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  /**
+   * Record a reaction without navigating. Fired and not awaited so the deck can
+   * advance immediately; `keepalive` keeps it in flight if the page is left.
+   */
+  function sendLike(form) {
+    if (!LIKE_URL) return false;
+    const url = form.querySelector('input[name="url"]')?.value;
+    const emoji = form.querySelector('input[name="emoji"]')?.value;
+    if (!url) return false;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    fetch(LIKE_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url, emoji}),
+      signal: controller.signal,
+      keepalive: true,
+    })
+      .catch(() => {})
+      .finally(() => clearTimeout(timer));
+    return true;
+  }
+
+  /**
+   * Resolve where a like on the current post would go. Cheap JSON only: the
+   * panel behind it is not built until the user shows intent to like, so posts
+   * that are never liked cost no extra page load.
+   */
+  async function refreshLikeTarget() {
+    likeTarget = null;
+    if (!LIKE_TARGET_URL) return;
+    const sep = LIKE_TARGET_URL.includes('?') ? '&' : '?';
+    const url = `${LIKE_TARGET_URL}${sep}url=${encodeURIComponent(currentUrl())}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    const requestedFor = currentUrl();
+    try {
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: {Accept: 'application/json'},
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // A swap may have landed while this was in flight; a stale target would
+      // send the next like to the wrong post's neighbour.
+      if (currentUrl() !== requestedFor) return;
+      if (data && data.post) {
+        likeTarget = data.post;
+        remember(likeTarget);
+      }
+    } catch {
+      // Leave likeTarget null: liking falls back to the next post.
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /** Build the like target's panel so its iframe is loading before the click. */
+  function mountLikeTarget() {
+    if (!likeTarget || sliding) return;
+    const selector = `.deck-panel[data-url="${CSS.escape(likeTarget.url)}"]`;
+    if (content.querySelector(selector)) return;
+    const panel = buildPanel(likeTarget);
+    panel.classList.add('is-preload');
+    content.appendChild(panel);
   }
 
   async function refill() {
@@ -230,8 +305,13 @@
    */
   function slideIn(panel, direction) {
     return new Promise((resolve) => {
-      const outgoing = content.querySelector('.deck-panel:not(.is-next)');
+      // Preload panels sit in the DOM alongside the next one; neither is the
+      // panel being replaced, so both must be excluded here.
+      const outgoing = content.querySelector(
+        '.deck-panel:not(.is-next):not(.is-preload)'
+      );
       panel.classList.remove('is-next');
+      panel.classList.remove('is-preload');
 
       const finish = () => {
         if (outgoing && outgoing !== panel) outgoing.remove();
@@ -314,8 +394,15 @@
     markSeen(post.seen_hash);
     document.dispatchEvent(new CustomEvent('sw:content-changed'));
 
+    // A preload built for the post we just left is dead weight, and its iframe
+    // would keep running behind the new one.
+    for (const stale of content.querySelectorAll('.deck-panel.is-preload')) {
+      if (stale !== panel) stale.remove();
+    }
+
     mountNextPanel();
     if (queue.length <= QUEUE_REFILL_AT) refill();
+    refreshLikeTarget();
 
     // A Back pressed mid-slide would otherwise leave the address bar pointing
     // at a post that is not on screen.
@@ -361,6 +448,37 @@
     handlePop(pageKey());
   });
 
+  /* Start loading the like destination as soon as the user reaches for the
+     heart. Pointerdown lands well before submit, which is the head start that
+     makes the swap feel instant on a first click. */
+  for (const evt of ['pointerenter', 'pointerdown', 'focusin']) {
+    document.addEventListener(
+      evt,
+      (event) => {
+        if (event.target.closest && event.target.closest('.emoji-form')) {
+          mountLikeTarget();
+        }
+      },
+      true  // capture: pointerenter does not bubble
+    );
+  }
+
+  /* Liking posts the reaction and swaps to the most similar post, matching
+     where the server's POST-and-redirect would have landed. Falls through to
+     the plain form whenever there is nowhere to go, so a like is never lost. */
+  document.addEventListener('submit', (event) => {
+    const form = event.target.closest && event.target.closest('.emoji-form');
+    if (!form) return;
+    const target = likeTarget;
+    const canAdvance = !deckBroken && queue.length > 0;
+    if (!target && !canAdvance) return;
+    if (!sendLike(form)) return;
+    event.preventDefault();
+    // Same order of preference as the /like route: similar post, then next.
+    if (target) show(target, 'next', true);
+    else advance();
+  });
+
   // Delegated, so the `n` shortcut clicking .next-button routes here too.
   document.addEventListener('click', (event) => {
     const link = event.target.closest && event.target.closest('.next-button');
@@ -375,4 +493,5 @@
   remember(current);
   history.replaceState({url: current.page_url}, '', location.href);
   refill();
+  refreshLikeTarget();
 })();

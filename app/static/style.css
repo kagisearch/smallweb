@@ -596,6 +596,11 @@ svg {
   z-index: 0;
 }
 
+/* The like destination, loading behind the current post. */
+.deck-panel.is-preload {
+  z-index: 0;
+}
+
 .deck-panel.is-sliding {
   z-index: 2;
   will-change: transform;
