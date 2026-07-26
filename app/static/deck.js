@@ -113,12 +113,19 @@
     const panel = document.createElement('div');
     panel.className = 'deck-panel';
     panel.dataset.url = post.url;
+    if (post.no_embed) panel.dataset.noEmbed = '1';
 
     const frame = document.createElement('iframe');
+    // Same order as index.html: a flagged post keeps the flag interstitial even
+    // when its domain also refuses framing.
     if (post.flagged) {
       frame.srcdoc =
         '<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p>' +
         `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener noreferrer">View Flagged Content</a>`;
+    } else if (post.no_embed) {
+      frame.srcdoc =
+        '<p>This site cannot be displayed here. Click below to open it in a new tab.</p>' +
+        `<a href="${escapeAttr(post.url)}" target="_blank" rel="noopener noreferrer">Open in new tab</a>`;
     } else {
       frame.src = post.url;
     }
@@ -153,6 +160,9 @@
    */
   function snapshotCurrent() {
     const panel = content.querySelector('.deck-panel');
+    // Both interstitials use srcdoc, so the flag has to be ruled out explicitly
+    // or Back would re-render a non-embeddable post as a flagged one.
+    const noEmbed = panel.dataset.noEmbed === '1';
     const slots = {};
     for (const id of SLOT_IDS) {
       const el = slotEl(id);
@@ -169,7 +179,8 @@
           ? similar.getAttribute('href')
           : '',
       next_link: nextBtn ? nextBtn.getAttribute('href') : null,
-      flagged: !!panel.querySelector('iframe[srcdoc]'),
+      flagged: !noEmbed && !!panel.querySelector('iframe[srcdoc]'),
+      no_embed: noEmbed,
       seen_hash: '',  // the server already recorded this one
     };
   }

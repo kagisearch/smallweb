@@ -272,6 +272,116 @@ def test_deck_page_url_round_trips_search(client, app_module):
     assert "search=rust" in post["page_url"]
 
 
+# --- non-embeddable domains ----------------------------------------------------
+
+# Tumblr sends X-Frame-Options: deny, so an iframe pointed at it renders blank.
+# Those posts get the same interstitial the flagged ones use.
+
+def _with_tumblr(app_module):
+    app_module.urls_cache = [
+        entry("https://bogleech.tumblr.com/post/823100926826004480", "Tumblr post"),
+        entry("https://a.example/1", "Alpha", ["tech"]),
+    ]
+    return app_module.urls_cache
+
+
+def test_no_embed_flags_tumblr(app_module):
+    assert app_module._is_embeddable("https://a.example/1") is True
+    assert app_module._is_embeddable("https://bogleech.tumblr.com/post/1") is False
+    # Subdomains and the apex are both blocked.
+    assert app_module._is_embeddable("https://www.tumblr.com/x") is False
+    assert app_module._is_embeddable("https://tumblr.com/x") is False
+    # Lookalikes are not: the match is on a host-label boundary, not substring.
+    assert app_module._is_embeddable("https://nottumblr.com/x") is True
+    assert app_module._is_embeddable("https://tumblr.com.evil.example/x") is True
+
+
+def test_deck_marks_non_embeddable_posts(client, app_module):
+    _with_tumblr(app_module)
+    res = client.get("/api/deck?count=2&url=https://a.example/1")
+    posts = {p["url"]: p for p in res.get_json()["posts"]}
+    tumblr = "https://bogleech.tumblr.com/post/823100926826004480"
+    assert posts[tumblr]["no_embed"] is True
+
+
+def test_deck_marks_embeddable_posts(client, app_module):
+    _with_tumblr(app_module)
+    res = client.get(
+        "/api/deck?count=2&url=https://bogleech.tumblr.com/post/823100926826004480"
+    )
+    posts = {p["url"]: p for p in res.get_json()["posts"]}
+    assert posts["https://a.example/1"]["no_embed"] is False
+
+
+def test_index_shows_interstitial_for_non_embeddable(client, app_module):
+    _with_tumblr(app_module)
+    tumblr = "https://bogleech.tumblr.com/post/823100926826004480"
+    res = client.get(f"/?url={tumblr}", follow_redirects=True)
+    body = res.get_data(as_text=True)
+    assert "srcdoc" in body, "no interstitial: the iframe would render blank"
+    assert "cannot be displayed here" in body
+    # The escape hatch has to be a real link to the post.
+    assert f'href="{tumblr}"' in body
+
+
+def test_index_embeds_normal_sites_directly(client, app_module):
+    _with_tumblr(app_module)
+    res = client.get("/?url=https://a.example/1", follow_redirects=True)
+    body = res.get_data(as_text=True)
+    assert 'src="https://a.example/1"' in body
+    assert "cannot be displayed here" not in body
+
+
+# --- category and cookie paths -------------------------------------------------
+
+# The deck is fetched with same-origin credentials, so the cookie-driven filters
+# have to apply there too or Next escapes the user's chosen topic.
+
+def test_deck_respects_sticky_cat_cookie(client):
+    client.set_cookie("sw_sticky_cat", "art", domain="localhost")
+    res = client.get("/api/deck?count=4&url=https://c.example/3")
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert links == ["https://d.example/4"]
+
+
+def test_deck_respects_excluded_cats_cookie(client):
+    client.set_cookie("sw_excluded_cats", "tech", domain="localhost")
+    res = client.get("/api/deck?count=5&url=https://c.example/3")
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert links, "excluded-cats cookie emptied the deck"
+    assert "https://a.example/1" not in links
+    assert "https://b.example/2" not in links
+
+
+def test_deck_cat_param_overrides_sticky_cookie(client):
+    client.set_cookie("sw_sticky_cat", "art", domain="localhost")
+    res = client.get("/api/deck?cat=tech&count=4&url=https://a.example/1")
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert links == ["https://b.example/2"]
+
+
+def test_deck_page_url_round_trips_cat(client):
+    res = client.get("/api/deck?cat=art&count=1&url=https://c.example/3")
+    post = res.get_json()["posts"][0]
+    assert "cat=art" in post["page_url"]
+
+
+def test_deck_recent_mode_walks_in_order(client, app_module):
+    ordered = sorted(app_module.urls_cache, key=lambda e: e.updated, reverse=True)
+    res = client.get(f"/api/deck?recent&count=2&url={ordered[0].link}")
+    links = [p["url"] for p in res.get_json()["posts"]]
+    assert links == [ordered[1].link, ordered[2].link]
+
+
+def test_deck_sticky_cookie_ignored_outside_blog_mode(client):
+    # _resolve_current_cat only honours the sticky cookie for mode 0, so comics
+    # must not be filtered by a leftover blog category.
+    client.set_cookie("sw_sticky_cat", "art", domain="localhost")
+    res = client.get("/api/deck?comic&count=2&url=https://comic.example/1")
+    assert res.status_code == 200
+    assert [p["url"] for p in res.get_json()["posts"]] == ["https://comic.example/2"]
+
+
 def test_index_search_and_deck_agree_on_pool(client, app_module):
     """The no-JS next anchor and the deck must not disagree about the pool."""
     _searchable(app_module)

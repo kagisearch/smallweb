@@ -1038,6 +1038,24 @@ def get_registered_domain(url):
     return parsed_url.netloc
 
 
+# Domains that refuse to be framed (Tumblr sends X-Frame-Options: deny), so an
+# iframe pointed at them renders blank. They get an interstitial instead.
+NO_EMBED_DOMAINS = {"tumblr.com"}
+
+
+def _is_embeddable(link):
+    """False for a blocked domain or any of its subdomains.
+
+    Matches on the host suffix rather than get_registered_domain(), which keeps
+    every label before the public suffix ('bogleech.tumblr.com', not
+    'tumblr.com') because callers want the full host for display.
+    """
+    host = (urlparse(link).hostname or "").lower()
+    return not any(
+        host == domain or host.endswith("." + domain) for domain in NO_EMBED_DOMAINS
+    )
+
+
 def _select_mode_cache(args):
     """Pick the per-mode cache and mode id from request args."""
     if "recent" in args:
@@ -1239,6 +1257,7 @@ def index():
 
     domain = get_registered_domain(url)
     domain = re.sub(r"^(www\.)?", "", domain)
+    no_embed = not _is_embeddable(url)
 
     videoid = ""
 
@@ -1379,6 +1398,7 @@ def index():
             seen_max=SEEN_MAX,
             deck_enabled=deck_enabled,
             deck_url=deck_url,
+            no_embed=no_embed,
         )
     )
     return _set_seen_cookie(resp, seen, url)
@@ -1874,6 +1894,8 @@ def _deck_item(entry, base_params, next_link, current_mode):
         "seen_hash": _hash_url(link),
         # Five or more flags replaces the embed with an interstitial.
         "flagged": flag_content_count >= 5,
+        # So does a domain that refuses to be framed.
+        "no_embed": not _is_embeddable(link),
         "similar_href": similar_href,
         "slots": {
             "reactions": render_template("partials/reactions.html", **ctx),
