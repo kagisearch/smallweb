@@ -10,7 +10,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta, timezone
 from html import escape
 from typing import NamedTuple
-from urllib.parse import parse_qs, urlencode, urlparse
+from urllib.parse import parse_qs, quote, urlencode, urlparse
 
 import fastfeedparser
 import numpy as np
@@ -1024,6 +1024,102 @@ def get_registered_domain(url):
     return parsed_url.netloc
 
 
+def _select_mode_cache(args):
+    """Pick the per-mode cache and mode id from request args."""
+    if "recent" in args:
+        return sorted(urls_cache, key=lambda e: e.updated, reverse=True), 6
+    if "yt" in args:
+        return urls_yt_cache, 1
+    # `?app` is kept as a legacy alias for older native-app builds.
+    if "liked" in args or "app" in args:
+        return urls_liked_cache, 2
+    if "gh" in args:
+        return urls_gh_cache, 3
+    if "comic" in args:
+        return urls_comic_cache, 4
+    if "flagged" in args:
+        return urls_flagged_cache, 5
+    return urls_cache, 0
+
+
+def _resolve_current_cat(req, current_mode):
+    """Resolve category: URL param > sticky cookie (blog mode only)."""
+    if "cat" in req.args:
+        return req.args["cat"]
+    if current_mode == 0:
+        cookie_cat = req.cookies.get("sw_sticky_cat", "")
+        return cookie_cat if cookie_cat in CATEGORIES else ""
+    return ""
+
+
+def _excluded_cats(req):
+    """Read user-hidden categories from cookie."""
+    raw = req.cookies.get("sw_excluded_cats", "")
+    return set(slug for slug in raw.split(",") if slug in CATEGORIES)
+
+
+def _apply_cat_filters(cache, current_cat, excluded_cats):
+    """Drop spam, user-hidden categories, and anything outside the chosen one."""
+    if current_cat != "spam":
+        cache = [entry for entry in cache if "spam" not in entry.categories]
+
+    if excluded_cats and not current_cat:
+        cache = [
+            entry
+            for entry in cache
+            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
+        ]
+
+    if current_cat and current_cat in CATEGORIES:
+        if current_cat == "uncategorized":
+            cache = [
+                entry
+                for entry in cache
+                if not entry.categories or "uncategorized" in entry.categories
+            ]
+        else:
+            cache = [entry for entry in cache if current_cat in entry.categories]
+
+    return cache
+
+
+def _pick_next_entry(cache, url, seen, post_cats, current_cat, current_mode):
+    """Pick the post that follows `url`, or None when there is nothing to show."""
+    if not cache:
+        return None
+
+    if current_mode == 6:
+        # Recent mode: next is the following entry in chronological order
+        cur_idx = next((i for i, e in enumerate(cache) if e.link == url), -1)
+        if cur_idx >= 0 and cur_idx + 1 < len(cache):
+            return cache[cur_idx + 1]
+        return None
+
+    # Exclude current URL from next candidates, then pick unseen
+    next_pool = [e for e in cache if e.link != url] or cache
+    seen_plus = seen | {_hash_url(url)}
+    next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
+    if not next_candidates:
+        next_candidates = next_pool
+    # 7% chance next post comes from the liked pool (unseen)
+    if current_mode != 2 and urls_liked_cache and random.random() < 0.07:
+        liked_unseen = [
+            e for e in urls_liked_cache
+            if _hash_url(e.link) not in seen_plus and e.link != url
+        ]
+        if liked_unseen:
+            return random.choice(liked_unseen)
+    # 60% chance to stay in the same category when browsing all
+    if not current_cat and post_cats and random.random() < 0.6:
+        same_cat = [
+            e for e in next_candidates
+            if any(c in e.categories for c in post_cats)
+        ]
+        if same_cat:
+            next_candidates = same_cat
+    return random.choice(next_candidates)
+
+
 @app.route("/")
 def index():
     global urls_cache, urls_yt_cache, urls_liked_cache, urls_gh_cache, urls_flagged_cache
@@ -1033,28 +1129,7 @@ def index():
     search_query = request.args.get("search", "").lower()
     title = None
     post_cats = []
-    current_mode = 0
-    if "recent" in request.args:
-        cache = sorted(urls_cache, key=lambda e: e.updated, reverse=True)
-        current_mode = 6
-    elif "yt" in request.args:
-        cache = urls_yt_cache
-        current_mode = 1
-    # `?app` is kept as a legacy alias for older native-app builds.
-    elif "liked" in request.args or "app" in request.args:
-        cache = urls_liked_cache
-        current_mode = 2
-    elif "gh" in request.args:
-        cache = urls_gh_cache
-        current_mode = 3
-    elif "comic" in request.args:
-        cache = urls_comic_cache
-        current_mode = 4
-    elif "flagged" in request.args:
-        cache = urls_flagged_cache
-        current_mode = 5
-    else:
-        cache = urls_cache
+    cache, current_mode = _select_mode_cache(request.args)
 
     # Reference to the per-mode cache before any filtering, so an explicit
     # ?url= lookup always finds the requested post even when the sticky
@@ -1085,47 +1160,16 @@ def index():
                     category_counts.get("uncategorized", 0) + 1
                 )
 
-    # Resolve category: URL param > sticky cookie (blog mode only)
-    if "cat" in request.args:
-        current_cat = request.args["cat"]
-    elif current_mode == 0:
-        cookie_cat = request.cookies.get("sw_sticky_cat", "")
-        current_cat = cookie_cat if cookie_cat in CATEGORIES else ""
-    else:
-        current_cat = ""
-    if current_cat != "spam":
-        cache = [entry for entry in cache if "spam" not in entry.categories]
+    current_cat = _resolve_current_cat(request, current_mode)
+    cache = _apply_cat_filters(cache, current_cat, _excluded_cats(request))
 
-    # Exclude user-hidden categories (stored in cookie)
-    excluded_cats_raw = request.cookies.get("sw_excluded_cats", "")
-    excluded_cats = set(
-        slug for slug in excluded_cats_raw.split(",") if slug in CATEGORIES
-    )
-    if excluded_cats and not current_cat:
-        cache = [
-            entry
-            for entry in cache
-            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
-        ]
-
-    # Category filtering
-    if current_cat and current_cat in CATEGORIES:
-        if current_cat == "uncategorized":
-            cache = [
-                entry
-                for entry in cache
-                if not entry.categories or "uncategorized" in entry.categories
-            ]
-        else:
-            cache = [entry for entry in cache if current_cat in entry.categories]
-
-        if not cache:
-            return _render_no_results(
-                current_mode,
-                current_cat=current_cat,
-                category_counts=category_counts,
-                no_results_cat=current_cat,
-            )
+    if current_cat and current_cat in CATEGORIES and not cache:
+        return _render_no_results(
+            current_mode,
+            current_cat=current_cat,
+            category_counts=category_counts,
+            no_results_cat=current_cat,
+        )
 
     if url is not None:
         http_url = url.replace("https://", "http://")
@@ -1169,47 +1213,14 @@ def index():
         return redirect(prefix + "/?" + urlencode(params), code=302)
 
     # -------------------------------------------------
-    # Build deterministic "next post" link and pre-load it
+    # Build deterministic "next post" link (no-JS fallback path)
     # -------------------------------------------------
     next_link = None
-    next_doc_url = None
-    next_host = None
-    if cache:
-        if current_mode == 6:
-            # Recent mode: next is the following entry in chronological order
-            cur_idx = next((i for i, e in enumerate(cache) if e.link == url), -1)
-            next_entry = cache[cur_idx + 1] if cur_idx >= 0 and cur_idx + 1 < len(cache) else None
-        else:
-            # Exclude current URL from next candidates, then pick unseen
-            next_pool = [e for e in cache if e.link != url] or cache
-            seen_plus = seen | {_hash_url(url)}
-            next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
-            if not next_candidates:
-                next_candidates = next_pool
-            # 7% chance next post comes from the liked pool (unseen)
-            if current_mode != 2 and urls_liked_cache and random.random() < 0.07:
-                liked_unseen = [e for e in urls_liked_cache if _hash_url(e.link) not in seen_plus and e.link != url]
-                if liked_unseen:
-                    next_entry = random.choice(liked_unseen)
-                    next_candidates = None  # skip normal selection
-            # 60% chance to stay in the same category when browsing all
-            if next_candidates and not current_cat and post_cats and random.random() < 0.6:
-                same_cat = [
-                    e for e in next_candidates
-                    if any(c in e.categories for c in post_cats)
-                ]
-                if same_cat:
-                    next_candidates = same_cat
-            if next_candidates:
-                next_entry = random.choice(next_candidates)
-
-        if next_entry:
-            next_params = request.args.to_dict(flat=True)
-            next_params["url"] = next_entry.link
-            next_link = prefix + "/?" + urlencode(next_params)
-            next_doc_url = next_entry.link
-            host_parts = urlparse(next_doc_url)
-            next_host = f"{host_parts.scheme}://{host_parts.netloc}"
+    next_entry = _pick_next_entry(cache, url, seen, post_cats, current_cat, current_mode)
+    if next_entry:
+        next_params = request.args.to_dict(flat=True)
+        next_params["url"] = next_entry.link
+        next_link = prefix + "/?" + urlencode(next_params)
 
     short_url = re.sub(r"^https?://(www\.)?", "", url)
     short_url = short_url.rstrip("/")
@@ -1311,12 +1322,20 @@ def index():
         if emoji in like_emoji_list:
             reactions_list.append((emoji, count))
 
+    # Client-side deck: only for modes whose content is a plain iframe.
+    deck_enabled = current_mode in DECK_MODES
+    deck_params = {k: v for k, v in request.args.items() if k != "url"}
+    deck_url = prefix + "/api/deck"
+    if deck_params:
+        deck_url += "?" + urlencode(deck_params)
+
     resp = make_response(
         render_template(
             "index.html",
             url=url,
             short_url=short_url,
             query_string=query_string,
+            qs=request.query_string.decode(),
             title=title,
             author=author,
             domain=domain,
@@ -1333,8 +1352,6 @@ def index():
             code_count=code_count,
             comics_count=comics_count,
             next_link=next_link,
-            next_doc_url=next_doc_url,
-            next_host=next_host,
             reactions_list=reactions_list,
             likes_total=likes_total,
             like_emoji_list=like_emoji_list,
@@ -1347,8 +1364,9 @@ def index():
             feed_url=feed_url,
             gh_meta=gh_meta,
             has_embedding=(bool(embeddings_cache) and url in embeddings_cache),
-            seen_hash=_hash_url(url) if url else "",
             seen_max=SEEN_MAX,
+            deck_enabled=deck_enabled,
+            deck_url=deck_url,
         )
     )
     return _set_seen_cookie(resp, seen, url)
@@ -1774,6 +1792,148 @@ def api_random():
     })
     response.headers["Access-Control-Allow-Origin"] = "*"
     return _set_seen_cookie(response, seen, entry.link)
+
+
+DECK_MAX = 10
+# Modes whose content is a plain iframe, so a post can be swapped in client-side.
+DECK_MODES = {0, 2, 4, 5, 6}
+
+
+def _https_url(link):
+    """Force https, as http will not load inside an https iframe anyway."""
+    return link.replace("http://", "https://", 1) if link.startswith("http://") else link
+
+
+def _deck_item(entry, base_params, next_link, current_mode):
+    """Build one deck post: display fields plus its server-rendered header slots."""
+    link = entry.link
+    reactions_dict = likes_dict.get(link, OrderedDict())
+    reactions_list = [
+        (emoji, count)
+        for emoji, count in reactions_dict.items()
+        if emoji in like_emoji_list
+    ]
+    flag_content_count = flagged_content_dict.get(link, 0)
+
+    domain = re.sub(r"^(www\.)?", "", get_registered_domain(link))
+    url = _https_url(link)
+
+    params = dict(base_params)
+    params["url"] = url
+    qs = urlencode(params)
+    qs_no_url = "&".join(f"{k}={v}" for k, v in base_params.items())
+    query_string = "?" + qs_no_url if qs_no_url else ""
+
+    has_embedding = bool(embeddings_cache) and link in embeddings_cache
+    post_categories = [
+        (s, CATEGORIES[s][0], CATEGORIES[s][2])
+        for s in entry.categories if s in CATEGORIES
+    ]
+
+    ctx = {
+        "prefix": prefix + "/",
+        "url": url,
+        "qs": qs,
+        "query_string": query_string,
+        "title": entry.title,
+        "domain": domain,
+        "next_link": next_link,
+        "reactions_dict": reactions_dict,
+        "reactions_list": reactions_list,
+        "post_categories": post_categories,
+        "flag_content_count": flag_content_count,
+        "current_mode": current_mode,
+        "has_embedding": has_embedding,
+    }
+
+    similar_href = ""
+    if current_mode == 0 and has_embedding:
+        similar_href = f"{prefix}/similar?url={quote(url)}"
+        if qs_no_url:
+            similar_href += f"&{qs_no_url}"
+
+    return {
+        "url": url,
+        "title": entry.title,
+        "author": entry.author,
+        "domain": domain,
+        "page_url": prefix + "/?" + qs,
+        "next_link": next_link,
+        "seen_hash": _hash_url(link),
+        # Five or more flags replaces the embed with an interstitial.
+        "flagged": flag_content_count >= 5,
+        "similar_href": similar_href,
+        "slots": {
+            "reactions": render_template("partials/reactions.html", **ctx),
+            "post-cats": render_template("partials/post_cats.html", **ctx),
+            "url-display-phone": render_template("partials/url_display.html", **ctx),
+            "share-dropdown": render_template("partials/share_links.html", **ctx),
+            "mobile-more-dropdown": render_template("partials/mobile_more.html", **ctx),
+            "flag-dropdown": render_template("partials/flag_panel.html", **ctx),
+            "flag-btn-label": render_template("partials/flag_label.html", **ctx),
+        },
+    }
+
+
+@app.route("/api/deck")
+@app.route(f"{prefix}/api/deck")
+def api_deck():
+    """Upcoming posts with pre-rendered header slots, so Next needs no navigation."""
+    cache, current_mode = _select_mode_cache(request.args)
+    if current_mode not in DECK_MODES:
+        return jsonify({"error": "mode does not support deck"}), 400
+
+    mode_cache = cache
+    current_cat = _resolve_current_cat(request, current_mode)
+    cache = _apply_cat_filters(cache, current_cat, _excluded_cats(request))
+    if not cache:
+        return jsonify({"error": "no posts available"}), 404
+
+    try:
+        count = int(request.args.get("count", 3))
+    except ValueError:
+        count = 3
+    count = max(1, min(count, DECK_MAX))
+
+    cur_url = request.args.get("url", "")
+    cur_cats = next(
+        (e.categories for e in mode_cache if e.link == cur_url), []
+    )
+
+    base_params = {
+        k: v for k, v in request.args.items() if k not in ("count", "url")
+    }
+
+    seen = _get_seen(request)
+    entries = []
+    # The post being viewed stays out of the whole deck, not just the next pick.
+    queued = {cur_url} if cur_url else set()
+    if cur_url:
+        seen = seen | {_hash_url(cur_url)}
+    for _ in range(count):
+        entry = _pick_next_entry(
+            cache, cur_url, seen, cur_cats, current_cat, current_mode
+        )
+        # _pick_next_entry recycles seen posts once the pool is exhausted, which
+        # is right for a single Next but would queue duplicates here.
+        if entry is None or entry.link in queued:
+            break
+        entries.append(entry)
+        queued.add(entry.link)
+        seen = seen | {_hash_url(entry.link)}
+        cur_url, cur_cats = entry.link, entry.categories
+
+    posts = []
+    for i, entry in enumerate(entries):
+        # Each post's no-JS "next" link is the page_url of the one queued behind it.
+        next_link = None
+        if i + 1 < len(entries):
+            next_params = dict(base_params)
+            next_params["url"] = _https_url(entries[i + 1].link)
+            next_link = prefix + "/?" + urlencode(next_params)
+        posts.append(_deck_item(entry, base_params, next_link, current_mode))
+
+    return jsonify({"posts": posts})
 
 
 @app.route("/opml")

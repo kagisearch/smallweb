@@ -50,6 +50,20 @@
     });
   }
 
+  /* Re-inject into whatever iframes are on the page now, including deck panels
+     swapped in after load. Binds each iframe once. */
+  function bindContentIframes() {
+    if (!document.getElementById(CSS_ID)) return;
+    updateIframeStyles(true);
+    document
+      .querySelectorAll('#content iframe, #content-yt iframe')
+      .forEach((ifr) => {
+        if (ifr.dataset.darkBound) return;
+        ifr.dataset.darkBound = '1';
+        ifr.addEventListener('load', () => updateIframeStyles(true));
+      });
+  }
+
   function applyDark() {
     if (document.getElementById(CSS_ID)) return;
 
@@ -61,10 +75,7 @@
     btn.innerHTML = sunSVG;
     localStorage.setItem('darkMode', 'on');
 
-    updateIframeStyles(true);
-    document
-      .querySelectorAll('#content iframe, #content-yt iframe')
-      .forEach((ifr) => ifr.addEventListener('load', () => updateIframeStyles(true)));
+    bindContentIframes();
   }
 
   function removeDark() {
@@ -82,4 +93,6 @@
   btn.addEventListener('click', () =>
     document.getElementById(CSS_ID) ? removeDark() : applyDark()
   );
+
+  document.addEventListener('sw:content-changed', bindContentIframes);
 })();

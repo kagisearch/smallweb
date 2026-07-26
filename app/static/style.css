@@ -580,12 +580,32 @@ svg {
   height: calc(100vh - var(--header-height));
   height: calc(100dvh - var(--header-height));
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Deck panels stack in place. The next post sits behind the current one,
+   already loaded, so advancing is a transform rather than a navigation. */
+.deck-panel {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.deck-panel.is-next {
+  z-index: 0;
+}
+
+.deck-panel.is-sliding {
+  z-index: 2;
+  will-change: transform;
 }
 
 #content iframe {
   border: none;
   width: 100%;
   height: 100%;
+  display: block;
 }
 
 #content-yt {
@@ -1419,6 +1439,12 @@ svg {
   flex-shrink: 1;
   min-width: 0;
   overflow: hidden;
+}
+
+/* The container is always rendered so the deck can fill it, but a post with
+   no categories must not leave a gap in the header. */
+.post-cats:empty {
+  display: none;
 }
 
 .cat-chip {
