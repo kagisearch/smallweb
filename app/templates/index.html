@@ -273,8 +273,13 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
       <h2 class="no-results-heading">Small Web temporarily unavailable</h2>
       <p class="no-results-sub">We're working on it. Please check back shortly.</p>
       {% elif no_results_cat is defined and no_results_cat %}
-      <h2 class="no-results-heading">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
-      <a href="{{ prefix }}" class="btn clear-search-button">Show All Topics</a>
+        {% if search_query %}
+        <h2 class="no-results-heading">No results for "{{ search_query }}" in "{{ categories[no_results_cat][0] }}"</h2>
+        <a href="{{ prefix }}?search={{ search_query|urlencode }}" class="btn clear-search-button">Search All Topics</a>
+        {% else %}
+        <h2 class="no-results-heading">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
+        <a href="{{ prefix }}" class="btn clear-search-button">Show All Topics</a>
+        {% endif %}
       {% else %}
       <h2 class="no-results-heading">No results found for "{{ search_query }}"</h2>
       <a href="{{ prefix }}" class="btn clear-search-button">Clear Search</a>

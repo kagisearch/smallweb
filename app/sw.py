@@ -745,68 +745,16 @@ def _build_redirect_params():
 
 
 def _similar_candidate_cache(req):
-    """Mirror the current page filters for similar-post selection."""
-    current_mode = 0
-    if "recent" in req.args:
-        cache = sorted(urls_cache, key=lambda e: e.updated, reverse=True)
-        current_mode = 6
-    elif "yt" in req.args:
-        cache = urls_yt_cache
-        current_mode = 1
-    elif "liked" in req.args or "app" in req.args:
-        cache = urls_liked_cache
-        current_mode = 2
-    elif "gh" in req.args:
-        cache = urls_gh_cache
-        current_mode = 3
-    elif "comic" in req.args:
-        cache = urls_comic_cache
-        current_mode = 4
-    elif "flagged" in req.args:
-        cache = urls_flagged_cache
-        current_mode = 5
-    else:
-        cache = urls_cache
+    """Mirror the current page filters for similar-post selection.
 
-    search_query = req.args.get("search", "").lower()
-    if search_query.strip():
-        phrases, words = _parse_search_query(search_query)
-        if phrases or words:
-            cache = [entry for entry in cache if _entry_matches(entry, phrases, words)]
-
-    if "cat" in req.args:
-        current_cat = req.args["cat"]
-    elif current_mode == 0:
-        cookie_cat = req.cookies.get("sw_sticky_cat", "")
-        current_cat = cookie_cat if cookie_cat in CATEGORIES else ""
-    else:
-        current_cat = ""
-
-    if current_cat != "spam":
-        cache = [entry for entry in cache if "spam" not in entry.categories]
-
-    excluded_cats_raw = req.cookies.get("sw_excluded_cats", "")
-    excluded_cats = set(
-        slug for slug in excluded_cats_raw.split(",") if slug in CATEGORIES
-    )
-    if excluded_cats and not current_cat:
-        cache = [
-            entry
-            for entry in cache
-            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
-        ]
-
-    if current_cat and current_cat in CATEGORIES:
-        if current_cat == "uncategorized":
-            cache = [
-                entry
-                for entry in cache
-                if not entry.categories or "uncategorized" in entry.categories
-            ]
-        else:
-            cache = [entry for entry in cache if current_cat in entry.categories]
-
-    return cache
+    Uses the same helpers as index() and the deck: this used to hand-inline the
+    mode, search and category logic, which is how one copy could be fixed while
+    the other silently kept the old behaviour.
+    """
+    cache, current_mode = _select_mode_cache(req.args)
+    cache = _apply_search_filter(cache, req.args.get("search", "").lower())
+    current_cat = _resolve_current_cat(req, current_mode)
+    return _apply_cat_filters(cache, current_cat, _excluded_cats(req))
 
 
 def _render_no_results(
@@ -1079,9 +1027,17 @@ def _select_mode_cache(args):
 
 
 def _resolve_current_cat(req, current_mode):
-    """Resolve category: URL param > sticky cookie (blog mode only)."""
+    """Resolve category: URL param > sticky cookie (blog mode only).
+
+    A search is an explicit request that the sticky cookie does not narrow: it
+    is a leftover from earlier browsing, and silently applying it answers a
+    search for "kagi" with "no posts in Life & Personal". An explicit ?cat= is
+    part of this request, so that still applies.
+    """
     if "cat" in req.args:
         return req.args["cat"]
+    if req.args.get("search", "").strip():
+        return ""
     if current_mode == 0:
         cookie_cat = req.cookies.get("sw_sticky_cat", "")
         return cookie_cat if cookie_cat in CATEGORIES else ""
@@ -1221,6 +1177,8 @@ def index():
             current_cat=current_cat,
             category_counts=category_counts,
             no_results_cat=current_cat,
+            # So the page can say what actually came up empty.
+            search_query=search_query,
         )
 
     if url is not None:
