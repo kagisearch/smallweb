@@ -960,6 +960,10 @@ def update_entries(url):
         formatted_entries = []
         for entry in entries:
             link = entry.get("link", "")
+            # Dropped at ingest so a post that can never be shown in the iframe
+            # is absent from every mode, the feeds and search alike.
+            if not _is_embeddable(link):
+                continue
             updated = datetime.now(timezone.utc).replace(tzinfo=None)
             updated_str = entry.get("updated") or entry.get("published")
             if updated_str:
@@ -1283,7 +1287,6 @@ def index():
 
     domain = get_registered_domain(url)
     domain = re.sub(r"^(www\.)?", "", domain)
-    no_embed = not _is_embeddable(url)
 
     videoid = ""
 
@@ -1428,7 +1431,6 @@ def index():
             deck_enabled=deck_enabled,
             deck_url=deck_url,
             like_target_url=like_target_url,
-            no_embed=no_embed,
         )
     )
     return _set_seen_cookie(resp, seen, url)
@@ -1924,8 +1926,6 @@ def _deck_item(entry, base_params, next_link, current_mode):
         "seen_hash": _hash_url(link),
         # Five or more flags replaces the embed with an interstitial.
         "flagged": flag_content_count >= 5,
-        # So does a domain that refuses to be framed.
-        "no_embed": not _is_embeddable(link),
         "similar_href": similar_href,
         "slots": {
             "reactions": render_template("partials/reactions.html", **ctx),

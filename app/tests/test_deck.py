@@ -349,15 +349,7 @@ def test_index_next_link_never_leaves_search_results(client, app_module):
 # --- non-embeddable domains ----------------------------------------------------
 
 # Tumblr sends X-Frame-Options: deny, so an iframe pointed at it renders blank.
-# Those posts get the same interstitial the flagged ones use.
-
-def _with_tumblr(app_module):
-    app_module.urls_cache = [
-        entry("https://bogleech.tumblr.com/post/823100926826004480", "Tumblr post"),
-        entry("https://a.example/1", "Alpha", ["tech"]),
-    ]
-    return app_module.urls_cache
-
+# Those posts are dropped at ingest and never reach any cache.
 
 def test_no_embed_flags_tumblr(app_module):
     assert app_module._is_embeddable("https://a.example/1") is True
@@ -368,42 +360,6 @@ def test_no_embed_flags_tumblr(app_module):
     # Lookalikes are not: the match is on a host-label boundary, not substring.
     assert app_module._is_embeddable("https://nottumblr.com/x") is True
     assert app_module._is_embeddable("https://tumblr.com.evil.example/x") is True
-
-
-def test_deck_marks_non_embeddable_posts(client, app_module):
-    _with_tumblr(app_module)
-    res = client.get("/api/deck?count=2&url=https://a.example/1")
-    posts = {p["url"]: p for p in res.get_json()["posts"]}
-    tumblr = "https://bogleech.tumblr.com/post/823100926826004480"
-    assert posts[tumblr]["no_embed"] is True
-
-
-def test_deck_marks_embeddable_posts(client, app_module):
-    _with_tumblr(app_module)
-    res = client.get(
-        "/api/deck?count=2&url=https://bogleech.tumblr.com/post/823100926826004480"
-    )
-    posts = {p["url"]: p for p in res.get_json()["posts"]}
-    assert posts["https://a.example/1"]["no_embed"] is False
-
-
-def test_index_shows_interstitial_for_non_embeddable(client, app_module):
-    _with_tumblr(app_module)
-    tumblr = "https://bogleech.tumblr.com/post/823100926826004480"
-    res = client.get(f"/?url={tumblr}", follow_redirects=True)
-    body = res.get_data(as_text=True)
-    assert "srcdoc" in body, "no interstitial: the iframe would render blank"
-    assert "cannot be displayed here" in body
-    # The escape hatch has to be a real link to the post.
-    assert f'href="{tumblr}"' in body
-
-
-def test_index_embeds_normal_sites_directly(client, app_module):
-    _with_tumblr(app_module)
-    res = client.get("/?url=https://a.example/1", follow_redirects=True)
-    body = res.get_data(as_text=True)
-    assert 'src="https://a.example/1"' in body
-    assert "cannot be displayed here" not in body
 
 
 # --- category and cookie paths -------------------------------------------------
