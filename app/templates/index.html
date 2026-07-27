@@ -24,26 +24,15 @@
   {% if feed_url is defined and feed_url %}
   <link rel="alternate" type="application/atom+xml" title="Kagi Small Web Feed" href="{{ feed_url }}">
   {% endif %}
-  {% if seen_hash is defined and seen_hash %}
-  <meta name="sw-seen-hash" content="{{ seen_hash }}">
-  <meta name="sw-seen-max" content="{{ seen_max }}">
-  <script defer src="{{ url_for('static', filename='seen-cookie.js') }}"></script>
-  {% endif %}
   <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  {% if next_link %}
-  <script type="speculationrules">
-  {
-    "prerender": [{ "urls": ["{{ next_link }}"], "eagerness": "eager" }],
-    "prefetch":  [{ "urls": ["{{ next_doc_url }}"], "eagerness": "eager", "referrer_policy": "no-referrer" }]
-  }
-  </script>
-  <link rel="prefetch" href="{{ next_link }}">
-  {% if next_doc_url %}
-  <link rel="preconnect" href="{{ next_host }}" crossorigin>
-  <link rel="dns-prefetch" href="{{ next_host }}">
-  <link rel="prefetch" href="{{ next_doc_url }}" as="document" crossorigin>
-  {% endif %}
+  {% if deck_enabled %}
+  <meta name="sw-deck-url" content="{{ deck_url }}">
+  <meta name="sw-seen-max" content="{{ seen_max }}">
+  <meta name="sw-like-url" content="{{ prefix }}api/like">
+  <meta name="sw-like-target-url" content="{{ like_target_url }}">
+  <script defer src="{{ url_for('static', filename='deck-like.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='deck.js') }}"></script>
   {% endif %}
   {% if current_mode == 0 %}
   <script defer src="{{ url_for('static', filename='header-category-dropdown.js') }}"></script>
@@ -78,31 +67,7 @@
       <a href="{{ next_link }}" class="stumble-link btn next-button" rel="prefetch" title="Show next post">Next<span class="next-btn-suffix">Post</span></a>
       {% endif %}
 
-      <div id="reactions" role="group" aria-label="Reactions">
-{% set thumb_cnt = reactions_dict.get('👍', 0) %}
-<form action="{{ prefix }}like?{{ request.query_string.decode()|safe }}"
-      method="post" class="emoji-form">
-  <input type="hidden" name="url" value="{{ url }}">
-  <input type="hidden" name="emoji" value="👍">
-  {% if next_link %}<input type="hidden" name="next" value="{{ next_link }}">{% endif %}
-  <button type="submit" class="emoji-badge" title="Like this post">
-      <svg class="pixel-heart" width="18" height="16" viewBox="0 0 9 8" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="0" width="2" height="1" fill="#ff3b5c"/><rect x="6" y="0" width="2" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="4" height="1" fill="#ff3b5c"/><rect x="5" y="1" width="4" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="9" height="2" fill="#ff3b5c"/><rect x="1" y="4" width="7" height="1" fill="#ff3b5c"/><rect x="2" y="5" width="5" height="1" fill="#ff3b5c"/><rect x="3" y="6" width="3" height="1" fill="#ff3b5c"/><rect x="4" y="7" width="1" height="1" fill="#ff3b5c"/></svg>{% if thumb_cnt %}<span>{{ thumb_cnt }}</span>{% endif %}
-  </button>
-</form>
-
-{% for emoji, cnt in reactions_list if emoji != '👍' %}
-<form action="{{ prefix }}like?{{ request.query_string.decode()|safe }}"
-      method="post" class="emoji-form">
-  <input type="hidden" name="url" value="{{ url }}">
-  <input type="hidden" name="emoji" value="{{ emoji }}">
-  {% if next_link %}<input type="hidden" name="next" value="{{ next_link }}">{% endif %}
-  <button type="submit" class="emoji-badge" title="Like this post">
-      <span>{{ emoji }}</span><span>{{ cnt }}</span>
-  </button>
-</form>
-{% endfor %}
-
-      </div>
+      <div id="reactions" role="group" aria-label="Reactions">{% include "partials/reactions.html" %}</div>
       {% endif %}
 
       <form action="{{ prefix }}" method="get" id="search-form"{% if search_query %} class="has-clear"{% endif %}>
@@ -201,43 +166,18 @@
         </div>
         {% endif %}
 
-        {% if current_mode == 0 and post_categories %}
-        <div class="post-cats">
-          {% for slug, label, emoji in post_categories %}
-          <a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
-          {% endfor %}
-        </div>
+        {% if current_mode == 0 %}
+        <div class="post-cats">{% include "partials/post_cats.html" %}</div>
         {% endif %}
 
-        <div id="url-display-phone">
-          <span class="phone-domain">{{domain}}</span>
-          <a class="phone-link" href="{{url}}" title="Go to the original post" target="_blank" rel="noopener noreferrer">
-            <svg class="external-link-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-              <path d="M3 13h2v2H3zM5 11h2v2H5zM7 9h2v2H7zM9 7h2v2H9zM9 3h2v2H9zM11 3h2v2H11zM13 3h2v2H13zM11 5h2v2H11zM13 5h2v2H13zM13 7h2v2H13z" fill="currentColor"></path>
-            </svg>
-          </a>
-        </div>
+        <div id="url-display-phone">{% include "partials/url_display.html" %}</div>
 
         <div class="dropdown-container">
           <button type="button" class="dropdown-link" title="Share this post" data-dropdown-trigger aria-haspopup="true" aria-expanded="false" aria-controls="share-dropdown">Share</button>
-          <div class="dropdown-panel spread-love" id="share-dropdown">
-            <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Hacker News</a>
-            <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Reddit</a>
-            <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Mastodon</a>
-            <a href="https://lemmy.world/create_post?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lemmy</a>
-            <a href="https://lobste.rs/stories/new?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Lobsters</a>
-            <a href="https://cohost.org" class="share-option" target="_blank" rel="noopener noreferrer">Cohost</a>
-            <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Email</a>
-            <hr class="share-separator">
-            <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Summarize</a>
-            <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Translate</a>
-            <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}"
-               class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
-          </div>
+          <div class="dropdown-panel spread-love" id="share-dropdown">{% include "partials/share_links.html" %}</div>
         </div>
 
-        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
+        <a class="similar-btn dropdown-link{% if not (current_mode == 0 and has_embedding) %} hidden{% endif %}" href="{{ prefix }}similar?url={{ source_url|default(url, true)|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show another unseen post with similar content" {% if not (current_mode == 0 and has_embedding) %}aria-hidden="true" tabindex="-1"{% endif %}>Similar</a>
 
         <div class="dropdown-container">
           <button type="button"
@@ -247,14 +187,8 @@
                   aria-haspopup="true"
                   aria-expanded="false"
                   aria-controls="flag-dropdown">
-                  Flag{% if flag_content_count and flag_content_count > 0 %} <span class="flag-danger">({{ flag_content_count }})</span>{% endif %}</button>
-          <div class="dropdown-panel flag-dropdown" id="flag-dropdown" role="alertdialog" aria-modal="false" aria-label="Flag confirmation" aria-describedby="flag-dropdown-text">
-            <p class="flag-dropdown-text" id="flag-dropdown-text">Flag this post as inappropriate?</p>
-            <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post" class="flag-dropdown-form">
-              <input type="hidden" name="url" value="{{ url }}">
-              <button type="submit" class="dropdown-action" data-dropdown-autofocus>Confirm</button>
-            </form>
-          </div>
+                  <span id="flag-btn-label">{% include "partials/flag_label.html" %}</span></button>
+          <div class="dropdown-panel flag-dropdown" id="flag-dropdown" role="alertdialog" aria-modal="false" aria-label="Flag confirmation" aria-describedby="flag-dropdown-text">{% include "partials/flag_panel.html" %}</div>
         </div>
 
         <div class="dropdown-container mobile-more">
@@ -265,26 +199,7 @@
                   aria-haspopup="true"
                   aria-expanded="false"
                   aria-controls="mobile-more-dropdown">⋮</button>
-          <div class="dropdown-panel" id="mobile-more-dropdown">
-            <a href="https://news.ycombinator.com/submitlink?u={{url|urlencode}}&t={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Hacker News</a>
-            <a href="https://www.reddit.com/submit?url={{url|urlencode}}&title={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Reddit</a>
-            <a href="https://twitter.com/share?url={{url|urlencode}}&text={{title|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="https://mastodon.social/share?text={{title|urlencode}}%0A%0A{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Mastodon</a>
-            <a href="mailto:?subject={{title|urlencode}}&body=Check%20out%20this%20link:%20{{url|urlencode}}" class="share-option" target="_blank" rel="noopener noreferrer">Email</a>
-            <hr class="share-separator">
-            <a href="https://kagi.com/summarizer/index.html?url={{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Summarize</a>
-            <a href="https://translate.kagi.com/translate/{{ url|urlencode }}" class="share-option" target="_blank" rel="noopener noreferrer">Translate</a>
-            <a href="{{ prefix }}?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" class="share-option" target="_blank" rel="noopener noreferrer">Link here</a>
-            {% if current_mode == 0 and has_embedding %}
-            <hr class="share-separator">
-            <a class="share-option" href="{{ prefix }}similar?url={{ url|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show similar post">Similar</a>
-            {% endif %}
-            <hr class="share-separator">
-            <form action="{{ prefix }}flag_content?{{ request.query_string.decode()|safe }}" method="post" class="mobile-flag-form">
-              <input type="hidden" name="url" value="{{ url }}">
-              <button type="submit" class="share-option mobile-flag-btn">Flag{% if flag_content_count and flag_content_count > 0 %} ({{ flag_content_count }}){% endif %}</button>
-            </form>
-          </div>
+          <div class="dropdown-panel" id="mobile-more-dropdown">{% include "partials/mobile_more.html" %}</div>
         </div>
       {% endif %}
     </div>
@@ -359,8 +274,13 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
       <h2 class="no-results-heading">Small Web temporarily unavailable</h2>
       <p class="no-results-sub">We're working on it. Please check back shortly.</p>
       {% elif no_results_cat is defined and no_results_cat %}
-      <h2 class="no-results-heading">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
-      <a href="{{ prefix }}" class="btn clear-search-button">Show All Topics</a>
+        {% if search_query %}
+        <h2 class="no-results-heading">No results for "{{ search_query }}" in "{{ categories[no_results_cat][0] }}"</h2>
+        <a href="{{ prefix }}?search={{ search_query|urlencode }}" class="btn clear-search-button">Search All Topics</a>
+        {% else %}
+        <h2 class="no-results-heading">No posts in "{{ categories[no_results_cat][0] }}" right now</h2>
+        <a href="{{ prefix }}" class="btn clear-search-button">Show All Topics</a>
+        {% endif %}
       {% else %}
       <h2 class="no-results-heading">No results found for "{{ search_query }}"</h2>
       <a href="{{ prefix }}" class="btn clear-search-button">Clear Search</a>
@@ -418,12 +338,14 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
     </div>
   {% else %}
     <div id="content">
-      <iframe
-        src="{{url}}"
-        {% if flag_content_count and flag_content_count >= 5 %}
-          srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target="_blank" rel="noopener noreferrer">View Flagged Content</a>'
-        {% endif %}
-      ></iframe>
+      <div class="deck-panel" data-url="{{ url }}" data-source-url="{{ source_url }}">
+        <iframe
+          src="{{url}}"
+          {% if flag_content_count and flag_content_count >= 5 %}
+            srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target="_blank" rel="noopener noreferrer">View Flagged Content</a>'
+          {% endif %}
+        ></iframe>
+      </div>
     </div>
   {% endif %}
   </main>

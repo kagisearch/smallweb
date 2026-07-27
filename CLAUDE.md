@@ -22,6 +22,14 @@ docker build -t smallweb .
 docker run -p 8080:8080 smallweb
 ```
 
+### Tests
+```bash
+pip install -r app/requirements-dev.txt
+python3 -m pytest app/tests -q
+```
+Tests stub the network and swap in an in-memory feed, so they never hit the
+Kagi API.
+
 ### Maintenance
 ```bash
 # Crawl all feeds (expensive operation)
@@ -62,6 +70,21 @@ Kagi Small Web is a feed aggregation platform that curates and displays content 
 2. **Filtering**: YouTube Shorts removal, image detection for comics
 3. **Caching**: In-memory storage with periodic updates
 4. **Generation**: Creates appreciated feed and OPML export
+
+### Post Deck (instant Next)
+
+Next does not navigate. `/api/deck` returns the upcoming posts, each with its
+header markup pre-rendered from `templates/partials/`, and `static/deck.js`
+mounts the next post's iframe behind the current one so it has already loaded
+by the time it is needed. Advancing slides the two panels and swaps the header
+slots in place.
+
+- Enabled only for iframe modes (`DECK_MODES` in `sw.py`); Videos and Code
+  still navigate.
+- The `<a class="next-button">` anchor remains the no-JS path, and the deck
+  falls back to it whenever the queue is empty or the fetch fails.
+- Post-specific header markup lives in `templates/partials/` and is rendered by
+  both `index.html` and `/api/deck`, so there is one source of truth.
 
 ### User Features
 

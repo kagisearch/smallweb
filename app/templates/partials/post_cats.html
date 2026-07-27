@@ -1,0 +1,3 @@
+{%- for slug, label, emoji in post_categories -%}
+<a href="{{ prefix }}?cat={{ slug }}" class="cat-chip" title="More from {{ label }}">{{ emoji }}</a>
+{%- endfor -%}
