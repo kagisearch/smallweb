@@ -1125,7 +1125,9 @@ def _pick_next_entry(
     # Exclude current URL from next candidates, then pick unseen
     next_pool = [e for e in cache if _url_key(e.link) != current_key]
     if not next_pool:
-        return None
+        # Single-post pool (e.g. a search with one match): loop back to the
+        # same post so the Next button never disappears.
+        return cache[0]
     seen_plus = seen | {_hash_url(url)}
     next_candidates = [e for e in next_pool if _hash_url(e.link) not in seen_plus]
     if not next_candidates:

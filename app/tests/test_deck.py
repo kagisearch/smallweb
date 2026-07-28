@@ -37,14 +37,12 @@ def test_next_entry_empty_cache_returns_none(app_module):
     assert app_module._pick_next_entry([], "https://x.example", set(), [], "", 0) is None
 
 
-def test_next_entry_single_post_does_not_repeat_itself(app_module):
+def test_next_entry_single_post_loops_back_to_itself(app_module):
+    # A one-post pool (e.g. a search with a single match) must still yield a
+    # next entry, so the Next button never disappears mid-browse.
     only = app_module.urls_cache[:1]
-    assert (
-        app_module._pick_next_entry(
-            only, only[0].link, set(), [], "", 0
-        )
-        is None
-    )
+    nxt = app_module._pick_next_entry(only, only[0].link, set(), [], "", 0)
+    assert nxt is not None and nxt.link == only[0].link
 
 
 def test_next_entry_recent_mode_walks_in_order(app_module):
@@ -350,6 +348,18 @@ def test_deck_search_with_no_other_match_queues_nothing(client, app_module):
     res = client.get("/api/deck?search=sourdough&count=3&url=https://k.example/1")
     assert res.status_code == 200
     assert res.get_json()["posts"] == []
+
+
+def test_index_search_single_match_keeps_next_button(client, app_module):
+    _searchable(app_module)
+    # "sourdough" matches only the post on screen; Next must still render and
+    # loop back to the same post instead of vanishing.
+    res = client.get(
+        "/?search=sourdough&url=https://k.example/1", follow_redirects=True
+    )
+    body = res.get_data(as_text=True)
+    assert "next-button" in body
+    assert "url=https%3A%2F%2Fk.example%2F1" in body
 
 
 def test_deck_search_with_zero_matches_returns_404(client, app_module):
