@@ -256,7 +256,27 @@ def test_index_no_longer_prerenders(client):
     res = client.get("/?url=https://a.example/1", follow_redirects=True)
     body = res.get_data(as_text=True)
     assert "speculationrules" not in body
-    assert "seen-cookie.js" not in body
+
+
+def test_index_marks_seen_client_side(client, app_module):
+    # _set_seen_cookie suppresses Set-Cookie on speculative requests, so a
+    # navigation served from a speculative load would never record the view
+    # and the post could be picked again. The page must mark itself seen.
+    res = client.get("/?url=https://a.example/1", follow_redirects=True)
+    body = res.get_data(as_text=True)
+    assert "seen-cookie.js" in body
+    expected = app_module._hash_url("https://a.example/1")
+    assert 'name="sw-seen-hash" content="%s"' % expected in body
+
+
+def test_index_marks_seen_client_side_without_deck(client, app_module):
+    # Videos/Code navigate instead of using the deck, so deck.js never marks
+    # their views; the seen-cookie script is the only client-side marker.
+    app_module.urls_gh_cache = [app_module.urls_cache[0]]
+    res = client.get("/?gh&url=https://a.example/1", follow_redirects=True)
+    body = res.get_data(as_text=True)
+    assert "seen-cookie.js" in body
+    assert 'name="sw-seen-hash"' in body
 
 
 def test_http_feed_link_keeps_one_identity_in_index_and_deck(

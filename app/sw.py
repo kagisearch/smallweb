@@ -1415,6 +1415,7 @@ def index():
                 bool(embeddings_cache) and source_url in embeddings_cache
             ),
             seen_max=SEEN_MAX,
+            seen_hash=_hash_url(source_url),
             deck_enabled=deck_enabled,
             deck_url=deck_url,
             like_target_url=like_target_url,

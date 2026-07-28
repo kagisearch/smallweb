@@ -26,9 +26,13 @@
   {% endif %}
   <link rel="preload" href="{{ url_for('static', filename='vt323-regular-webfont.woff2') }}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="sw-seen-max" content="{{ seen_max }}">
+  {% if seen_hash %}
+  <meta name="sw-seen-hash" content="{{ seen_hash }}">
+  {% endif %}
+  <script defer src="{{ url_for('static', filename='seen-cookie.js') }}"></script>
   {% if deck_enabled %}
   <meta name="sw-deck-url" content="{{ deck_url }}">
-  <meta name="sw-seen-max" content="{{ seen_max }}">
   <meta name="sw-like-url" content="{{ prefix }}api/like">
   <meta name="sw-like-target-url" content="{{ like_target_url }}">
   <script defer src="{{ url_for('static', filename='deck-like.js') }}"></script>
