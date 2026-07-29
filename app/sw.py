@@ -1493,6 +1493,8 @@ def river():
             sw_params["yt"] = ""
         elif mode == "gh":
             sw_params["gh"] = ""
+        elif mode == "comic":
+            sw_params["comic"] = ""
         sw_url = prefix + "/?" + urlencode(sw_params)
         cards.append({
             "link": entry.link,
