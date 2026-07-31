@@ -1239,6 +1239,11 @@ def index():
                 chosen.categories,
             )
             source_url = chosen.link
+            # The requested ?url is gone from the pool (dropped from the feed,
+            # or a domain we refuse to embed). Without this the address bar
+            # keeps naming a post the page does not show, so every link, share
+            # and history entry from here on describes the wrong thing.
+            should_redirect_to_chosen_url = True
         else:
             return _render_no_results(
                 current_mode,
@@ -1250,7 +1255,11 @@ def index():
     if should_redirect_to_chosen_url and url:
         params = request.args.to_dict(flat=True)
         params["url"] = _https_url(source_url)
-        return redirect(prefix + "/?" + urlencode(params), code=302)
+        redirect_resp = redirect(prefix + "/?" + urlencode(params), code=302)
+        # The target is picked per request, so a cached redirect would pin one
+        # reader to one post forever.
+        redirect_resp.headers["Cache-Control"] = "no-store"
+        return redirect_resp
 
     # -------------------------------------------------
     # Build deterministic "next post" link (no-JS fallback path)
@@ -1421,6 +1430,10 @@ def index():
             like_target_url=like_target_url,
         )
     )
+    # Next link, reactions and the seen cookie are all computed per request from
+    # cookies this response never declares a Vary on. Storing it anywhere would
+    # replay one reader's post to the next.
+    resp.headers["Cache-Control"] = "no-store"
     return _set_seen_cookie(resp, seen, source_url)
 
 
@@ -2043,7 +2056,11 @@ def api_deck():
             next_link = prefix + "/?" + urlencode(next_params)
         posts.append(_deck_item(entry, base_params, next_link, current_mode))
 
-    return jsonify({"posts": posts})
+    response = jsonify({"posts": posts})
+    # Picked per request from the caller's seen cookie and exclude list, so a
+    # stored copy would hand one reader the batch built for another.
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.route("/api/like-target")
@@ -2089,7 +2106,11 @@ def api_like_target():
         next_params["url"] = _https_url(nxt.link)
         next_link = prefix + "/?" + urlencode(next_params)
 
-    return jsonify({"post": _deck_item(sim, base_params, next_link, current_mode)})
+    response = jsonify(
+        {"post": _deck_item(sim, base_params, next_link, current_mode)}
+    )
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.route("/opml")

@@ -258,6 +258,36 @@ def test_index_no_longer_prerenders(client):
     assert "speculationrules" not in body
 
 
+def test_index_redirects_when_requested_url_is_not_in_the_pool(client):
+    # A post that has aged out of the feed (or a domain we refuse to embed)
+    # still gets a page, but rendering it under the requested ?url would leave
+    # the address bar, the share links and the history entry naming a post the
+    # reader is not looking at.
+    res = client.get("/?url=https://gone.example/9")
+    assert res.status_code == 302
+    landed = parse_qs(urlparse(res.headers["Location"]).query)["url"][0]
+    assert landed != "https://gone.example/9"
+
+    page = client.get(res.headers["Location"]).get_data(as_text=True)
+    assert 'data-source-url="%s"' % landed in page
+
+
+def test_index_and_its_redirect_are_never_stored(client):
+    # The next link is drawn per request and the page depends on cookies it
+    # does not Vary on, so a cached copy replays one reader's post to the next.
+    res = client.get("/?url=https://a.example/1")
+    assert res.headers.get("Cache-Control") == "no-store"
+
+    redirected = client.get("/")
+    assert redirected.status_code == 302
+    assert redirected.headers.get("Cache-Control") == "no-store"
+
+    # Same for the JSON the deck advances on: it is built from the caller's
+    # seen cookie and exclude list.
+    deck = client.get("/api/deck?count=1&url=https://a.example/1")
+    assert deck.headers.get("Cache-Control") == "no-store"
+
+
 def test_index_marks_seen_client_side(client, app_module):
     # _set_seen_cookie suppresses Set-Cookie on speculative requests, so a
     # navigation served from a speculative load would never record the view
