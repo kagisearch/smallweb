@@ -121,7 +121,14 @@
   function updateNextLink() {
     const nextBtn = document.querySelector('.next-button');
     if (!nextBtn) return;
-    const href = queue[0]?.page_url || current?.next_link || '';
+    // A server-rendered next_link points back at this post when the pool holds
+    // nothing else (a one-result search, a one-post category). Offering it
+    // would make Next a full navigation that lands where the reader already is.
+    const fallback =
+      current && current.next_link && current.next_link !== current.page_url
+        ? current.next_link
+        : '';
+    const href = queue[0]?.page_url || fallback;
     if (href) {
       nextBtn.href = href;
       nextBtn.removeAttribute('aria-disabled');
@@ -306,50 +313,79 @@
 
   function show(post, push) {
     if (sliding) return false;
+    // Rendering the post already on screen is never an advance: it would push a
+    // duplicate history entry and change nothing the reader can see. Whatever
+    // handed us this post is wrong, and swallowing it here keeps that bug off
+    // the screen.
+    if (!post || (current && identityUrl(post) === currentUrl())) return false;
     sliding = true;
 
-    const postKey = identityUrl(post);
-    queue = queue.filter((candidate) => identityUrl(candidate) !== postKey);
+    try {
+      const postKey = identityUrl(post);
+      queue = queue.filter((candidate) => identityUrl(candidate) !== postKey);
 
-    let panel = content.querySelector(`.deck-panel[data-url="${CSS.escape(post.url)}"]`);
-    if (!panel) {
-      panel = buildPanel(post);
-      content.appendChild(panel);
+      let panel = content.querySelector(`.deck-panel[data-url="${CSS.escape(post.url)}"]`);
+      if (!panel) {
+        panel = buildPanel(post);
+        content.appendChild(panel);
+      }
+
+      if (push) {
+        try {
+          history.pushState(
+            {swDeck: true, index: historyIndex + 1, url: post.page_url},
+            '',
+            post.page_url
+          );
+          historyIndex += 1;
+        } catch {
+          // Throttled by the browser: advance anyway, the address bar lags.
+          // Leaving historyIndex alone keeps it matched to the entries that
+          // do exist, so a later popstate still resolves.
+        }
+      }
+
+      swapPanel(panel);
+      current = post;
+      // The exclusion set just changed, so a pool that had nothing to add for
+      // the previous post is worth asking again.
+      deckBroken = false;
+      applySlots(post);
+      markSeen(post.seen_hash);
+      document.dispatchEvent(new CustomEvent('sw:content-changed'));
+
+      // A preload built for the post we just left is dead weight, and its
+      // iframe would keep running behind the new one.
+      for (const stale of content.querySelectorAll('.deck-panel.is-preload')) {
+        if (stale !== panel) stale.remove();
+      }
+
+      likeClient?.reset();
+    } finally {
+      // Anything that throws mid-swap must not leave the deck latched: sliding
+      // gates every advance and every popstate render.
+      sliding = false;
     }
 
-    if (push) {
-      historyIndex += 1;
-      history.pushState(
-        {swDeck: true, index: historyIndex, url: post.page_url},
-        '',
-        post.page_url
-      );
-    }
-
-    swapPanel(panel);
-    current = post;
-    applySlots(post);
-    markSeen(post.seen_hash);
-    document.dispatchEvent(new CustomEvent('sw:content-changed'));
-
-    // A preload built for the post we just left is dead weight, and its iframe
-    // would keep running behind the new one.
-    for (const stale of content.querySelectorAll('.deck-panel.is-preload')) {
-      if (stale !== panel) stale.remove();
-    }
-
-    likeClient?.reset();
-    sliding = false;
     mountNextPanel();
     updateNextLink();
     if (queue.length <= QUEUE_REFILL_AT) refill();
     return true;
   }
 
+  /** Drop any queued copy of the post on screen; advancing to it is a no-op. */
+  function dropCurrentFromQueue() {
+    const key = currentUrl();
+    if (!key) return;
+    queue = queue.filter((candidate) => identityUrl(candidate) !== key);
+  }
+
   async function advance() {
     if (sliding) return false;
+    dropCurrentFromQueue();
     if (!queue.length) {
       await refill();
+      dropCurrentFromQueue();
       if (!queue.length) return false;
     }
     return show(queue[0], true);
@@ -368,6 +404,17 @@
 
     const movingBack = targetIndex < historyIndex;
     historyIndex = targetIndex;
+
+    // Landing on the post already on screen: there is nothing to render, and
+    // the queue must not be touched. An iframe navigation inside a post adds a
+    // history entry of its own, so this fires on ordinary browsing; queueing
+    // `current` here would leave it at the head and replay it on the next
+    // advance, which is only ever undone by the show() below.
+    if (current && identityUrl(current) === identityUrl(post)) {
+      updateNextLink();
+      return;
+    }
+
     if (current && movingBack) {
       const currentKey = identityUrl(current);
       queue = queue.filter((candidate) => identityUrl(candidate) !== currentKey);
@@ -379,10 +426,6 @@
       if (targetPosition > 0) queue = queue.slice(targetPosition);
     }
 
-    if (current && identityUrl(current) === identityUrl(post)) {
-      updateNextLink();
-      return;
-    }
     show(post, false);
   }
 
@@ -447,8 +490,9 @@
     }
 
     if (currentUrl() !== submittedFor) return;
-    if (target) show(target, true);
-    else advance();
+    // show() refuses a target that is already on screen, so fall through to a
+    // plain advance rather than leaving the reader where they liked.
+    if (!target || !show(target, true)) advance();
   });
 
   // Delegated, so the `n` shortcut clicking .next-button routes here too.
