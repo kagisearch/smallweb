@@ -180,7 +180,11 @@ function boot({batches = [], nextHref = pageUrl('https://z.example/0')} = {}) {
 
   const content = makeEl('div', {id: 'content'});
   content.appendChild(
-    makeEl('div', {'data-url': A, 'data-source-url': A}, ['deck-panel'])
+    makeEl(
+      'div',
+      {'data-url': A, 'data-source-url': A, 'data-epoch': '0'},
+      ['deck-panel']
+    )
   );
   root.appendChild(content);
 
@@ -267,6 +271,9 @@ function boot({batches = [], nextHref = pageUrl('https://z.example/0')} = {}) {
     location,
     flush,
     nextHref: () => nextBtn.getAttribute('href'),
+    /** The panel element currently mounted for a post, whatever its state. */
+    panelFor: (url) =>
+      content.childNodes.find((c) => c.getAttribute('data-url') === url) || null,
     /** data-url of the panel that is actually on top. */
     shown: () => {
       const panel = content.querySelector(
@@ -349,6 +356,37 @@ test('a throttled pushState does not latch the deck', async () => {
 
   await deck.clickNext();
   assert.equal(deck.shown(), C);
+});
+
+test('a panel that lived through a traversal is rebuilt, not reused', async () => {
+  // A history traversal restores the documents the target entry recorded for
+  // each frame slot, so a preloaded iframe can end up on another post's page
+  // while its src still names this one: the header advances, the frame does
+  // not. Any panel older than the last traversal has to be thrown away.
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]]});
+  await deck.flush();
+
+  const preloaded = deck.panelFor(B);
+  assert.ok(preloaded, 'B is preloaded behind the current post');
+
+  await deck.pop({swDeck: true, index: 0, url: pageUrl(A)});
+  await deck.clickNext();
+
+  assert.equal(deck.shown(), B);
+  assert.notEqual(
+    deck.panelFor(B), preloaded, 'the pre-traversal panel must not be reused'
+  );
+});
+
+test('a panel built since the last traversal is reused', async () => {
+  // The rebuild is a reload, so it must not happen on every advance.
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]]});
+  await deck.flush();
+
+  const preloaded = deck.panelFor(B);
+  await deck.clickNext();
+  assert.equal(deck.shown(), B);
+  assert.equal(deck.panelFor(B), preloaded, 'no traversal, so no reload');
 });
 
 test('a self-referential server next_link is not offered', async () => {

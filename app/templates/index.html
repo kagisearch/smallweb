@@ -342,8 +342,9 @@ href="https://github.com/kagisearch/smallweb" target="_blank" rel="noopener nore
     </div>
   {% else %}
     <div id="content">
-      <div class="deck-panel" data-url="{{ url }}" data-source-url="{{ source_url }}">
+      <div class="deck-panel" data-url="{{ url }}" data-source-url="{{ source_url }}" data-epoch="0">
         <iframe
+          name="sw-post-{{ seen_hash }}"
           src="{{url}}"
           {% if flag_content_count and flag_content_count >= 5 %}
             srcdoc='<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p><a href="{{url}}" target="_blank" rel="noopener noreferrer">View Flagged Content</a>'

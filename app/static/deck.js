@@ -40,6 +40,12 @@
   let refillPromise = null;
   let deckBroken = false;
   let historyIndex = 0;
+  /* Bumped by every history traversal. A traversal restores the documents the
+     target entry recorded for each frame slot, so an iframe that lived through
+     one can be sitting on another post's page (or about:blank) while its src
+     still names this post -- the header updates, the frame does not. Panels
+     built before the last traversal are therefore not reusable. */
+  let historyEpoch = 0;
 
   function slotEl(id) {
     return document.getElementById(id) || document.querySelector(`.${id}`);
@@ -108,11 +114,19 @@
     }
   }
 
+  /** A panel whose iframe a history traversal may have re-pointed. */
+  function isStale(panel) {
+    return !panel || panel.dataset.epoch !== String(historyEpoch);
+  }
+
   /** Build the like target's panel so its iframe is loading before the click. */
   function mountLikeTarget(post) {
     if (!post || sliding) return;
     const selector = `.deck-panel[data-url="${CSS.escape(post.url)}"]`;
-    if (content.querySelector(selector)) return;
+    const existing = content.querySelector(selector);
+    // Never drop the panel on screen: only show() replaces that one.
+    if (existing && (!isStale(existing) || existing.dataset.url === current?.url)) return;
+    if (existing) existing.remove();
     const panel = buildPanel(post);
     panel.classList.add('is-preload');
     content.appendChild(panel);
@@ -195,8 +209,12 @@
     panel.className = 'deck-panel';
     panel.dataset.url = post.url;
     panel.dataset.sourceUrl = identityUrl(post);
+    panel.dataset.epoch = String(historyEpoch);
 
     const frame = document.createElement('iframe');
+    // A name of its own keeps the browser from matching this frame slot to a
+    // document another post recorded there.
+    frame.name = 'sw-post-' + (post.seen_hash || '');
     if (post.flagged) {
       frame.srcdoc =
         '<p>The content of this page has been flagged by users. Click below to open the page in new tab.</p>' +
@@ -225,7 +243,7 @@
     }
     const post = queue[0];
     const existing = content.querySelector('.deck-panel.is-next');
-    if (existing && existing.dataset.url === post.url) return;
+    if (existing && existing.dataset.url === post.url && !isStale(existing)) return;
     if (existing) existing.remove();
 
     const panel = buildPanel(post);
@@ -325,6 +343,13 @@
       queue = queue.filter((candidate) => identityUrl(candidate) !== postKey);
 
       let panel = content.querySelector(`.deck-panel[data-url="${CSS.escape(post.url)}"]`);
+      // A panel from before the last traversal may be showing someone else's
+      // page behind a src that still names this post. Reloading is cheap next
+      // to putting the wrong post on screen under this post's header.
+      if (panel && isStale(panel)) {
+        panel.remove();
+        panel = null;
+      }
       if (!panel) {
         panel = buildPanel(post);
         content.appendChild(panel);
@@ -430,7 +455,15 @@
   }
 
   window.addEventListener('popstate', (event) => {
+    historyEpoch += 1;
     handlePop(pageKey(), event.state);
+  });
+
+  /* A back/forward that restored this whole document from the bfcache is a
+     traversal too, and it fires no popstate when the entry is the one we were
+     already on. */
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) historyEpoch += 1;
   });
 
   /* Start loading the like destination as soon as the user reaches for the
