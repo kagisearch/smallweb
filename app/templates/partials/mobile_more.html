@@ -12,7 +12,7 @@
 <a class="share-option" href="{{ prefix }}similar?url={{ source_url|default(url, true)|urlencode }}{% if query_string %}&{{ query_string[1:] }}{% endif %}" title="Show similar post">Similar</a>
 {% endif %}
 <hr class="share-separator">
-<form action="{{ prefix }}flag_content?{{ qs|safe }}" method="post" class="mobile-flag-form">
+<form action="{{ prefix }}flag_content?{{ qs }}" method="post" class="mobile-flag-form">
   <input type="hidden" name="url" value="{{ source_url|default(url, true) }}">
   <button type="submit" class="share-option mobile-flag-btn">Flag{% if flag_content_count and flag_content_count > 0 %} ({{ flag_content_count }}){% endif %}</button>
 </form>

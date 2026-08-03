@@ -1,5 +1,5 @@
 {% set thumb_cnt = reactions_dict.get('👍', 0) %}
-<form action="{{ prefix }}like?{{ qs|safe }}"
+<form action="{{ prefix }}like?{{ qs }}"
       method="post" class="emoji-form">
   <input type="hidden" name="url" value="{{ source_url|default(url, true) }}">
   <input type="hidden" name="emoji" value="👍">
@@ -10,7 +10,7 @@
 </form>
 
 {% for emoji, cnt in reactions_list if emoji != '👍' %}
-<form action="{{ prefix }}like?{{ qs|safe }}"
+<form action="{{ prefix }}like?{{ qs }}"
       method="post" class="emoji-form">
   <input type="hidden" name="url" value="{{ source_url|default(url, true) }}">
   <input type="hidden" name="emoji" value="{{ emoji }}">
