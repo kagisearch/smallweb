@@ -106,7 +106,6 @@ https://electrictransit.wordpress.com/feed/atom
 https://elephant.town/comic/rss
 https://epicchaoswebcomic.com/comic/feed/
 https://existentialcomics.com/rss.xml
-https://www.exocomics.com/index.xml
 https://explosm.net/rss.xml
 https://farragone.tumblr.com/rss
 https://fatecomic.com/rss
@@ -131,6 +130,7 @@ https://gungnir.thecomicseries.com/rss/
 https://halflightcomics.com/feed
 https://heartofthestorm.co.uk/comic/rss
 https://heirsoftheveil.com/feed/
+https://heyokyay.com/feed/
 https://hi-strangeness.com/feed/atom/
 https://hollymacycomic.com/feed.txt
 https://houseoflief.com/rss.xml
@@ -402,4 +402,5 @@ https://www.wychwoodcomic.com/comic/rss
 https://www.yoshsaga.com/feed/atom/
 https://www.zombieranchcomic.com/comic/feed/
 https://xkcd.com/atom.xml
-https://yokokasquest.com/feed
+https://yokokasquest.com/atom
+https://www.exocomics.com/index.xml
