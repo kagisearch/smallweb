@@ -3221,10 +3221,6 @@ https://ayearofreadingtheworld.com/feed/
 https://ayeforscotland.tumblr.com/rss
 https://ayeks.de/index.xml
 https://ayende.com/blog/rss
-https://ayende.com/blog/rss/raven
-https://ayende.com:443/blog/rss/
-https://ayende.com:443/blog/rss/bugs
-https://ayende.com:443/blog/rss/raven
 https://ayewo.com/rss/
 https://ayfkm.blog/feed/
 https://ayham.xyz/index.xml
@@ -6917,7 +6913,7 @@ https://cafbit.com/atom.xml
 https://cafe.elharo.com/feed/atom/
 https://cafebedouin.org/feed/
 https://cafecode.co/rss.xml
-https://cafelog.fr:443/feed/
+https://cafelog.fr/feed/
 https://caffeinated.bearblog.dev/feed/
 https://caffeinatedcode.com/index.xml
 https://caffeinatedgorillas.com/atom/
@@ -22324,7 +22320,6 @@ https://patrick.wagstrom.net/weblog/index.xml
 https://patrickaudley.com/feed.xml
 https://patrickbalestra.com/feed.xml
 https://patrickbrosset.com/feed
-https://patrickbrosset.com:443/feed
 https://patrickcelentano.com/rss.xml
 https://patrickdesjardins.com/blog/rss.xml
 https://patrickdichter.com/feed/
@@ -25825,7 +25820,7 @@ https://shanesnover.com/feed.xml
 https://shankarganesh.blog/feed/
 https://shanmonster.dreamwidth.org/data/rss
 https://shannadige.com/rss.xml
-https://shannon-a.dreamwidth.org:443/data/rss
+https://shannon-a.dreamwidth.org/data/rss
 https://shannonselin.com/feed/
 https://shantanugoel.com/index.xml
 https://shantesh.com/feed.atom
@@ -28838,7 +28833,7 @@ https://tloriato.com/rss.xml
 https://tmandry.gitlab.io/blog/index.xml
 https://tmarice.dev/index.xml
 https://tmarman.com/atom.xml
-https://tmc.dev:443/feed.xml
+https://tmc.dev/feed.xml
 https://tmctmt.com/index.xml
 https://tmewett.com/feed.xml
 https://tmfarrell.github.io/atom.xml
@@ -29937,7 +29932,7 @@ https://viktorh.org/atom/
 https://vildravn.eu/index.xml
 https://viljoen.space/writing/rss.xml
 https://ville.saalo.moi/feed.xml
-https://villepreux.net:443/blog/rss
+https://villepreux.net/blog/rss
 https://vilyaem.xyz/rss_feed.xml
 https://vimproved.dev/index.xml
 https://vimuser.org/feed.xml
@@ -33944,7 +33939,7 @@ https://www.math3ma.com/blog/rss.xml
 https://www.matheusmoreira.com/atom.xml
 https://www.matheusrich.com/feed.xml
 https://www.mathewinkson.com/index.xml
-https://www.mathieupassenaud.fr:443/rss/
+https://www.mathieupassenaud.fr/rss/
 https://www.mathpax.com/feed/
 https://www.mathys.to/feed.xml
 https://www.matijacniacki.com/feed.xml
