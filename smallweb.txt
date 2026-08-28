@@ -1,4 +1,3 @@
-
 http://200sc.dev/index.xml
 http://3d.laboratorium.net/feed.xml
 http://3niti.org/rss.xml
@@ -3208,11 +3207,11 @@ https://ayearinthecountry.co.uk/feed/
 https://ayearofreadingtheworld.com/feed/
 https://ayeforscotland.tumblr.com/rss
 https://ayeks.de/index.xml
+https://ayende.com/blog/rss
+https://ayende.com/blog/rss/raven
 https://ayende.com:443/blog/rss/
 https://ayende.com:443/blog/rss/bugs
 https://ayende.com:443/blog/rss/raven
-https://ayende.com/blog/rss
-https://ayende.com/blog/rss/raven
 https://ayewo.com/rss/
 https://ayfkm.blog/feed/
 https://ayham.xyz/index.xml
@@ -8468,6 +8467,7 @@ https://curbfreewithcorylee.com/feed/
 https://cureresearch4type1diabetes.blogspot.com/feeds/posts/default
 https://curi.us/rss
 https://curiosite.bearblog.dev/feed/
+https://curiosities.nontrivialpursuit.org/rssfeed.xml
 https://curiosityarb.blog/feed.xml
 https://curiositydrivendevelopment.blogspot.com/feeds/posts/default
 https://curious-droid.com/feed/
@@ -11397,9 +11397,9 @@ https://feeding.cloud.geek.nz/index.rss
 https://feedpress.me/pxlnv
 https://feeds.allenpike.com/feed/
 https://feeds.eppol.net/blogmac
+https://feeds.feedburner.com/Who-t
 https://feeds.feedburner.com/c82
 https://feeds.feedburner.com/cek
-https://feeds.feedburner.com/Who-t
 https://feeds.hackercodex.com/feeds/main
 https://feeds.hanselman.com/ScottHanselman
 https://feeds.jimkang.com/weblog/feed.xml
@@ -18008,6 +18008,7 @@ https://lucaswiman.github.io/feed.xml
 https://lucavauda.bearblog.dev/feed/
 https://lucaweiss.eu/index.xml
 https://lucb1e.com/?p=rss
+https://lucdaigle.net/feed/
 https://lucept.com/feed/
 https://lucerity.tumblr.com/rss
 https://luciacerchie.dev/feed.xml
@@ -21172,7 +21173,6 @@ https://nonrandomduck.tumblr.com/rss
 https://nonsense-notion.bearblog.dev/feed/
 https://nonsense.fyi/index.xml
 https://nonstructured.com/feed/
-https://curiosities.nontrivialpursuit.org/rssfeed.xml
 https://nonzerosum.games/rss.xml
 https://noof.omg.lol/atom.xml
 https://nooneshappy.com/rss.xml
@@ -22213,8 +22213,8 @@ https://patrick.sirref.org/weeklies/atom.xml
 https://patrick.wagstrom.net/weblog/index.xml
 https://patrickaudley.com/feed.xml
 https://patrickbalestra.com/feed.xml
-https://patrickbrosset.com:443/feed
 https://patrickbrosset.com/feed
+https://patrickbrosset.com:443/feed
 https://patrickcelentano.com/rss.xml
 https://patrickdesjardins.com/blog/rss.xml
 https://patrickdichter.com/feed/
@@ -25436,6 +25436,7 @@ https://seanshadmand.com/feed/
 https://seanstuber.com/feed/
 https://seanvoisen.com/feed.xml
 https://seanvwork.com/blog/feed/
+https://searat.blog/feed.xml
 https://search.feep.dev/blog/index.rss
 https://searchingforsignal.net/feed/
 https://searchresearch1.blogspot.com/feeds/posts/default
@@ -27163,6 +27164,7 @@ https://supermegaultragroovy.com/feed.xml
 https://superouman.net/feed/
 https://superpositionstore.com/feed/
 https://superr.in/rss.xml
+https://superrune.dk/rss.xml
 https://supersimple.org/rss
 https://supersonicbyte.com/feed/feed.xml
 https://superuserdone.com/index.xml
