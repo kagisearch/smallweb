@@ -613,6 +613,29 @@ def _apply_like(url, emoji="👍", count=1):
     return entry
 
 
+def _apply_unlike(url, emoji="👍"):
+    """Remove one reaction from a URL and persist the result."""
+    global time_saved_likes
+
+    entry = likes_dict.get(url, OrderedDict())
+    if emoji not in entry:
+        return entry
+
+    if entry[emoji] <= 1:
+        del entry[emoji]
+    else:
+        entry[emoji] -= 1
+    if not entry:
+        del likes_dict[url]
+
+    _rebuild_liked_cache()
+
+    time_saved_likes = datetime.now()
+    save_likes()
+
+    return entry
+
+
 def time_ago(timestamp):
     delta = datetime.now() - timestamp
     seconds = delta.total_seconds()
@@ -1621,6 +1644,35 @@ def api_like():
         emoji = emoji_from_input
 
     entry = _apply_like(url, emoji=emoji, count=1)
+    return jsonify(
+        {
+            "ok": True,
+            "url": url,
+            "emoji": emoji,
+            "reaction_count": entry.get(emoji, 0),
+            "likes_total": sum(entry.values()),
+        }
+    )
+
+
+@app.post("/api/unlike")
+@app.post(f"{prefix}/api/unlike")
+def api_unlike():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"ok": False, "error": "expected JSON object"}), 400
+
+    raw_url = payload.get("url")
+    url = raw_url.strip() if isinstance(raw_url, str) else ""
+    if not url:
+        return jsonify({"ok": False, "error": "missing url"}), 400
+
+    emoji = "👍"
+    emoji_from_input = payload.get("emoji")
+    if emoji_from_input and emoji_from_input in like_emoji_list:
+        emoji = emoji_from_input
+
+    entry = _apply_unlike(url, emoji=emoji)
     return jsonify(
         {
             "ok": True,
