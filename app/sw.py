@@ -131,6 +131,14 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
+            "education",
+            (
+                "Education",
+                "Teaching · pedagogy · assessment · higher ed · edtech",
+                "\U0001f393",
+            ),
+        ),
+        (
             "essays",
             (
                 "Essays",
@@ -276,6 +284,7 @@ CATEGORY_GROUPS = OrderedDict(
                 "travel",
                 "politics",
                 "economy",
+                "education",
             ],
         ),
         ("Other", ["uncategorized"]),
