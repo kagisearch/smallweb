@@ -149,9 +149,17 @@ CATEGORIES = OrderedDict(
         (
             "art",
             (
-                "Art & Design",
-                "Visual art · illustration · typography · creative writing",
+                "Art",
+                "Visual art · illustration · architecture · creative writing",
                 "🌊",
+            ),
+        ),
+        (
+            "design",
+            (
+                "Design & UX",
+                "UX · UI · typography · graphic design · accessibility",
+                "\U0001f4d0",
             ),
         ),
         (
@@ -179,6 +187,14 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
+            "sports",
+            (
+                "Sports",
+                "Football · motor racing · basketball · match reports · previews",
+                "\U0001f3c6",
+            ),
+        ),
+        (
             "politics",
             (
                 "Politics",
@@ -200,6 +216,14 @@ CATEGORIES = OrderedDict(
                 "Society",
                 "Discrimination · civil rights · social structure",
                 "👥",
+            ),
+        ),
+        (
+            "work",
+            (
+                "Work & Business",
+                "Careers · management · startups · freelancing · indie business",
+                "\U0001f4bc",
             ),
         ),
         (
@@ -265,8 +289,8 @@ CATEGORY_GROUPS = OrderedDict(
         (
             "Culture & Creative",
             [
-                "health",
                 "art",
+                "design",
                 "essays",
                 "humanities",
                 "retro",
@@ -285,6 +309,9 @@ CATEGORY_GROUPS = OrderedDict(
                 "politics",
                 "economy",
                 "education",
+                "work",
+                "health",
+                "sports",
             ],
         ),
         ("Other", ["uncategorized"]),
