@@ -16,7 +16,7 @@ steps:
       '--update-secrets', 'MOD_SECRET_KEY=smallweb-mod-secret-key:latest',
       '--service-account', 'smallweb@${PROJECT_ID}.iam.gserviceaccount.com',
       '--cpu=1',
-      '--memory=1Gi',
+      '--memory=2Gi',
       '--min-instances', '2',
       '--max-instances', '4',
       # Startup budget of 220s (under Cloud Run's 240s ceiling) covers the
