@@ -54,3 +54,35 @@ def test_every_topic_is_listed_in_exactly_one_group(app_module):
     # up twice. Spam is filtered out of browsing and has no menu entry.
     listed = [s for slugs in app_module.CATEGORY_GROUPS.values() for s in slugs]
     assert sorted(listed) == sorted(set(app_module.CATEGORIES) - {"spam"})
+
+
+def test_categories_api_lists_every_menu_topic_in_order(client, app_module):
+    body = client.get("/api/categories").get_json()
+    assert [g["label"] for g in body["groups"]] == list(app_module.CATEGORY_GROUPS)
+    for group, slugs in zip(body["groups"], app_module.CATEGORY_GROUPS.values()):
+        assert [c["slug"] for c in group["categories"]] == slugs
+    assert body["groups"][0]["id"] == "tech-science"
+
+
+def test_categories_api_carries_labels_and_counts(client, app_module, monkeypatch):
+    from conftest import entry
+
+    monkeypatch.setattr(
+        app_module,
+        "urls_cache",
+        app_module.urls_cache + [entry("https://s.example/", cats=["art", "spam"])],
+    )
+    body = client.get("/api/categories").get_json()
+    topics = {c["slug"]: c for g in body["groups"] for c in g["categories"]}
+    assert topics["tech"] == {
+        "slug": "tech",
+        "label": app_module.CATEGORIES["tech"][0],
+        "description": app_module.CATEGORIES["tech"][1],
+        "emoji": app_module.CATEGORIES["tech"][2],
+        "count": 2,
+    }
+    # Spam posts are not browsable, so they do not inflate their other topics.
+    assert topics["art"]["count"] == 2
+    assert topics["uncategorized"]["count"] == 1
+    assert topics["ai"]["count"] == 0
+    assert "spam" not in topics
