@@ -1949,6 +1949,45 @@ def api_random():
     return _set_seen_cookie(response, seen, entry.link)
 
 
+@app.route("/api/categories")
+@app.route(f"{prefix}/api/categories")
+def api_categories():
+    """Blog-mode topics as shown in the Topics menu, for native clients.
+
+    Group ids are slugs of the group names so clients can localise them;
+    counts are blog posts per topic, spam excluded.
+    """
+    counts = {}
+    for entry in urls_cache:
+        if "spam" in entry.categories:
+            continue
+        for slug in entry.categories or ["uncategorized"]:
+            counts[slug] = counts.get(slug, 0) + 1
+
+    groups = [
+        {
+            "id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"),
+            "label": name,
+            "categories": [
+                {
+                    "slug": slug,
+                    "label": CATEGORIES[slug][0],
+                    "description": CATEGORIES[slug][1],
+                    "emoji": CATEGORIES[slug][2],
+                    "count": counts.get(slug, 0),
+                }
+                for slug in slugs
+            ],
+        }
+        for name, slugs in CATEGORY_GROUPS.items()
+    ]
+
+    response = jsonify({"groups": groups})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Cache-Control"] = "public, max-age=300"
+    return response
+
+
 DECK_MAX = 10
 # Modes whose content is a plain iframe, so a post can be swapped in client-side.
 DECK_MODES = {0, 2, 4, 5, 6}
