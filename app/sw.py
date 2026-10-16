@@ -1119,8 +1119,21 @@ def _resolve_current_cat(req, current_mode):
 
 def _excluded_cats(req):
     """Read user-hidden categories from cookie."""
-    raw = req.cookies.get("sw_excluded_cats", "")
+    return _parse_excluded_cats(req.cookies.get("sw_excluded_cats", ""))
+
+
+def _parse_excluded_cats(raw):
+    """Known category slugs from a comma-separated list."""
     return set(slug for slug in raw.split(",") if slug in CATEGORIES)
+
+
+def _drop_excluded_cats(cache, excluded_cats):
+    """Drop posts in any user-hidden category; untagged posts count as uncategorized."""
+    return [
+        entry
+        for entry in cache
+        if not excluded_cats.intersection(entry.categories or ["uncategorized"])
+    ]
 
 
 def _apply_cat_filters(cache, current_cat, excluded_cats):
@@ -1129,11 +1142,7 @@ def _apply_cat_filters(cache, current_cat, excluded_cats):
         cache = [entry for entry in cache if "spam" not in entry.categories]
 
     if excluded_cats and not current_cat:
-        cache = [
-            entry
-            for entry in cache
-            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
-        ]
+        cache = _drop_excluded_cats(cache, excluded_cats)
 
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
@@ -1924,6 +1933,12 @@ def api_random():
             cache = [e for e in cache if not e.categories or "uncategorized" in e.categories]
         else:
             cache = [e for e in cache if cat in e.categories]
+
+    # Hidden topics (blog mode, no topic chosen), mirroring the web's
+    # sw_excluded_cats cookie: ?exclude_cats=ai,web
+    excluded_cats = _parse_excluded_cats(request.args.get("exclude_cats", ""))
+    if excluded_cats and cat not in CATEGORIES and cache is urls_cache:
+        cache = _drop_excluded_cats(cache, excluded_cats)
 
     if not cache:
         return jsonify({"error": "no posts available"}), 404
