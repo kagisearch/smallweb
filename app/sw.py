@@ -131,6 +131,14 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
+            "education",
+            (
+                "Education",
+                "Teaching · pedagogy · assessment · higher ed · edtech",
+                "\U0001f393",
+            ),
+        ),
+        (
             "essays",
             (
                 "Essays",
@@ -141,9 +149,17 @@ CATEGORIES = OrderedDict(
         (
             "art",
             (
-                "Art & Design",
-                "Visual art · illustration · typography · creative writing",
+                "Art",
+                "Visual art · illustration · architecture · creative writing",
                 "🌊",
+            ),
+        ),
+        (
+            "design",
+            (
+                "Design & UX",
+                "UX · UI · typography · graphic design · accessibility",
+                "\U0001f4d0",
             ),
         ),
         (
@@ -171,6 +187,14 @@ CATEGORIES = OrderedDict(
             ),
         ),
         (
+            "sports",
+            (
+                "Sports",
+                "Football · motor racing · basketball · match reports · previews",
+                "\U0001f3c6",
+            ),
+        ),
+        (
             "politics",
             (
                 "Politics",
@@ -192,6 +216,14 @@ CATEGORIES = OrderedDict(
                 "Society",
                 "Discrimination · civil rights · social structure",
                 "👥",
+            ),
+        ),
+        (
+            "work",
+            (
+                "Work & Business",
+                "Careers · management · startups · freelancing · indie business",
+                "\U0001f4bc",
             ),
         ),
         (
@@ -257,8 +289,8 @@ CATEGORY_GROUPS = OrderedDict(
         (
             "Culture & Creative",
             [
-                "health",
                 "art",
+                "design",
                 "essays",
                 "humanities",
                 "retro",
@@ -276,6 +308,10 @@ CATEGORY_GROUPS = OrderedDict(
                 "travel",
                 "politics",
                 "economy",
+                "education",
+                "work",
+                "health",
+                "sports",
             ],
         ),
         ("Other", ["uncategorized"]),
@@ -607,6 +643,29 @@ def _apply_like(url, emoji="👍", count=1):
     _rebuild_liked_cache()
 
     # Save to disk immediately (multi-instance deployment requires immediate persistence)
+    time_saved_likes = datetime.now()
+    save_likes()
+
+    return entry
+
+
+def _apply_unlike(url, emoji="👍"):
+    """Remove one reaction from a URL and persist the result."""
+    global time_saved_likes
+
+    entry = likes_dict.get(url, OrderedDict())
+    if emoji not in entry:
+        return entry
+
+    if entry[emoji] <= 1:
+        del entry[emoji]
+    else:
+        entry[emoji] -= 1
+    if not entry:
+        del likes_dict[url]
+
+    _rebuild_liked_cache()
+
     time_saved_likes = datetime.now()
     save_likes()
 
@@ -1060,8 +1119,21 @@ def _resolve_current_cat(req, current_mode):
 
 def _excluded_cats(req):
     """Read user-hidden categories from cookie."""
-    raw = req.cookies.get("sw_excluded_cats", "")
+    return _parse_excluded_cats(req.cookies.get("sw_excluded_cats", ""))
+
+
+def _parse_excluded_cats(raw):
+    """Known category slugs from a comma-separated list."""
     return set(slug for slug in raw.split(",") if slug in CATEGORIES)
+
+
+def _drop_excluded_cats(cache, excluded_cats):
+    """Drop posts in any user-hidden category; untagged posts count as uncategorized."""
+    return [
+        entry
+        for entry in cache
+        if not excluded_cats.intersection(entry.categories or ["uncategorized"])
+    ]
 
 
 def _apply_cat_filters(cache, current_cat, excluded_cats):
@@ -1070,11 +1142,7 @@ def _apply_cat_filters(cache, current_cat, excluded_cats):
         cache = [entry for entry in cache if "spam" not in entry.categories]
 
     if excluded_cats and not current_cat:
-        cache = [
-            entry
-            for entry in cache
-            if not excluded_cats.intersection(entry.categories or ["uncategorized"])
-        ]
+        cache = _drop_excluded_cats(cache, excluded_cats)
 
     if current_cat and current_cat in CATEGORIES:
         if current_cat == "uncategorized":
@@ -1632,6 +1700,35 @@ def api_like():
     )
 
 
+@app.post("/api/unlike")
+@app.post(f"{prefix}/api/unlike")
+def api_unlike():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"ok": False, "error": "expected JSON object"}), 400
+
+    raw_url = payload.get("url")
+    url = raw_url.strip() if isinstance(raw_url, str) else ""
+    if not url:
+        return jsonify({"ok": False, "error": "missing url"}), 400
+
+    emoji = "👍"
+    emoji_from_input = payload.get("emoji")
+    if emoji_from_input and emoji_from_input in like_emoji_list:
+        emoji = emoji_from_input
+
+    entry = _apply_unlike(url, emoji=emoji)
+    return jsonify(
+        {
+            "ok": True,
+            "url": url,
+            "emoji": emoji,
+            "reaction_count": entry.get(emoji, 0),
+            "likes_total": sum(entry.values()),
+        }
+    )
+
+
 @app.post("/api/likes")
 @app.post(f"{prefix}/api/likes")
 def api_likes():
@@ -1837,6 +1934,12 @@ def api_random():
         else:
             cache = [e for e in cache if cat in e.categories]
 
+    # Hidden topics (blog mode, no topic chosen), mirroring the web's
+    # sw_excluded_cats cookie: ?exclude_cats=ai,web
+    excluded_cats = _parse_excluded_cats(request.args.get("exclude_cats", ""))
+    if excluded_cats and cat not in CATEGORIES and cache is urls_cache:
+        cache = _drop_excluded_cats(cache, excluded_cats)
+
     if not cache:
         return jsonify({"error": "no posts available"}), 404
 
@@ -1859,6 +1962,45 @@ def api_random():
     })
     response.headers["Access-Control-Allow-Origin"] = "*"
     return _set_seen_cookie(response, seen, entry.link)
+
+
+@app.route("/api/categories")
+@app.route(f"{prefix}/api/categories")
+def api_categories():
+    """Blog-mode topics as shown in the Topics menu, for native clients.
+
+    Group ids are slugs of the group names so clients can localise them;
+    counts are blog posts per topic, spam excluded.
+    """
+    counts = {}
+    for entry in urls_cache:
+        if "spam" in entry.categories:
+            continue
+        for slug in entry.categories or ["uncategorized"]:
+            counts[slug] = counts.get(slug, 0) + 1
+
+    groups = [
+        {
+            "id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"),
+            "label": name,
+            "categories": [
+                {
+                    "slug": slug,
+                    "label": CATEGORIES[slug][0],
+                    "description": CATEGORIES[slug][1],
+                    "emoji": CATEGORIES[slug][2],
+                    "count": counts.get(slug, 0),
+                }
+                for slug in slugs
+            ],
+        }
+        for name, slugs in CATEGORY_GROUPS.items()
+    ]
+
+    response = jsonify({"groups": groups})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Cache-Control"] = "public, max-age=300"
+    return response
 
 
 DECK_MAX = 10

@@ -582,3 +582,40 @@ def test_index_search_and_deck_agree_on_pool(client, app_module):
     deck = client.get("/api/deck?search=rust&count=4&url=https://r.example/1")
     for post in deck.get_json()["posts"]:
         assert "k.example" not in post["url"]
+
+
+# --- /api/random --------------------------------------------------------------
+
+def _random_links(client, query, draws=30):
+    links = set()
+    for _ in range(draws):
+        client.delete_cookie("seen", domain="localhost")
+        res = client.get(f"/api/random?{query}")
+        assert res.status_code == 200
+        links.add(res.get_json()["url"])
+    return links
+
+
+def test_api_random_drops_excluded_cats(client):
+    links = _random_links(client, "exclude_cats=tech,uncategorized")
+    assert links == {"https://c.example/3", "https://d.example/4"}
+
+
+def test_api_random_ignores_unknown_excluded_cats(client):
+    links = _random_links(client, "exclude_cats=nope,tech")
+    assert links == {"https://c.example/3", "https://d.example/4", "https://e.example/5"}
+
+
+def test_api_random_chosen_cat_overrides_excluded_cats(client):
+    links = _random_links(client, "cat=tech&exclude_cats=tech")
+    assert links == {"https://a.example/1", "https://b.example/2"}
+
+
+def test_api_random_excluded_cats_only_apply_to_blogs(client):
+    links = _random_links(client, "comic&exclude_cats=uncategorized")
+    assert links == {"https://comic.example/1", "https://comic.example/2"}
+
+
+def test_api_random_everything_excluded_is_404(client):
+    res = client.get("/api/random?exclude_cats=tech,art,uncategorized")
+    assert res.status_code == 404
