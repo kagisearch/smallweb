@@ -60,11 +60,21 @@ Remove a website if :
 - It does not adhere to the above guidelines
 - In the removal request, state which guideline does it break
 
-Clicking "Remove website" will edit small web list in new tab, where you can locate and remove the website feed in question. Make sure to add in comments the reason for removal.
+Clicking "Remove website" will edit small web list in new tab, where you can locate and remove the website feed in question. Add the reason for removal to the PR description.
+
+When removing a feed, move the line from the accepted list to the corresponding rejected list, so the import process does not add it back later:
+
+| Accepted list | Rejected list |
+| --- | --- |
+| [smallweb.txt](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt) | [smallweb_rejected.txt](https://github.com/kagisearch/smallweb/edit/main/smallweb_rejected.txt) |
+| [smallyt.txt](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt) | [yt_rejected.txt](https://github.com/kagisearch/smallweb/edit/main/yt_rejected.txt) |
+| [smallcomic.txt](https://github.com/kagisearch/smallweb/edit/main/smallcomic.txt) | [smallcomic_rejected.txt](https://github.com/kagisearch/smallweb/edit/main/smallcomic_rejected.txt) |
 
 [Remove website](https://github.com/kagisearch/smallweb/edit/main/smallweb.txt)
 
 [Remove channel](https://github.com/kagisearch/smallweb/edit/main/smallyt.txt)
+
+[Remove comic](https://github.com/kagisearch/smallweb/edit/main/smallcomic.txt)
 
 ## What we show on the site
 
@@ -108,9 +118,13 @@ What is Small Web exactly? Recommend reading:
 
 [smallweb.txt](https://github.com/kagisearch/smallweb/blob/main/smallweb.txt) - Contains the feeds of indexed blogs
 
+[smallweb_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/smallweb_rejected.txt) - Contains the feed URLs that were reviewed and rejected from smallweb.txt
+
 [smallyt.txt](https://github.com/kagisearch/smallweb/blob/main/smallyt.txt) - Contains the feeds of indexed YouTube channels
 
 [smallcomic.txt](https://github.com/kagisearch/smallweb/blob/main/smallcomic.txt) - Contains the feeds of indexed independent comics
+
+[smallcomic_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/smallcomic_rejected.txt) - Contains the feed URLs that were reviewed and rejected from smallcomic.txt
 
 [yt_rejected.txt](https://github.com/kagisearch/smallweb/blob/main/yt_rejected.txt) - Contains the list of YouTube channels that were reviewed (in an automated way) and rejected 
 
