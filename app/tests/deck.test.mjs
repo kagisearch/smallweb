@@ -56,6 +56,7 @@ class El {
     this.attrs = new Map();
     this.classes = new Set();
     this.innerHTML = '';
+    this.listeners = [];
     this.classList = {
       add: (...names) => names.forEach((n) => this.classes.add(n)),
       remove: (...names) => names.forEach((n) => this.classes.delete(n)),
@@ -100,6 +101,19 @@ class El {
 
   hasAttribute(name) {
     return this.attrs.has(name);
+  }
+
+  addEventListener(type, fn, options) {
+    this.listeners.push({type, fn, once: !!options?.once});
+  }
+
+  /** Fire `type` at this element's own listeners (no bubbling needed here). */
+  fire(type) {
+    for (const entry of [...this.listeners]) {
+      if (entry.type !== type) continue;
+      if (entry.once) this.listeners = this.listeners.filter((e) => e !== entry);
+      entry.fn({type, target: this});
+    }
   }
 
   appendChild(child) {
@@ -169,23 +183,28 @@ function deckPost(url) {
  * Boot deck.js on a page showing post A.
  * `batches` is consumed one /api/deck response at a time.
  */
-function boot({batches = [], nextHref = pageUrl('https://z.example/0')} = {}) {
+function boot({
+  batches = [],
+  nextHref = pageUrl('https://z.example/0'),
+  deckUrl = PREFIX + 'api/deck',
+  loaded = true,
+} = {}) {
   const root = new El('html');
-  root.appendChild(makeEl('meta', {name: 'sw-deck-url'})).content =
-    PREFIX + 'api/deck';
+  root.appendChild(makeEl('meta', {name: 'sw-deck-url'})).content = deckUrl;
   root.appendChild(makeEl('meta', {name: 'sw-seen-max'})).content = '100';
 
   const nextBtn = makeEl('a', {href: nextHref}, ['next-button']);
   root.appendChild(nextBtn);
 
   const content = makeEl('div', {id: 'content'});
-  content.appendChild(
+  const firstPanel = content.appendChild(
     makeEl(
       'div',
       {'data-url': A, 'data-source-url': A, 'data-epoch': '0'},
       ['deck-panel']
     )
   );
+  firstPanel.appendChild(makeEl('iframe'));
   root.appendChild(content);
 
   const listeners = new Map();
@@ -258,10 +277,14 @@ function boot({batches = [], nextHref = pageUrl('https://z.example/0')} = {}) {
     },
   };
   vm.runInNewContext(fs.readFileSync(DECK_JS, 'utf8'), context);
+  if (loaded) firstPanel.querySelector('iframe').fire('load');
 
   const flush = async () => {
     for (let i = 0; i < 6; i++) await new Promise((r) => setTimeout(r, 0));
   };
+
+  const panelFor = (url) =>
+    content.childNodes.find((c) => c.getAttribute('data-url') === url) || null;
 
   return {
     content,
@@ -272,8 +295,9 @@ function boot({batches = [], nextHref = pageUrl('https://z.example/0')} = {}) {
     flush,
     nextHref: () => nextBtn.getAttribute('href'),
     /** The panel element currently mounted for a post, whatever its state. */
-    panelFor: (url) =>
-      content.childNodes.find((c) => c.getAttribute('data-url') === url) || null,
+    panelFor,
+    /** Finish loading the page inside a post's iframe. */
+    load: (url) => panelFor(url).querySelector('iframe').fire('load'),
     /** data-url of the panel that is actually on top. */
     shown: () => {
       const panel = content.querySelector(
@@ -281,10 +305,22 @@ function boot({batches = [], nextHref = pageUrl('https://z.example/0')} = {}) {
       );
       return panel ? panel.getAttribute('data-url') : null;
     },
+    /** A mouse press then release on Next, as a browser delivers them. */
+    pressNext: async () => {
+      const base = {
+        target: nextBtn, button: 0, metaKey: false, ctrlKey: false,
+        shiftKey: false, preventDefault() {},
+      };
+      document.dispatchEvent({...base, type: 'pointerdown', pointerType: 'mouse'});
+      await flush();
+      document.dispatchEvent({...base, type: 'click', detail: 1});
+      await flush();
+    },
     clickNext: async () => {
       document.dispatchEvent({
         type: 'click',
         target: nextBtn,
+        detail: 0,
         button: 0,
         metaKey: false,
         ctrlKey: false,
@@ -397,4 +433,70 @@ test('a self-referential server next_link is not offered', async () => {
   await deck.flush();
 
   assert.equal(deck.nextHref(), null, 'Next must not link to the current page');
+});
+
+test('the next post waits for the one on screen to finish loading', async () => {
+  // Loading the next site while the current one is still arriving splits the
+  // bandwidth, so the page the reader is actually looking at loads slower.
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]], loaded: false});
+  await deck.flush();
+  assert.equal(deck.panelFor(B), null, 'nothing preloads while A is loading');
+
+  deck.load(A);
+  assert.ok(deck.panelFor(B), 'B starts loading once A has');
+});
+
+test('a slow post on screen does not hold preloading back for good', async () => {
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]], loaded: false});
+  await deck.flush();
+  await new Promise((r) => setTimeout(r, 1600));
+  assert.ok(deck.panelFor(B), 'the cap opens the gate without a load event');
+});
+
+test('two posts preload behind the current one', async () => {
+  // With one, a reader who moves on in a second or two lands on a page that
+  // is still loading; a second gives Next something ready to pick.
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]]});
+  await deck.flush();
+  assert.ok(deck.panelFor(B));
+  assert.ok(deck.panelFor(C));
+  assert.equal(deck.panelFor(D), null, 'no more than PRELOAD_AHEAD');
+});
+
+test('Next prefers a preloaded post that has finished loading', async () => {
+  // Picks are random outside Recent, so skipping a still-loading B for a
+  // ready C costs nothing and shows a rendered page instead of a blank one.
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]]});
+  await deck.flush();
+  deck.load(C);
+
+  await deck.clickNext();
+  assert.equal(deck.shown(), C);
+
+  await deck.clickNext();
+  assert.equal(deck.shown(), B, 'the skipped post is still next in line');
+});
+
+test('Recent mode keeps date order even when a later post loads first', async () => {
+  const deck = boot({
+    batches: [[deckPost(B), deckPost(C), deckPost(D)]],
+    deckUrl: PREFIX + 'api/deck?recent',
+  });
+  await deck.flush();
+  deck.load(C);
+
+  await deck.clickNext();
+  assert.equal(deck.shown(), B);
+});
+
+test('a mouse press advances once, not again on the click that follows', async () => {
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]]});
+  await deck.flush();
+
+  await deck.pressNext();
+  assert.equal(deck.shown(), B, 'press then release is one advance');
+
+  // The `n` shortcut and keyboard activation click with detail 0.
+  await deck.clickNext();
+  assert.equal(deck.shown(), C, 'a keyboard click after a press still advances');
 });

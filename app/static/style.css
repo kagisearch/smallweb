@@ -328,6 +328,12 @@ svg {
   background: var(--color-accent);
 }
 
+/* Next is waiting on /api/deck for a post to show. */
+.next-button[aria-busy="true"] {
+  cursor: progress;
+  filter: brightness(0.88);
+}
+
 .next-button:active,
 .ok-button:active {
   border-top-color: var(--color-bg);
@@ -599,6 +605,35 @@ svg {
 /* The like destination, loading behind the current post. */
 .deck-panel.is-preload {
   z-index: 0;
+}
+
+/* A post on screen that is still loading: a thin sweep along the top edge,
+   held back briefly so a fast load never flashes it. */
+.deck-panel.is-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent) no-repeat;
+  background-size: 40% 100%;
+  opacity: 0;
+  pointer-events: none;
+  animation: deck-loading 1.1s linear 150ms infinite;
+}
+
+@keyframes deck-loading {
+  from { background-position: -70% 0; opacity: 1; }
+  to { background-position: 170% 0; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deck-panel.is-loading::after {
+    animation: none;
+    opacity: 1;
+    background: var(--color-accent);
+  }
 }
 
 #content iframe {

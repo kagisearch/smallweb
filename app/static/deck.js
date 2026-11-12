@@ -24,7 +24,12 @@
   const HISTORY_MAX = 50;      // cached posts kept for Back; older ones reload
   const QUEUE_TARGET = 3;      // posts to keep queued ahead of the current one
   const QUEUE_REFILL_AT = 2;   // refill once the queue drops to this
+  const PRELOAD_AHEAD = 2;     // queued posts whose iframes load behind this one
+  const PRELOAD_WAIT_MAX_MS = 1500;  // preload anyway if the visible post is slow
   const FETCH_TIMEOUT_MS = 8000;
+  // Recent mode walks the feed in date order; every other mode picks at random,
+  // so Next is free to take whichever queued post finished loading first.
+  const ORDERED = new URL(DECK_URL, location.href).searchParams.has('recent');
   const SLOT_IDS = [
     'reactions', 'post-cats', 'url-display-phone',
     'share-dropdown', 'mobile-more-dropdown', 'flag-dropdown', 'flag-btn-label',
@@ -46,6 +51,10 @@
      still names this post -- the header updates, the frame does not. Panels
      built before the last traversal are therefore not reusable. */
   let historyEpoch = 0;
+  /* Background preloads wait until the visible post has loaded, so the page
+     the reader is looking at never shares bandwidth with one they are not. */
+  let preloadOpen = false;
+  let preloadGate = 0;
 
   function slotEl(id) {
     return document.getElementById(id) || document.querySelector(`.${id}`);
@@ -191,7 +200,7 @@
         queue.push(post);
         remember(post);
       }
-      mountNextPanel();
+      mountNextPanels();
       return true;
     })().finally(() => {
       refillPromise = null;
@@ -222,6 +231,11 @@
     } else {
       frame.src = post.url;
     }
+    panel.classList.add('is-loading');
+    frame.addEventListener('load', () => {
+      panel.dataset.loaded = 'true';
+      panel.classList.remove('is-loading');
+    }, {once: true});
     panel.appendChild(frame);
     return panel;
   }
@@ -234,21 +248,59 @@
       .replace(/>/g, '&gt;');
   }
 
-  /** Mount the head of the queue behind the current panel, loading it now. */
-  function mountNextPanel() {
-    if (sliding) return;
-    if (!queue.length) {
-      content.querySelector('.deck-panel.is-next')?.remove();
-      return;
-    }
-    const post = queue[0];
-    const existing = content.querySelector('.deck-panel.is-next');
-    if (existing && existing.dataset.url === post.url && !isStale(existing)) return;
-    if (existing) existing.remove();
+  function nextPanelFor(post) {
+    return content.querySelector(
+      `.deck-panel.is-next[data-url="${CSS.escape(post.url)}"]`
+    );
+  }
 
-    const panel = buildPanel(post);
-    panel.classList.add('is-next');
-    content.appendChild(panel);
+  /**
+   * Keep the first PRELOAD_AHEAD queued posts mounted behind the current
+   * panel. Panels for posts that left that window are dropped at once; new
+   * ones are only started while the preload gate is open.
+   */
+  function mountNextPanels() {
+    if (sliding) return;
+    const wanted = queue.slice(0, PRELOAD_AHEAD);
+    const wantedUrls = new Set(wanted.map((post) => post.url));
+    for (const panel of content.querySelectorAll('.deck-panel.is-next')) {
+      if (!wantedUrls.has(panel.dataset.url) || isStale(panel)) panel.remove();
+    }
+    if (!preloadOpen) return;
+    for (const post of wanted) {
+      if (nextPanelFor(post)) continue;
+      const panel = buildPanel(post);
+      panel.classList.add('is-next');
+      content.appendChild(panel);
+    }
+  }
+
+  /** Open the preload gate once `panel` has loaded, or after the cap. */
+  function openPreloadAfter(panel) {
+    const gate = ++preloadGate;
+    preloadOpen = !!panel?.dataset.loaded;
+    if (preloadOpen) return;
+    const open = () => {
+      if (gate !== preloadGate) return;  // a newer post took the screen
+      preloadOpen = true;
+      mountNextPanels();
+    };
+    setTimeout(open, PRELOAD_WAIT_MAX_MS);
+    panel?.querySelector('iframe')?.addEventListener('load', open, {once: true});
+  }
+
+  /**
+   * The post Next should show: the first preloaded one that has finished
+   * loading, so the reader lands on a rendered page whenever one is ready.
+   */
+  function pickNext() {
+    if (!ORDERED) {
+      for (const post of queue.slice(0, PRELOAD_AHEAD)) {
+        const panel = nextPanelFor(post);
+        if (panel && panel.dataset.loaded && !isStale(panel)) return post;
+      }
+    }
+    return queue[0];
   }
 
   /**
@@ -392,7 +444,10 @@
       sliding = false;
     }
 
-    mountNextPanel();
+    openPreloadAfter(content.querySelector(
+      '.deck-panel:not(.is-next):not(.is-preload)'
+    ));
+    mountNextPanels();
     updateNextLink();
     if (queue.length <= QUEUE_REFILL_AT) refill();
     return true;
@@ -413,7 +468,7 @@
       dropCurrentFromQueue();
       if (!queue.length) return false;
     }
-    return show(queue[0], true);
+    return show(pickNext(), true);
   }
 
   function handlePop(key, state) {
@@ -528,15 +583,38 @@
     if (!target || !show(target, true)) advance();
   });
 
+  /* A mouse advances on press, not release, and the click that follows is
+     swallowed. Touch stays on click so a scroll that starts on the button
+     never advances; keyboard and the `n` shortcut click with detail 0. */
+  let pressAdvanced = false;
+  document.addEventListener('pointerdown', (event) => {
+    pressAdvanced = false;
+    const link = event.target.closest && event.target.closest('.next-button');
+    if (!link || event.pointerType !== 'mouse') return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+    if (deckBroken && !queue.length && link.hasAttribute('href')) return;
+    pressAdvanced = true;
+    advance();
+  });
+
   // Delegated, so the `n` shortcut clicking .next-button routes here too.
   document.addEventListener('click', (event) => {
     const link = event.target.closest && event.target.closest('.next-button');
     if (!link) return;
+    const pressed = pressAdvanced && event.detail > 0;
+    pressAdvanced = false;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     if (deckBroken && !queue.length && link.hasAttribute('href')) return;
     event.preventDefault();
-    advance();
+    if (!pressed) advance();
   });
+
+  // The server-rendered post: mark it loaded so pickNext/openPreloadAfter see
+  // it. Its loading indicator is the browser's own, so no is-loading here.
+  currentPanel.querySelector('iframe')?.addEventListener('load', () => {
+    currentPanel.dataset.loaded = 'true';
+  }, {once: true});
+  openPreloadAfter(currentPanel);
 
   current = snapshotCurrent();
   remember(current);
