@@ -2,6 +2,8 @@
 import json
 from urllib.parse import parse_qs, urlparse
 
+import flask
+
 from conftest import entry
 
 
@@ -619,3 +621,53 @@ def test_api_random_excluded_cats_only_apply_to_blogs(client):
 def test_api_random_everything_excluded_is_404(client):
     res = client.get("/api/random?exclude_cats=tech,art,uncategorized")
     assert res.status_code == 404
+
+
+# --- asset versioning -----------------------------------------------------------
+
+def _static_hash(app_module, filename):
+    import hashlib
+    import os
+
+    with open(os.path.join(app_module.app.static_folder, filename), "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()[:10]
+
+
+def test_index_static_urls_carry_content_hash(client, app_module):
+    # Pages are no-store, so a hash in the URL is what gets a changed script to
+    # every reader on their next load, whatever their browser cached.
+    res = client.get("/?url=https://a.example/1", follow_redirects=True)
+    body = res.get_data(as_text=True)
+    assert f"deck.js?v={_static_hash(app_module, 'deck.js')}" in body
+    assert f"style.css?v={_static_hash(app_module, 'style.css')}" in body
+
+
+def test_static_url_changes_when_file_changes(app_module, tmp_path, monkeypatch):
+    import os
+
+    monkeypatch.setattr(app_module.app, "static_folder", str(tmp_path))
+    asset = tmp_path / "x.js"
+    asset.write_text("one")
+    with app_module.app.test_request_context():
+        first = flask.url_for("static", filename="x.js")
+    asset.write_text("two")
+    os.utime(asset, (1, 1))  # a new mtime, as a deploy or an edit gives it
+    with app_module.app.test_request_context():
+        second = flask.url_for("static", filename="x.js")
+    assert first != second
+
+
+def test_explicit_static_version_is_kept(app_module):
+    with app_module.app.test_request_context():
+        url = flask.url_for("static", filename="favicon.png", v="pinned")
+    assert url.endswith("v=pinned")
+
+
+def test_deck_reports_the_version_the_page_ships(client, app_module):
+    # deck.js compares the two to spot a tab left open across a deploy; they
+    # must agree on a page served by the same process.
+    page = client.get("/?url=https://a.example/1", follow_redirects=True)
+    meta = f'name="sw-asset-version" content="{app_module.ASSET_VERSION}"'
+    assert meta in page.get_data(as_text=True)
+    res = client.get("/api/deck?url=https://a.example/1&count=1")
+    assert json.loads(res.data)["version"] == app_module.ASSET_VERSION

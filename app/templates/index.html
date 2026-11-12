@@ -33,6 +33,7 @@
   <script defer src="{{ url_for('static', filename='seen-cookie.js') }}"></script>
   {% if deck_enabled %}
   <meta name="sw-deck-url" content="{{ deck_url }}">
+  <meta name="sw-asset-version" content="{{ asset_version }}">
   <meta name="sw-like-url" content="{{ prefix }}api/like">
   <meta name="sw-like-target-url" content="{{ like_target_url }}">
   <script defer src="{{ url_for('static', filename='deck-like.js') }}"></script>

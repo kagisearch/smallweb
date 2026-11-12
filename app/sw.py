@@ -1,4 +1,5 @@
 import atexit
+import functools
 import hashlib
 import json
 import logging
@@ -722,6 +723,41 @@ prefix = os.environ.get("URL_PREFIX", "")
 app = Flask(__name__, static_url_path=prefix + "/static")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.jinja_env.filters["time_ago"] = time_ago
+
+
+@functools.lru_cache(maxsize=None)
+def _static_file_hash(filename, mtime):
+    """Content hash of one static file; `mtime` only keys the cache."""
+    with open(os.path.join(app.static_folder, filename), "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()[:10]
+
+
+@app.url_defaults
+def _version_static_urls(endpoint, values):
+    """Give every static URL a content-hash ?v=.
+
+    Pages are never cached, so a changed file reaches each reader on their next
+    page load under a new URL, whatever the browser does with its cache.
+    """
+    if endpoint != "static" or "v" in values:
+        return
+    filename = values.get("filename", "")
+    try:
+        mtime = os.path.getmtime(os.path.join(app.static_folder, filename))
+    except OSError:
+        return
+    values["v"] = _static_file_hash(filename, mtime)
+
+
+# The client code this process serves. An open deck tab never reloads, so
+# /api/deck reports this and deck.js reloads once it stops matching.
+ASSET_VERSION = hashlib.md5(
+    "".join(
+        _static_file_hash(name, 0)
+        for name in sorted(os.listdir(app.static_folder))
+        if name.endswith((".js", ".css"))
+    ).encode()
+).hexdigest()[:10]
 
 master_feed = False
 
@@ -1496,6 +1532,7 @@ def index():
             deck_enabled=deck_enabled,
             deck_url=deck_url,
             like_target_url=like_target_url,
+            asset_version=ASSET_VERSION,
         )
     )
     # Next link, reactions and the seen cookie are all computed per request from
@@ -2198,7 +2235,7 @@ def api_deck():
             next_link = prefix + "/?" + urlencode(next_params)
         posts.append(_deck_item(entry, base_params, next_link, current_mode))
 
-    response = jsonify({"posts": posts})
+    response = jsonify({"posts": posts, "version": ASSET_VERSION})
     # Picked per request from the caller's seen cookie and exclude list, so a
     # stored copy would hand one reader the batch built for another.
     response.headers["Cache-Control"] = "no-store"

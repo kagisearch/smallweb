@@ -21,6 +21,8 @@
     document.querySelector('meta[name="sw-seen-max"]')?.content || '', 10
   );
   const SEEN_MAX = Number.isFinite(parsedSeenMax) ? parsedSeenMax : 100;
+  const ASSET_VERSION =
+    document.querySelector('meta[name="sw-asset-version"]')?.content || '';
   const HISTORY_MAX = 50;      // cached posts kept for Back; older ones reload
   const QUEUE_TARGET = 3;      // posts to keep queued ahead of the current one
   const QUEUE_REFILL_AT = 2;   // refill once the queue drops to this
@@ -44,6 +46,10 @@
   let sliding = false;
   let refillPromise = null;
   let deckBroken = false;
+  /* Set once /api/deck reports a deploy newer than this page. A deck tab
+     never reloads on its own, so Next follows its link as a full page load
+     instead, which brings the new code. */
+  let outdated = false;
   let historyIndex = 0;
   /* Bumped by every history traversal. A traversal restores the documents the
      target entry recorded for each frame slot, so an iframe that lived through
@@ -112,6 +118,9 @@
       });
       if (!res.ok) return {ok: false, posts: []};
       const data = await res.json();
+      if (ASSET_VERSION && data.version && data.version !== ASSET_VERSION) {
+        outdated = true;
+      }
       return {
         ok: true,
         posts: Array.isArray(data.posts) ? data.posts : [],
@@ -593,6 +602,7 @@
     if (!link || event.pointerType !== 'mouse') return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     if (deckBroken && !queue.length && link.hasAttribute('href')) return;
+    if (outdated && link.hasAttribute('href')) return;
     pressAdvanced = true;
     advance();
   });
@@ -605,6 +615,7 @@
     pressAdvanced = false;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     if (deckBroken && !queue.length && link.hasAttribute('href')) return;
+    if (outdated && !pressed && link.hasAttribute('href')) return;
     event.preventDefault();
     if (!pressed) advance();
   });

@@ -188,10 +188,14 @@ function boot({
   nextHref = pageUrl('https://z.example/0'),
   deckUrl = PREFIX + 'api/deck',
   loaded = true,
+  pageVersion = 'v1',
+  serverVersion = 'v1',
 } = {}) {
   const root = new El('html');
   root.appendChild(makeEl('meta', {name: 'sw-deck-url'})).content = deckUrl;
   root.appendChild(makeEl('meta', {name: 'sw-seen-max'})).content = '100';
+  root.appendChild(makeEl('meta', {name: 'sw-asset-version'})).content =
+    pageVersion;
 
   const nextBtn = makeEl('a', {href: nextHref}, ['next-button']);
   root.appendChild(nextBtn);
@@ -273,7 +277,7 @@ function boot({
     fetch: async (href) => {
       fetchCalls.push(href);
       const posts = batches.length ? batches.shift() : [];
-      return {ok: true, json: async () => ({posts})};
+      return {ok: true, json: async () => ({posts, version: serverVersion})};
     },
   };
   vm.runInNewContext(fs.readFileSync(DECK_JS, 'utf8'), context);
@@ -316,7 +320,9 @@ function boot({
       document.dispatchEvent({...base, type: 'click', detail: 1});
       await flush();
     },
+    /** Resolves true when deck.js kept the anchor from navigating. */
     clickNext: async () => {
+      let prevented = false;
       document.dispatchEvent({
         type: 'click',
         target: nextBtn,
@@ -325,9 +331,12 @@ function boot({
         metaKey: false,
         ctrlKey: false,
         shiftKey: false,
-        preventDefault() {},
+        preventDefault() {
+          prevented = true;
+        },
       });
       await flush();
+      return prevented;
     },
     pop: async (state) => {
       for (const fn of listeners.get('popstate') || []) fn({state});
@@ -499,4 +508,28 @@ test('a mouse press advances once, not again on the click that follows', async (
   // The `n` shortcut and keyboard activation click with detail 0.
   await deck.clickNext();
   assert.equal(deck.shown(), C, 'a keyboard click after a press still advances');
+});
+
+test('a tab left open across a deploy reloads on its next Next', async () => {
+  // Next never reloads the page, so without this an open tab would run the
+  // old deck.js until the reader happened to reload it themselves.
+  const deck = boot({
+    batches: [[deckPost(B), deckPost(C), deckPost(D)]],
+    pageVersion: 'old',
+    serverVersion: 'new',
+  });
+  await deck.flush();
+
+  const prevented = await deck.clickNext();
+  assert.equal(prevented, false, 'the anchor navigates, loading the new code');
+  assert.equal(deck.shown(), A, 'no client-side swap');
+});
+
+test('a tab on the current deploy keeps swapping in place', async () => {
+  const deck = boot({batches: [[deckPost(B), deckPost(C), deckPost(D)]]});
+  await deck.flush();
+
+  const prevented = await deck.clickNext();
+  assert.equal(prevented, true);
+  assert.equal(deck.shown(), B);
 });
